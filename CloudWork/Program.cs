@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace CloudWork
 {
     public class Program
@@ -8,6 +10,11 @@ namespace CloudWork
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            // Add DbContext ∂¡»°≈‰÷√Œƒº˛
+            builder.Services.AddDbContext<Data.AppContext>(options =>
+            {
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             var app = builder.Build();
 
