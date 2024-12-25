@@ -9,7 +9,7 @@ namespace CloudWork.Models
         public int Id { get; set; }
         public string Code { get; set; } = String.Empty;
         public ProgramLanguage Language { get; set; }
-        public DateTime SubmittedAt { get; set; }
+        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
         public int UserId { get; set; }
         public int ProblemId { get; set; }

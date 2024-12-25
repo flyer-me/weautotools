@@ -9,9 +9,10 @@ namespace CloudWork
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<Data.AppContext>(options =>
+            builder.Services.AddDbContext<Data.CloudWorkDbContext>(options =>
             {
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+                //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
             });
 
             var app = builder.Build();

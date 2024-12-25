@@ -6,11 +6,11 @@ using System.Reflection.Emit;
 
 namespace CloudWork.Data
 {
-    public class AppContext : DbContext
+    public class CloudWorkDbContext : DbContext
     {
-        #pragma warning disable CS8618
-        public AppContext(DbContextOptions<AppContext> options) : base(options)
-        #pragma warning restore CS8618 // 考虑添加 "required" 修饰符或声明为可为 null。
+#pragma warning disable CS8618
+        public CloudWorkDbContext(DbContextOptions<CloudWorkDbContext> options) : base(options)
+#pragma warning restore CS8618
         {
         }
 
@@ -40,15 +40,12 @@ namespace CloudWork.Data
             modelBuilder.Entity<Problem>(entity =>
             {
                 entity.Property(p => p.Title).IsUnicode(false);
-                entity.Property(p => p.IsPublic).HasDefaultValue(false);
+                entity.Property(p => p.IsPublic).HasDefaultValue(true);
                 entity.HasIndex(entity => entity.IsPublic);
-                entity.HasQueryFilter(p => p.IsPublic == true); // 全局查询过滤器
             });
 
             modelBuilder.Entity<Submission>(entity =>
             {
-                entity.Property(s => s.SubmittedAt).HasDefaultValue(DateTime.UtcNow);
-
                 entity.HasOne(s => s.User)
                       .WithMany(u => u.Submissions)
                       .HasForeignKey(s => s.UserId)
@@ -71,10 +68,6 @@ namespace CloudWork.Data
                       .HasForeignKey(tc => tc.ProblemId);
             });
 
-            modelBuilder.Entity<SubmissionEvaluation>(entity =>
-            {
-                entity.Property(se => se.EvaluatedAt).HasDefaultValue(DateTime.UtcNow);
-            });
         }
     }
 }
