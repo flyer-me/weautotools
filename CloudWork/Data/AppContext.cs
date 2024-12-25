@@ -8,7 +8,9 @@ namespace CloudWork.Data
 {
     public class AppContext : DbContext
     {
+        #pragma warning disable CS8618
         public AppContext(DbContextOptions<AppContext> options) : base(options)
+        #pragma warning restore CS8618 // 考虑添加 "required" 修饰符或声明为可为 null。
         {
         }
 
@@ -18,41 +20,34 @@ namespace CloudWork.Data
         public DbSet<TestCase> TestCases { get; set; }
         public DbSet<SubmissionEvaluation> SubmissionEvaluations { get; set; }
 
-        private static readonly DateTime DefaultDateTime =  new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.LogTo(System.Console.WriteLine, LogLevel.Information);
+            // optionsBuilder.UseLazyLoadingProxies();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // 配置额外的模型约束和关系
-            // User Configuration
+            // 模型约束和关系
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(u => u.Id);
-                entity.Property(u => u.Username).IsRequired().IsUnicode(false);
-                entity.Property(u => u.PasswordHash).IsRequired();
+                entity.Property(u => u.Username).IsUnicode(false).HasMaxLength(30);
                 entity.HasIndex(u => u.Username).IsUnique();
             });
 
-            // Problem Configuration
             modelBuilder.Entity<Problem>(entity =>
             {
-                entity.HasKey(p => p.Id);
-                entity.Property(p => p.Title).IsRequired().IsUnicode(false);
-                entity.Property(p => p.Description).IsRequired();
+                entity.Property(p => p.Title).IsUnicode(false);
+                entity.Property(p => p.IsPublic).HasDefaultValue(false);
+                entity.HasIndex(entity => entity.IsPublic);
+                entity.HasQueryFilter(p => p.IsPublic == true); // 全局查询过滤器
             });
 
-            // Submission Configuration
             modelBuilder.Entity<Submission>(entity =>
             {
-                entity.HasKey(s => s.Id);
-                entity.Property(s => s.Code).IsRequired();
-                entity.Property(s => s.SubmittedAt).HasDefaultValue(DefaultDateTime);
+                entity.Property(s => s.SubmittedAt).HasDefaultValue(DateTime.UtcNow);
 
                 entity.HasOne(s => s.User)
                       .WithMany(u => u.Submissions)
@@ -69,23 +64,16 @@ namespace CloudWork.Data
                       .HasForeignKey<SubmissionEvaluation>(se => se.SubmissionId);
             });
 
-            // TestCase Configuration
             modelBuilder.Entity<TestCase>(entity =>
             {
-                entity.HasKey(tc => tc.Id);
-                entity.Property(tc => tc.Input).IsRequired();
-                entity.Property(tc => tc.ExpectedOutput).IsRequired();
-
                 entity.HasOne(tc => tc.Problem)
                       .WithMany(p => p.TestCases)
                       .HasForeignKey(tc => tc.ProblemId);
             });
 
-            // SubmissionEvaluation Configuration
             modelBuilder.Entity<SubmissionEvaluation>(entity =>
             {
-                entity.HasKey(se => se.Id);
-                entity.Property(se => se.EvaluatedAt).HasDefaultValue(DefaultDateTime);
+                entity.Property(se => se.EvaluatedAt).HasDefaultValue(DateTime.UtcNow);
             });
         }
     }

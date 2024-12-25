@@ -8,9 +8,7 @@ namespace CloudWork
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
-            // Add DbContext ∂¡»°≈‰÷√Œƒº˛
             builder.Services.AddDbContext<Data.AppContext>(options =>
             {
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -18,7 +16,6 @@ namespace CloudWork
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");

@@ -7,6 +7,6 @@
         public string Input { get; set; } = String.Empty;
         public string ExpectedOutput { get; set; } = String.Empty;
 
-        public virtual Problem Problem { get; set; }
+        public virtual Problem Problem { get; set; } = null!;
     }
 }
