@@ -7,23 +7,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CloudWork.Data;
 using CloudWork.Models;
+using CloudWork.Repository;
 
 namespace CloudWork.Controllers
 {
     public class TestCasesController : Controller
     {
         private readonly CloudWorkDbContext _context;
+        private readonly IGenericRepository<TestCase> _repository;
+        private readonly ITestCaseRepository _testCaseRepository;
 
-        public TestCasesController(CloudWorkDbContext context)
+        public TestCasesController(CloudWorkDbContext context,
+            ITestCaseRepository testCaseRepository, IGenericRepository<TestCase> repository)
         {
             _context = context;
+            _repository = repository;
+            _testCaseRepository = testCaseRepository;
         }
 
-        // GET: TestCases
+        // GET: TestCases 需要导航属性
         public async Task<IActionResult> Index()
         {
-            var cloudWorkDbContext = _context.TestCases.Include(t => t.Question);
-            return View(await cloudWorkDbContext.ToListAsync());
+            return View(await _testCaseRepository.GetAllTestCasesAsync());
         }
 
         // GET: TestCases/Details/5
@@ -34,9 +39,8 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var testCase = await _context.TestCases
-                .Include(t => t.Question)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var testCase = await _testCaseRepository.GetTestCaseByIdAsync(id.Value);
+
             if (testCase == null)
             {
                 return NotFound();
@@ -48,7 +52,7 @@ namespace CloudWork.Controllers
         // GET: TestCases/Create
         public IActionResult Create()
         {
-            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", "Title");
+            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", nameof(Question.Title));
             return View();
         }
 
@@ -61,12 +65,12 @@ namespace CloudWork.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(testCase);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(testCase);
+                await _repository.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", "Title", testCase.QuestionId);
+            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
 
@@ -78,7 +82,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var testCase = await _context.TestCases.FindAsync(id);
+            var testCase = await  _repository.GetByIdAsync(id.Value);
             if (testCase == null)
             {
                 return NotFound();
@@ -103,12 +107,13 @@ namespace CloudWork.Controllers
             {
                 try
                 {
-                    _context.Update(testCase);
-                    await _context.SaveChangesAsync();
+                    _repository.Update(testCase);
+                    await _repository.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TestCaseExists(testCase.Id))
+                    var test = await _repository.GetByIdAsync(id);
+                    if (test == null)
                     {
                         return NotFound();
                     }
@@ -131,9 +136,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var testCase = await _context.TestCases
-                .Include(t => t.Question)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var testCase = await _testCaseRepository.GetTestCaseByIdAsync(id.Value);
             if (testCase == null)
             {
                 return NotFound();
@@ -147,19 +150,15 @@ namespace CloudWork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var testCase = await _context.TestCases.FindAsync(id);
+            var testCase = await _repository.GetByIdAsync(id);
             if (testCase != null)
             {
-                _context.TestCases.Remove(testCase);
+                await _repository.DeleteAsync(id);
+                await _repository.SaveAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TestCaseExists(int id)
-        {
-            return _context.TestCases.Any(e => e.Id == id);
-        }
     }
 }

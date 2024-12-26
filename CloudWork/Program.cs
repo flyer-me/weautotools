@@ -1,3 +1,4 @@
+using CloudWork.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudWork
@@ -11,9 +12,12 @@ namespace CloudWork
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<Data.CloudWorkDbContext>(options =>
             {
-                //options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-                options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+                //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
             });
+
+            builder.Services.AddScoped<ITestCaseRepository, TestCaseRepository>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             var app = builder.Build();
 

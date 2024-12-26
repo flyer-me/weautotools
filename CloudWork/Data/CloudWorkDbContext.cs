@@ -9,10 +9,8 @@ namespace CloudWork.Data
     public class CloudWorkDbContext : DbContext
     {
 #pragma warning disable CS8618
-        public CloudWorkDbContext(DbContextOptions<CloudWorkDbContext> options) : base(options)
+        public CloudWorkDbContext(DbContextOptions<CloudWorkDbContext> options) : base(options) { }
 #pragma warning restore CS8618
-        {
-        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Question> Questions { get; set; }
