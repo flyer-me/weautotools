@@ -15,7 +15,7 @@ namespace CloudWork.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Problem> Problems { get; set; }
+        public DbSet<Question> Questions { get; set; }
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<TestCase> TestCases { get; set; }
         public DbSet<SubmissionEvaluation> SubmissionEvaluations { get; set; }
@@ -33,15 +33,13 @@ namespace CloudWork.Data
             // 模型约束和关系
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(u => u.Username).IsUnicode(false).HasMaxLength(30);
                 entity.HasIndex(u => u.Username).IsUnique();
             });
 
-            modelBuilder.Entity<Problem>(entity =>
+            modelBuilder.Entity<Question>(entity =>
             {
-                entity.Property(p => p.Title).IsUnicode(false);
                 entity.Property(p => p.IsPublic).HasDefaultValue(true);
-                entity.HasIndex(entity => entity.IsPublic);
+                entity.HasIndex(entity => entity.Title).IsUnique();
             });
 
             modelBuilder.Entity<Submission>(entity =>
@@ -51,9 +49,9 @@ namespace CloudWork.Data
                       .HasForeignKey(s => s.UserId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(s => s.Problem)
+                entity.HasOne(s => s.Question)
                       .WithMany(p => p.Submissions)
-                      .HasForeignKey(s => s.ProblemId)
+                      .HasForeignKey(s => s.QuestionId)
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(s => s.Evaluation)
@@ -63,9 +61,9 @@ namespace CloudWork.Data
 
             modelBuilder.Entity<TestCase>(entity =>
             {
-                entity.HasOne(tc => tc.Problem)
+                entity.HasOne(tc => tc.Question)
                       .WithMany(p => p.TestCases)
-                      .HasForeignKey(tc => tc.ProblemId);
+                      .HasForeignKey(tc => tc.QuestionId);
             });
 
         }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CloudWork.Migrations
 {
     [DbContext(typeof(CloudWorkDbContext))]
-    [Migration("20241225153519_Db")]
-    partial class Db
+    [Migration("20241226073158_testCase")]
+    partial class testCase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace CloudWork.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CloudWork.Models.Problem", b =>
+            modelBuilder.Entity("CloudWork.Models.Question", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,14 +44,13 @@ namespace CloudWork.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IsPublic");
+                    b.HasIndex("Title");
 
-                    b.ToTable("Problems");
+                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("CloudWork.Models.Submission", b =>
@@ -69,7 +68,7 @@ namespace CloudWork.Migrations
                     b.Property<int>("Language")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProblemId")
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SubmittedAt")
@@ -80,7 +79,7 @@ namespace CloudWork.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProblemId");
+                    b.HasIndex("QuestionId");
 
                     b.HasIndex("UserId");
 
@@ -132,12 +131,12 @@ namespace CloudWork.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProblemId")
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProblemId");
+                    b.HasIndex("QuestionId");
 
                     b.ToTable("TestCases");
                 });
@@ -160,9 +159,7 @@ namespace CloudWork.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -174,9 +171,9 @@ namespace CloudWork.Migrations
 
             modelBuilder.Entity("CloudWork.Models.Submission", b =>
                 {
-                    b.HasOne("CloudWork.Models.Problem", "Problem")
+                    b.HasOne("CloudWork.Models.Question", "Question")
                         .WithMany("Submissions")
-                        .HasForeignKey("ProblemId")
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -186,7 +183,7 @@ namespace CloudWork.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Problem");
+                    b.Navigation("Question");
 
                     b.Navigation("User");
                 });
@@ -204,16 +201,16 @@ namespace CloudWork.Migrations
 
             modelBuilder.Entity("CloudWork.Models.TestCase", b =>
                 {
-                    b.HasOne("CloudWork.Models.Problem", "Problem")
+                    b.HasOne("CloudWork.Models.Question", "Question")
                         .WithMany("TestCases")
-                        .HasForeignKey("ProblemId")
+                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Problem");
+                    b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("CloudWork.Models.Problem", b =>
+            modelBuilder.Entity("CloudWork.Models.Question", b =>
                 {
                     b.Navigation("Submissions");
 

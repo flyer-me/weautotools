@@ -12,9 +12,9 @@ namespace CloudWork.Models
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
         public int UserId { get; set; }
-        public int ProblemId { get; set; }
+        public int QuestionId { get; set; }
         public virtual User User { get; set; } = null!;
-        public virtual Problem Problem { get; set; } = null!;
+        public virtual Question Question { get; set; } = null!;
         public virtual SubmissionEvaluation? Evaluation { get; set; }
     }
 

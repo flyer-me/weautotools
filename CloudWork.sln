@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116 d17.12
+VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork", "CloudWork\CloudWork.csproj", "{1B8C97B1-EA49-4E9B-838B-E1848367C75B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{9361628C-8F61-4142-864E-7072CE7E7F87}"
+	ProjectSection(SolutionItems) = preProject
+		setup_docker_sqlserver.sh = setup_docker_sqlserver.sh
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

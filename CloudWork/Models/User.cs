@@ -9,7 +9,9 @@ namespace CloudWork.Models
         public int Id { get; set; }
         public string Username { get; set; } = String.Empty;
         public string PasswordHash { get; set; } = String.Empty;
-        public string Email { get; set; } = "Example@mail.com";
+
+        [EmailAddress]
+        public string Email { get; set; } = String.Empty;
         public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 
         public User()
