@@ -1,9 +1,9 @@
-﻿using CloudWork.Models;
+﻿using CloudWork.Model;
 using CloudWork.Repository.Base;
 
 namespace CloudWork.Repository
 {
-    public interface ITestCaseRepository : IGenericRepository<TestCase>
+    public interface ITestCaseRepository : IBaseRepository<TestCase>
     {
         // 以下完成附带导航属性的查询
 

@@ -1,10 +1,10 @@
-﻿namespace CloudWork.Models
+﻿namespace CloudWork.Model
 {
     public class SubmissionEvaluation
     {
         public int Id { get; set; }
         public bool IsPassed { get; set; }
-        public string Message { get; set; } = String.Empty;
+        public string Message { get; set; } = string.Empty;
         public DateTime EvaluatedAt { get; set; } = DateTime.UtcNow;
 
         public int SubmissionId { get; set; }

@@ -1,10 +1,11 @@
-using CloudWork.Repository;
+using CloudWork.Common.DB;
 using CloudWork.Repository.Base;
 using CloudWork.Repository.UnitOfWorks;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using CloudWork.Service;
+using CloudWork.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace CloudWork
+namespace CloudWork.Web
 {
     public class Program
     {
@@ -13,14 +14,17 @@ namespace CloudWork
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<Data.CloudWorkDbContext>(options =>
+            builder.Services.AddDbContext<CloudWorkDbContext>(options =>
             {
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
             });
 
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+            builder.Services.AddScoped(typeof(ITestCaseService), typeof(TestCaseService));
+            builder.Services.AddScoped(typeof(IQuestionService), typeof(QuestionService));
 
             var app = builder.Build();
 

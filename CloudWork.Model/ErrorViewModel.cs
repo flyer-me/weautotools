@@ -1,4 +1,4 @@
-namespace CloudWork.Models
+namespace CloudWork.Model
 {
     public class ErrorViewModel
     {

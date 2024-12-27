@@ -1,10 +1,8 @@
-﻿using CloudWork.Models;
+﻿using CloudWork.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Collections.Generic;
-using System.Reflection.Emit;
+using Microsoft.Extensions.Logging;
 
-namespace CloudWork.Data
+namespace CloudWork.Common.DB
 {
     public class CloudWorkDbContext : DbContext
     {
@@ -20,7 +18,7 @@ namespace CloudWork.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.LogTo(System.Console.WriteLine, LogLevel.Information);
+            optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
             // optionsBuilder.UseLazyLoadingProxies();
         }
 

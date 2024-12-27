@@ -1,31 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CloudWork.Data;
-using CloudWork.Models;
+using CloudWork.Model;
+using CloudWork.Common.DB;
 using CloudWork.Repository.Base;
+using CloudWork.Service;
+using CloudWork.Service.Interface;
 
-namespace CloudWork.Controllers
+namespace CloudWork.Web.Controllers
 {
     public class QuestionsController : Controller
     {
-        private readonly CloudWorkDbContext _context;
-        private readonly IGenericRepository<Question> _genericRepository;
-
-        public QuestionsController(IGenericRepository<Question> genericRepository, CloudWorkDbContext context)
+        private readonly IBaseService<Question> _baseService;
+        public QuestionsController(IBaseService<Question> baseService)
         {
-            _genericRepository = genericRepository;
-            _context = context;
+            _baseService = baseService;
         }
 
         // GET: Questions
         public async Task<IActionResult> Index()
         {
-            var questions = await _genericRepository.GetAllAsync();
+            var questions = await _baseService.GetAllAsync();
             return View(questions);
         }
 
@@ -37,7 +31,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var question = await _genericRepository.GetByIdAsync(id.Value);
+            var question = await _baseService.GetByIdAsync(id.Value);
             if (question == null)
             {
                 return NotFound();
@@ -61,8 +55,7 @@ namespace CloudWork.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _genericRepository.AddAsync(question);
-                await _genericRepository.SaveAsync();
+                await _baseService.AddAsync(question);
                 return RedirectToAction(nameof(Index));
             }
             return View(question);
@@ -76,7 +69,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var question = await _genericRepository.GetByIdAsync(id.Value);
+            var question = await _baseService.GetByIdAsync(id.Value);
             if (question == null)
             {
                 return NotFound();
@@ -100,12 +93,11 @@ namespace CloudWork.Controllers
             {
                 try
                 {
-                    _genericRepository.Update(question);
-                    await _genericRepository.SaveAsync();
+                    await _baseService.UpdateAsync(question);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    var que = await _genericRepository.GetByIdAsync(question.Id);
+                    var que = await _baseService.GetByIdAsync(question.Id);
                     if (que == null)
                     {
                         return NotFound();
@@ -128,7 +120,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var question = await _genericRepository.GetByIdAsync(id.Value);
+            var question = await _baseService.GetByIdAsync(id.Value);
             if (question == null)
             {
                 return NotFound();
@@ -142,11 +134,10 @@ namespace CloudWork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var question = await _genericRepository.GetByIdAsync(id);
+            var question = await _baseService.GetByIdAsync(id);
             if (question != null)
             {
-                await _genericRepository.DeleteAsync(id);
-                await _genericRepository.SaveAsync();
+                await _baseService.DeleteAsync(id);
             }
 
             return RedirectToAction(nameof(Index));

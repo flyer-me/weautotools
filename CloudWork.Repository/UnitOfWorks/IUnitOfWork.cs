@@ -4,8 +4,8 @@ namespace CloudWork.Repository.UnitOfWorks
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<T> Repository<T>() where T : class;
-        TestCaseRepository TestCases { get; }
+        IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class;
+        //TestCaseRepository TestCases { get; }
 
         void BeginTransaction();
         void CommitTransaction();

@@ -5,24 +5,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CloudWork.Data;
-using CloudWork.Models;
+using CloudWork.Common.DB;
+using CloudWork.Model;
+using CloudWork.Service.Interface;
 
-namespace CloudWork.Controllers
+namespace CloudWork.Web.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly CloudWorkDbContext _context;
+        private readonly IBaseService<User> _userService;
 
-        public UsersController(CloudWorkDbContext context)
+        public UsersController(IBaseService<User> baseService)
         {
-            _context = context;
+            _userService = baseService;
         }
 
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            return View(await _userService.GetAllAsync());
         }
 
         // GET: Users/Details/5
@@ -33,8 +34,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _userService.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -58,8 +58,7 @@ namespace CloudWork.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
+                await _userService.AddAsync(user);
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
@@ -73,7 +72,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -97,8 +96,7 @@ namespace CloudWork.Controllers
             {
                 try
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    await _userService.UpdateAsync(user);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,8 +122,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _userService.GetByIdAsync(id.Value);
             if (user == null)
             {
                 return NotFound();
@@ -139,19 +136,18 @@ namespace CloudWork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.GetByIdAsync(id);
             if (user != null)
             {
-                _context.Users.Remove(user);
+                await _userService.DeleteAsync(id);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _userService.GetByIdAsync(id).Result != null;
         }
     }
 }

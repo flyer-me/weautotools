@@ -1,7 +1,5 @@
-﻿using CloudWork.Data;
-using CloudWork.Models;
+﻿using CloudWork.Common.DB;
 using CloudWork.Repository.Base;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CloudWork.Repository.UnitOfWorks
@@ -12,17 +10,16 @@ namespace CloudWork.Repository.UnitOfWorks
         private bool _disposed;
         private IDbContextTransaction? _transaction;
 
-        public TestCaseRepository TestCases { get; private set; }
+        // public TestCaseRepository TestCases { get; private set; }
 
         public UnitOfWork(CloudWorkDbContext context)
         {
             _context = context;
-            TestCases = new TestCaseRepository(_context);
         }
 
-        public IGenericRepository<T> Repository<T>() where T : class // 不需要包含导航属性的
+        public IBaseRepository<T> Repository<T>() where T : class // 不需要包含导航属性的
         {
-            return new GenericRepository<T>(_context);
+            return new BaseRepository<T>(_context);
         }
 
         public void BeginTransaction()

@@ -1,13 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace CloudWork.Models
+namespace CloudWork.Model
 {
     public class Submission
     {
         [Key]
         public int Id { get; set; }
-        public string Code { get; set; } = String.Empty;
+        public string Code { get; set; } = string.Empty;
         public ProgramLanguage Language { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
