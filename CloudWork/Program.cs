@@ -1,4 +1,7 @@
 using CloudWork.Repository;
+using CloudWork.Repository.Base;
+using CloudWork.Repository.UnitOfWorks;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudWork
@@ -16,8 +19,8 @@ namespace CloudWork
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
             });
 
-            builder.Services.AddScoped<ITestCaseRepository, TestCaseRepository>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 
@@ -25,6 +28,7 @@ namespace CloudWork
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseStaticFiles();
 
             app.UseRouting();

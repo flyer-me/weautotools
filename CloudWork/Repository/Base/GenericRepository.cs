@@ -2,7 +2,7 @@
 using CloudWork.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CloudWork.Repository
+namespace CloudWork.Repository.Base
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
@@ -35,7 +35,7 @@ namespace CloudWork.Repository
             _dbSet.Update(entity);
         }
 
-        public async Task DeleteAsync(Object id)
+        public async Task DeleteAsync(object id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity != null)

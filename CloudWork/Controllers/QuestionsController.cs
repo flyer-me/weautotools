@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CloudWork.Data;
 using CloudWork.Models;
-using CloudWork.Repository;
+using CloudWork.Repository.Base;
 
 namespace CloudWork.Controllers
 {

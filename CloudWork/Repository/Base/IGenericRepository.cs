@@ -1,6 +1,6 @@
 ﻿using CloudWork.Models;
 
-namespace CloudWork.Repository
+namespace CloudWork.Repository.Base
 {
     public interface IGenericRepository<T> where T : class
     {

@@ -8,27 +8,24 @@ using Microsoft.EntityFrameworkCore;
 using CloudWork.Data;
 using CloudWork.Models;
 using CloudWork.Repository;
+using CloudWork.Repository.Base;
+using CloudWork.Repository.UnitOfWorks;
 
 namespace CloudWork.Controllers
 {
     public class TestCasesController : Controller
     {
-        private readonly CloudWorkDbContext _context;
-        private readonly IGenericRepository<TestCase> _repository;
-        private readonly ITestCaseRepository _testCaseRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public TestCasesController(CloudWorkDbContext context,
-            ITestCaseRepository testCaseRepository, IGenericRepository<TestCase> repository)
+        public TestCasesController(IUnitOfWork unitOfWork)
         {
-            _context = context;
-            _repository = repository;
-            _testCaseRepository = testCaseRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        // GET: TestCases 需要导航属性
+        // GET: TestCases 默认需要导航属性
         public async Task<IActionResult> Index()
         {
-            return View(await _testCaseRepository.GetAllTestCasesAsync());
+            return View(await _unitOfWork.TestCases.GetAllTestCasesAsync());
         }
 
         // GET: TestCases/Details/5
@@ -39,7 +36,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var testCase = await _testCaseRepository.GetTestCaseByIdAsync(id.Value);
+            var testCase = await _unitOfWork.TestCases.GetTestCaseByIdAsync(id.Value);
 
             if (testCase == null)
             {
@@ -50,9 +47,10 @@ namespace CloudWork.Controllers
         }
 
         // GET: TestCases/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", nameof(Question.Title));
+            var questions = await _unitOfWork.Repository<Question>().GetAllAsync();
+            ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title));
             return View();
         }
 
@@ -65,12 +63,20 @@ namespace CloudWork.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _repository.AddAsync(testCase);
-                await _repository.SaveAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _unitOfWork.TestCases.AddAsync(testCase);
+                    await _unitOfWork.SaveAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    // _unitOfWork.RollbackTransaction();
+                    throw;
+                }
             }
-
-            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", nameof(Question.Title), testCase.QuestionId);
+            var questions = await _unitOfWork.Repository<Question>().GetAllAsync();
+            ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
 
@@ -82,12 +88,13 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var testCase = await  _repository.GetByIdAsync(id.Value);
+            var testCase = await _unitOfWork.TestCases.GetByIdAsync(id.Value);
             if (testCase == null)
             {
                 return NotFound();
             }
-            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", nameof(Question.Title), testCase.QuestionId);
+            var questions = await _unitOfWork.Repository<Question>().GetAllAsync();
+            ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
 
@@ -107,12 +114,13 @@ namespace CloudWork.Controllers
             {
                 try
                 {
-                    _repository.Update(testCase);
-                    await _repository.SaveAsync();
+                    _unitOfWork.TestCases.Update(testCase);
+                    await _unitOfWork.SaveAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    var test = await _repository.GetByIdAsync(id);
+                    var test = await _unitOfWork.TestCases.GetByIdAsync(id);
                     if (test == null)
                     {
                         return NotFound();
@@ -122,9 +130,9 @@ namespace CloudWork.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["QuestionId"] = new SelectList(_context.Questions, "Id", nameof(Question.Title), testCase.QuestionId);
+            var questions = await _unitOfWork.Repository<Question>().GetAllAsync();
+            ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
 
@@ -136,7 +144,7 @@ namespace CloudWork.Controllers
                 return NotFound();
             }
 
-            var testCase = await _testCaseRepository.GetTestCaseByIdAsync(id.Value);
+            var testCase = await _unitOfWork.TestCases.GetTestCaseByIdAsync(id.Value);
             if (testCase == null)
             {
                 return NotFound();
@@ -150,15 +158,21 @@ namespace CloudWork.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var testCase = await _repository.GetByIdAsync(id);
+            var testCase = await _unitOfWork.TestCases.GetByIdAsync(id);
             if (testCase != null)
             {
-                await _repository.DeleteAsync(id);
-                await _repository.SaveAsync();
+                try
+                {
+                    await _unitOfWork.TestCases.DeleteAsync(id);
+                    await _unitOfWork.SaveAsync();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
             }
-
             return RedirectToAction(nameof(Index));
-        }
 
+        }
     }
 }

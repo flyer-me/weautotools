@@ -1,5 +1,6 @@
 ﻿using CloudWork.Data;
 using CloudWork.Models;
+using CloudWork.Repository.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudWork.Repository
