@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CloudWork.Repository.UnitOfWorks;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
 using CloudWork.Repository.Base;

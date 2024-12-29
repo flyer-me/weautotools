@@ -1,6 +1,6 @@
 using CloudWork.Common.DB;
+using CloudWork.Common.Extensions;
 using CloudWork.Repository.Base;
-using CloudWork.Repository.UnitOfWorks;
 using CloudWork.Service;
 using CloudWork.Service.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -20,11 +20,11 @@ namespace CloudWork.Web
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
             });
 
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Logging.AddConsole();
+
+            builder.Services.RegisterByServiceAttribute();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
-            builder.Services.AddScoped(typeof(ITestCaseService), typeof(TestCaseService));
-            builder.Services.AddScoped(typeof(IQuestionService), typeof(QuestionService));
 
             var app = builder.Build();
 

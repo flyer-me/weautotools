@@ -1,8 +1,9 @@
 ﻿using CloudWork.Service.Interface;
-using CloudWork.Repository;
 using CloudWork.Repository.Base;
+using CloudWork.Common;
 namespace CloudWork.Service
 {
+    [Service]
     public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : class
     {
 

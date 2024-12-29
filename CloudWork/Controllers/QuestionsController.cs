@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
-using CloudWork.Common.DB;
-using CloudWork.Repository.Base;
-using CloudWork.Service;
 using CloudWork.Service.Interface;
 
 namespace CloudWork.Web.Controllers
