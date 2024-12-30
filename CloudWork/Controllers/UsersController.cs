@@ -7,9 +7,9 @@ namespace CloudWork.Web.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly IBaseService<User> _userService;
+        private readonly IGenericService<User> _userService;
 
-        public UsersController(IBaseService<User> baseService)
+        public UsersController(IGenericService<User> baseService)
         {
             _userService = baseService;
         }
@@ -53,6 +53,7 @@ namespace CloudWork.Web.Controllers
             if (ModelState.IsValid)
             {
                 await _userService.AddAsync(user);
+                await _userService.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(user);
@@ -90,7 +91,8 @@ namespace CloudWork.Web.Controllers
             {
                 try
                 {
-                    await _userService.UpdateAsync(user);
+                    _userService.Update(user);
+                    await _userService.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -134,6 +136,7 @@ namespace CloudWork.Web.Controllers
             if (user != null)
             {
                 await _userService.DeleteAsync(id);
+                await _userService.SaveAsync();
             }
 
             return RedirectToAction(nameof(Index));

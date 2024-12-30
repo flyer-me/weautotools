@@ -9,19 +9,17 @@ namespace CloudWork.Web.Controllers
 {
     public class TestCasesController : Controller
     {
-        private readonly ITestCaseService _testCaseService;
-        private readonly IBaseRepository<Question> _questionRepository;
+        private readonly ITestCaseService _service;
 
-        public TestCasesController(ITestCaseService testCaseService, IBaseRepository<Question> questionRepository)
+        public TestCasesController(ITestCaseService testCaseService)
         {
-            _testCaseService = testCaseService;
-            _questionRepository = questionRepository;
+            _service = testCaseService;
         }
 
         // GET: TestCases 默认需要导航属性
         public async Task<IActionResult> Index()
         {
-            return View(await _testCaseService.GetTestCasesWithQuestionAsync());
+            return View(await _service.GetTestCasesWithQuestionAsync());
         }
 
         // GET: TestCases/Details/5
@@ -32,7 +30,7 @@ namespace CloudWork.Web.Controllers
                 return NotFound();
             }
 
-            var testCase = await _testCaseService.GetTestCaseWithQuestionAsync(id.Value);
+            var testCase = await _service.GetTestCaseWithQuestionAsync(id.Value);
 
             if (testCase == null)
             {
@@ -45,7 +43,7 @@ namespace CloudWork.Web.Controllers
         // GET: TestCases/Create
         public async Task<IActionResult> Create()
         {
-            var questions = await _questionRepository.GetAllAsync();
+            IEnumerable<Question> questions = await _service.GetQuestionsAsync();
             ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title));
             return View();
         }
@@ -61,7 +59,8 @@ namespace CloudWork.Web.Controllers
             {
                 try
                 {
-                    await _testCaseService.AddAsync(testCase);
+                    await _service.AddAsync(testCase);
+                    await _service.SaveAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception)
@@ -70,7 +69,7 @@ namespace CloudWork.Web.Controllers
                     throw;
                 }
             }
-            var questions = await _questionRepository.GetAllAsync();
+            IEnumerable<Question> questions = await _service.GetQuestionsAsync();
             ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
@@ -83,12 +82,12 @@ namespace CloudWork.Web.Controllers
                 return NotFound();
             }
 
-            var testCase = await _testCaseService.GetTestCaseWithQuestionAsync(id.Value);
+            var testCase = await _service.GetTestCaseWithQuestionAsync(id.Value);
             if (testCase == null)
             {
                 return NotFound();
             }
-            var questions = await _questionRepository.GetAllAsync();
+            IEnumerable<Question> questions = await _service.GetQuestionsAsync();
             ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
@@ -109,12 +108,13 @@ namespace CloudWork.Web.Controllers
             {
                 try
                 {
-                    await _testCaseService.UpdateAsync(testCase);
+                    _service.Update(testCase);
+                    await _service.SaveAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    var test = await _testCaseService.GetByIdAsync(id);
+                    var test = await _service.GetByIdAsync(id);
                     if (test == null)
                     {
                         return NotFound();
@@ -125,7 +125,7 @@ namespace CloudWork.Web.Controllers
                     }
                 }
             }
-            var questions = await _questionRepository.GetAllAsync();
+            IEnumerable<Question> questions = await _service.GetQuestionsAsync();
             ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
             return View(testCase);
         }
@@ -138,7 +138,7 @@ namespace CloudWork.Web.Controllers
                 return NotFound();
             }
 
-            var testCase = await _testCaseService.GetTestCaseWithQuestionAsync(id.Value);
+            var testCase = await _service.GetTestCaseWithQuestionAsync(id.Value);
             if (testCase == null)
             {
                 return NotFound();
@@ -152,12 +152,13 @@ namespace CloudWork.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var testCase = await _testCaseService.GetTestCaseWithQuestionAsync(id);
+            var testCase = await _service.GetTestCaseWithQuestionAsync(id);
             if (testCase != null)
             {
                 try
                 {
-                    await _testCaseService.DeleteAsync(id);
+                    await _service.DeleteAsync(id);
+                    await _service.SaveAsync();
                 }
                 catch (Exception)
                 {

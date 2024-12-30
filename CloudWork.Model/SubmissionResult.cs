@@ -1,6 +1,6 @@
 ﻿namespace CloudWork.Model
 {
-    public class SubmissionEvaluation
+    public class SubmissionResult
     {
         public int Id { get; set; }
         public bool IsPassed { get; set; }

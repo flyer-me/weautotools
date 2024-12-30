@@ -14,7 +14,7 @@ namespace CloudWork.Common.DB
         public DbSet<Question> Questions { get; set; }
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<TestCase> TestCases { get; set; }
-        public DbSet<SubmissionEvaluation> SubmissionEvaluations { get; set; }
+        public DbSet<SubmissionResult> SubmissionEvaluations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,13 +29,19 @@ namespace CloudWork.Common.DB
             // 模型约束和关系
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasIndex(u => u.Username).IsUnique();
+                entity.HasIndex(u => u.Username);
+                entity.HasIndex(u => u.PhoneNumber);
+                entity.Property(u => u.IsDeleted).HasDefaultValue(false);
             });
 
             modelBuilder.Entity<Question>(entity =>
             {
                 entity.Property(p => p.IsPublic).HasDefaultValue(true);
-                entity.HasIndex(entity => entity.Title).IsUnique();
+                entity.HasIndex(entity => entity.Title);
+                entity.HasMany(q => q.TestCases)
+                      .WithOne(tc => tc.Question)
+                      .HasForeignKey(tc => tc.QuestionId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Submission>(entity =>
@@ -52,7 +58,8 @@ namespace CloudWork.Common.DB
 
                 entity.HasOne(s => s.Evaluation)
                       .WithOne(se => se.Submission)
-                      .HasForeignKey<SubmissionEvaluation>(se => se.SubmissionId);
+                      .HasForeignKey<SubmissionResult>(se => se.SubmissionId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<TestCase>(entity =>

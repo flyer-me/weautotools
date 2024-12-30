@@ -4,7 +4,6 @@ namespace CloudWork.Model
 {
     public class Submission
     {
-        [Key]
         public int Id { get; set; }
         public string Code { get; set; } = string.Empty;
         public ProgramLanguage Language { get; set; }
@@ -14,7 +13,7 @@ namespace CloudWork.Model
         public int QuestionId { get; set; }
         public virtual User User { get; set; } = null!;
         public virtual Question Question { get; set; } = null!;
-        public virtual SubmissionEvaluation? Evaluation { get; set; }
+        public virtual SubmissionResult? Evaluation { get; set; }
     }
 
     public enum ProgramLanguage

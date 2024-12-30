@@ -1,18 +1,18 @@
 ﻿using CloudWork.Service.Interface;
 using CloudWork.Repository.Base;
 using CloudWork.Common;
+using CloudWork.Repository.UnitOfWork;
 namespace CloudWork.Service
 {
     [Service]
-    public class BaseService<TEntity> : IBaseService<TEntity> where TEntity : class
+    public class GenericService<TEntity> : IGenericService<TEntity> where TEntity : class
     {
+        public IBaseRepository<TEntity> Repository { get; }
 
-        public BaseService(IBaseRepository<TEntity> repository)
+        public GenericService(IBaseRepository<TEntity> repository)
         {
             Repository = repository;
         }
-
-        public IBaseRepository<TEntity> Repository { get; set; }
 
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
@@ -24,30 +24,32 @@ namespace CloudWork.Service
             return await Repository.GetByIdAsync(id);
         }
         /// <summary>
-        /// Add entity to database
+        /// 增加实体
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>Task</returns>
-        public async Task<int> AddAsync(TEntity entity)
+        public async Task AddAsync(TEntity entity)
         {
             await Repository.AddAsync(entity);
-            return await Repository.SaveAsync();
         }
 
         /// <summary>
-        /// 更新实体到数据库
+        /// 更新实体
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>Task 影响行数</returns>
-        public async Task<int> UpdateAsync(TEntity entity)
+        public void Update(TEntity entity)
         {
             Repository.Update(entity);
-            return await Repository.SaveAsync();
         }
 
-        public async Task<int> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             await Repository.DeleteAsync(id);
+        }
+
+        public virtual async Task<int> SaveAsync()
+        {
             return await Repository.SaveAsync();
         }
     }

@@ -1,6 +1,7 @@
 using CloudWork.Common.DB;
 using CloudWork.Common.Extensions;
 using CloudWork.Repository.Base;
+using CloudWork.Repository.UnitOfWork;
 using CloudWork.Service;
 using CloudWork.Service.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -16,15 +17,17 @@ namespace CloudWork.Web
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<CloudWorkDbContext>(options =>
             {
-                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"),
+                    b => b.MigrationsAssembly("CloudWork"));
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"));
             });
 
             builder.Logging.AddConsole();
 
             builder.Services.RegisterByServiceAttribute();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            builder.Services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+            builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
             var app = builder.Build();
 

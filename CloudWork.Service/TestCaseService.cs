@@ -1,29 +1,68 @@
 ﻿using CloudWork.Common;
 using CloudWork.Model;
 using CloudWork.Repository.Base;
+using CloudWork.Repository.UnitOfWork;
 using CloudWork.Service.Interface;
 
 namespace CloudWork.Service
 {
     [Service]
-    public class TestCaseService : BaseService<TestCase>, ITestCaseService
+    public class TestCaseService : ITestCaseService
     {
-        private readonly IBaseRepository<TestCase> _repository;
-        public TestCaseService(IBaseRepository<TestCase> repository) : base(repository)
+        private readonly IUnitOfWork _unitOfWork;
+        public TestCaseService(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<TestCase>> GetTestCasesWithQuestionAsync()
         {
-            return await _repository.Get(t => t, w => true, null, nameof(Question));
+            return await _unitOfWork.TestCases.GetAllTestCasesAsync();
+                //.GetAsync(t => t, w => true, null, nameof(Question));
         }
 
         public async Task<TestCase?> GetTestCaseWithQuestionAsync(int id)
         {
-            var result =  await _repository.Get(t => t, w => w.Id == id, null, nameof(Question));
-            
-            return result.FirstOrDefault();
+            return await _unitOfWork.TestCases.GetByIdAsync(id);
+        }
+        public async Task<Question?> GetQuestionAsync(int id)
+        {
+            return await _unitOfWork.Questions.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<Question>> GetQuestionsAsync()
+        {
+            return await _unitOfWork.Questions.GetAllAsync();
+        }
+
+        public async Task<TestCase?> GetByIdAsync(int id)
+        {
+            return await _unitOfWork.TestCases.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<TestCase>> GetAllAsync()
+        {
+            return await _unitOfWork.TestCases.GetAllAsync();
+        }
+
+        public async Task AddAsync(TestCase entity)
+        {
+            await _unitOfWork.TestCases.AddAsync(entity);
+        }
+
+        public void Update(TestCase entity)
+        {
+            _unitOfWork.TestCases.Update(entity);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            await _unitOfWork.TestCases.DeleteAsync(id);
+        }
+
+        public async Task<int> SaveAsync()
+        {
+            return await _unitOfWork.SaveAsync();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 namespace CloudWork.Service.Interface
 {
-    public interface IBaseService<TEntity> where TEntity : class
+    public interface IGenericService<TEntity> where TEntity : class
     {
         /// <summary>
         /// id 获取实体
@@ -16,22 +16,27 @@ namespace CloudWork.Service.Interface
         /// <returns>实体枚举</returns>
         Task<IEnumerable<TEntity>> GetAllAsync();
         /// <summary>
-        /// 添加实体到数据库
+        /// 添加实体
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>Task 影响行数</returns>
-        Task<int> AddAsync(TEntity entity);
+        Task AddAsync(TEntity entity);
         /// <summary>
-        /// 更新实体到数据库
+        /// 更新实体
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>Task 影响行数</returns>
-        Task<int> UpdateAsync(TEntity entity);
+        void Update(TEntity entity);
         /// <summary>
-        /// 删除实体到数据库
+        /// 删除实体
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Task 影响行数</returns>
-        Task<int> DeleteAsync(int id);
+        Task DeleteAsync(int id);
+        /// <summary>
+        /// 保存到数据库
+        /// </summary>
+        /// <returns></returns>
+        Task<int> SaveAsync();
     }
 }

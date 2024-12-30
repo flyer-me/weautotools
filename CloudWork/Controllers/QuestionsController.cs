@@ -7,16 +7,16 @@ namespace CloudWork.Web.Controllers
 {
     public class QuestionsController : Controller
     {
-        private readonly IBaseService<Question> _baseService;
-        public QuestionsController(IBaseService<Question> baseService)
+        private readonly IGenericService<Question> _service;
+        public QuestionsController(IGenericService<Question> baseService)
         {
-            _baseService = baseService;
+            _service = baseService;
         }
 
         // GET: Questions
         public async Task<IActionResult> Index()
         {
-            var questions = await _baseService.GetAllAsync();
+            IEnumerable<Question> questions = await _service.GetAllAsync();
             return View(questions);
         }
 
@@ -28,7 +28,7 @@ namespace CloudWork.Web.Controllers
                 return NotFound();
             }
 
-            var question = await _baseService.GetByIdAsync(id.Value);
+            var question = await _service.GetByIdAsync(id.Value);
             if (question == null)
             {
                 return NotFound();
@@ -52,7 +52,8 @@ namespace CloudWork.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _baseService.AddAsync(question);
+                await _service.AddAsync(question);
+                await _service.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(question);
@@ -66,7 +67,7 @@ namespace CloudWork.Web.Controllers
                 return NotFound();
             }
 
-            var question = await _baseService.GetByIdAsync(id.Value);
+            var question = await _service.GetByIdAsync(id.Value);
             if (question == null)
             {
                 return NotFound();
@@ -90,11 +91,12 @@ namespace CloudWork.Web.Controllers
             {
                 try
                 {
-                    await _baseService.UpdateAsync(question);
+                    _service.Update(question);
+                    await _service.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    var que = await _baseService.GetByIdAsync(question.Id);
+                    var que = await _service.GetByIdAsync(question.Id);
                     if (que == null)
                     {
                         return NotFound();
@@ -117,7 +119,7 @@ namespace CloudWork.Web.Controllers
                 return NotFound();
             }
 
-            var question = await _baseService.GetByIdAsync(id.Value);
+            var question = await _service.GetByIdAsync(id.Value);
             if (question == null)
             {
                 return NotFound();
@@ -131,10 +133,11 @@ namespace CloudWork.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var question = await _baseService.GetByIdAsync(id);
+            var question = await _service.GetByIdAsync(id);
             if (question != null)
             {
-                await _baseService.DeleteAsync(id);
+                await _service.DeleteAsync(id);
+                await _service.SaveAsync();
             }
 
             return RedirectToAction(nameof(Index));

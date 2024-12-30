@@ -33,18 +33,7 @@ namespace CloudWork.Common.Extensions
                     services.Add(new ServiceDescriptor(i, type, lifeTime));
 
                     Console.WriteLine($"注册 {lifeTime}: {i.Name} => {type.Name}");
-
-                    /*switch (lifeTime)
-                    {
-                        case ServiceLifetime.Singleton:
-                            services.AddSingleton(i, type); break;
-                        case ServiceLifetime.Transient:
-                            services.AddTransient(i, type); break;
-                        case ServiceLifetime.Scoped:
-                            services.AddScoped(i, type);    break;
-                        default:
-                            services.AddScoped(i, type);    break;
-                    }*/
+                    break;
                 }
             }
 

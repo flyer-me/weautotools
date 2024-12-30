@@ -19,7 +19,7 @@ namespace CloudWork.Repository.Base
             return await DbSet.ToListAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(object id)
+        public async Task<TEntity?> GetByIdAsync(int id)
         {
             return await DbSet.FindAsync(id);
         }
@@ -34,7 +34,7 @@ namespace CloudWork.Repository.Base
             await DbSet.AddRangeAsync(entities);
         }
 
-        public async Task DeleteAsync(object id)
+        public async Task DeleteAsync(int id)
         {
             var entity = await DbSet.FindAsync(id);
             if (entity != null)
@@ -63,7 +63,7 @@ namespace CloudWork.Repository.Base
             return await DbContext.SaveChangesAsync();
         }
 
-        public virtual async Task<IEnumerable<TResult>> Get<TResult>(
+        public virtual async Task<IEnumerable<TResult>> GetAsync<TResult>(
             Expression<Func<TEntity, TResult>> expression,
             Expression<Func<TEntity, bool>> whereExpression,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy,
