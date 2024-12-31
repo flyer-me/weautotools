@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CloudWork.Model
+﻿namespace CloudWork.Model
 {
     public class Submission
     {

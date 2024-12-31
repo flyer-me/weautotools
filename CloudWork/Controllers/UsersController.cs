@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
 
-namespace CloudWork.Web.Controllers
+namespace CloudWork.Controllers
 {
     public class UsersController : Controller
     {
@@ -48,7 +48,7 @@ namespace CloudWork.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,PasswordHash,Email")] User user)
+        public async Task<IActionResult> Create([Bind("UserName,PasswordHash,Email")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -80,7 +80,7 @@ namespace CloudWork.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,PasswordHash,Email")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("UserName,PasswordHash,Email")] User user)
         {
             if (id != user.Id)
             {

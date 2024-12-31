@@ -6,7 +6,7 @@ using CloudWork.Service;
 using CloudWork.Service.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace CloudWork.Web
+namespace CloudWork
 {
     public class Program
     {

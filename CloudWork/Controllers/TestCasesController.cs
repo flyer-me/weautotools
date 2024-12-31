@@ -5,7 +5,7 @@ using CloudWork.Model;
 using CloudWork.Service.Interface;
 using CloudWork.Repository.Base;
 
-namespace CloudWork.Web.Controllers
+namespace CloudWork.Controllers
 {
     public class TestCasesController : Controller
     {

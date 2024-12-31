@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
 
-namespace CloudWork.Web.Controllers
+namespace CloudWork.Controllers
 {
     public class QuestionsController : Controller
     {

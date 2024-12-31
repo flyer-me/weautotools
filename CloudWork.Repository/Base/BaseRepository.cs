@@ -92,5 +92,10 @@ namespace CloudWork.Repository.Base
 
             return await query.Select(expression).ToListAsync();
         }
+
+        public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await DbContext.Set<TEntity>().AnyAsync(predicate);
+        }
     }
 }

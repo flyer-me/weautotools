@@ -29,7 +29,7 @@ namespace CloudWork.Common.DB
             // 模型约束和关系
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasIndex(u => u.Username);
+                entity.HasIndex(u => u.UserName);
                 entity.HasIndex(u => u.PhoneNumber);
                 entity.Property(u => u.IsDeleted).HasDefaultValue(false);
             });

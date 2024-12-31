@@ -9,7 +9,7 @@ namespace CloudWork.Repository.UnitOfWork
     [Service]
     public class UnitOfWork : IUnitOfWork
     {
-        public CloudWorkDbContext _context;
+        private readonly CloudWorkDbContext _context;
         private IDbContextTransaction? _transaction;
 
         private TestCaseRepository? _testCases;

@@ -69,5 +69,11 @@ namespace CloudWork.Repository.Base
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderByFunc,
             string includeProperties
             );
+        /// <summary>
+        /// 查询是否存在符合条件的实体
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

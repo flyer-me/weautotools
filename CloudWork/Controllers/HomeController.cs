@@ -2,7 +2,7 @@ using System.Diagnostics;
 using CloudWork.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CloudWork.Web.Controllers
+namespace CloudWork.Controllers
 {
     public class HomeController : Controller
     {
