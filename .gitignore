@@ -5,6 +5,7 @@
 # Custom define
 *.db-shm
 *.db-wal
+/CloudWork/dev.db
 # User-specific files
 *.rsuser
 *.suo
