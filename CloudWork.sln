@@ -3,25 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork", "CloudWork\CloudWork.csproj", "{1B8C97B1-EA49-4E9B-838B-E1848367C75B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork", "MVC\CloudWork\CloudWork.csproj", "{1B8C97B1-EA49-4E9B-838B-E1848367C75B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{504FA00B-A167-4298-ADD6-1F2840ABBF1E}"
 	ProjectSection(SolutionItems) = preProject
-		setup_docker_sqlserver.sh = setup_docker_sqlserver.sh
+		setup\setup_docker_sqlserver.sh = setup\setup_docker_sqlserver.sh
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Model", "CloudWork.Model\CloudWork.Model.csproj", "{70C2E18E-A2B1-4902-BF08-E13AD796AAFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Model", "MVC\CloudWork.Model\CloudWork.Model.csproj", "{70C2E18E-A2B1-4902-BF08-E13AD796AAFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Repository", "CloudWork.Repository\CloudWork.Repository.csproj", "{059123B3-6348-4406-B2C6-0E30BFC3ABF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Repository", "MVC\CloudWork.Repository\CloudWork.Repository.csproj", "{059123B3-6348-4406-B2C6-0E30BFC3ABF5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{70C2E18E-A2B1-4902-BF08-E13AD796AAFE} = {70C2E18E-A2B1-4902-BF08-E13AD796AAFE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Service", "CloudWork.Service\CloudWork.Service.csproj", "{B6DE4D51-4010-4C2A-ABF5-E7283602B78B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Service", "MVC\CloudWork.Service\CloudWork.Service.csproj", "{B6DE4D51-4010-4C2A-ABF5-E7283602B78B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Test", "CloudWork.Test\CloudWork.Test.csproj", "{DAC42905-15D5-44BB-B792-1179E9E97FCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Test", "MVC\CloudWork.Test\CloudWork.Test.csproj", "{DAC42905-15D5-44BB-B792-1179E9E97FCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Common", "CloudWork.Common\CloudWork.Common.csproj", "{5F2138D5-03CF-4BD6-BECF-88C02FFF3803}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Common", "MVC\CloudWork.Common\CloudWork.Common.csproj", "{5F2138D5-03CF-4BD6-BECF-88C02FFF3803}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{0B9E3E61-FD08-455C-9C61-38F36EFAE271}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,5 +58,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B8C97B1-EA49-4E9B-838B-E1848367C75B} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
+		{70C2E18E-A2B1-4902-BF08-E13AD796AAFE} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
+		{059123B3-6348-4406-B2C6-0E30BFC3ABF5} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
+		{B6DE4D51-4010-4C2A-ABF5-E7283602B78B} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
+		{DAC42905-15D5-44BB-B792-1179E9E97FCE} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
+		{5F2138D5-03CF-4BD6-BECF-88C02FFF3803} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
 	EndGlobalSection
 EndGlobal
