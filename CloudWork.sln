@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Common", "MVC\Clo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{0B9E3E61-FD08-455C-9C61-38F36EFAE271}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Core", "API\App.Core\App.Core.csproj", "{61BA9B80-131E-4D60-B24E-F02E10541752}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{5F2138D5-03CF-4BD6-BECF-88C02FFF3803}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F2138D5-03CF-4BD6-BECF-88C02FFF3803}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F2138D5-03CF-4BD6-BECF-88C02FFF3803}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61BA9B80-131E-4D60-B24E-F02E10541752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61BA9B80-131E-4D60-B24E-F02E10541752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61BA9B80-131E-4D60-B24E-F02E10541752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61BA9B80-131E-4D60-B24E-F02E10541752}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
