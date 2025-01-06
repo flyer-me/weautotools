@@ -50,7 +50,7 @@ namespace CloudWork.Service
 
             for (int i = 0, max = 0; i < count && max < MAX_RANDOM; )
             {
-                var suggestion = userNameBase + new Random().Next(1000, 10000);
+                var suggestion = userNameBase + new Random().Next(100, 1000);
                 if (await _unitOfWork.Users.AnyAsync(u => u.UserName == suggestion))
                 {
                     continue;
