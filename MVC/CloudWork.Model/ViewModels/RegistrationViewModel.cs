@@ -9,7 +9,7 @@ namespace CloudWork.Model.ViewModels
         [StringLength(20, MinimumLength = 3, ErrorMessage = "用户名长度必须在3到20个字符之间")]
         [RegularExpression(@"^[\u4e00-\u9fa5a-zA-Z0-9_-]*$",
             ErrorMessage = "用户名只能包含中英文字符、数字、下划线(_)或连字符(-)")]
-        [Remote(action: "IsUserNameAvailable", controller: "Registration", ErrorMessage = "用户名已被占用")]
+        [Remote(action: "IsUserNameAvailable", controller: "RemoteValidation", ErrorMessage = "用户名已被占用")]
         public string UserName { get; set; } = string.Empty;
         [Required]
         [DataType(DataType.Password)]
