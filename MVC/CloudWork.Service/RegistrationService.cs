@@ -15,7 +15,7 @@ namespace CloudWork.Service
 {
     public interface IRegistrationService
     {
-        Task<IEnumerable<string>> GenerateUniqueUserNamesAsync(string userName, int count);
+        Task<IEnumerable<string>> GenerateUniqueUserNamesAsync(string userName, int count = 3);
     }
 
     [Service]

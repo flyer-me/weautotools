@@ -58,6 +58,22 @@ namespace CloudWork.Controllers
             }
         }
 
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> IsUserNameAvailable(string userName)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                return Json("用户名不能为空");
+            }
+            if (await _unitOfWork.Users.AnyAsync(u => u.UserName == userName))
+            {
+                var suggestions = await _registration.GenerateUniqueUserNamesAsync(userName);
+                var strSuggestions = string.Join(", ", suggestions);
+                return Json($"已被占用，可使用： {strSuggestions}");
+            }
+            return Json(true);
+        }
+
         [HttpGet]
         [ValidateAntiForgeryToken]
         public ActionResult Dashboard(User user)
