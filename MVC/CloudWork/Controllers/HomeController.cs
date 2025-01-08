@@ -1,9 +1,11 @@
 using System.Diagnostics;
+using CloudWork.Filter;
 using CloudWork.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudWork.Controllers
 {
+    [TimerFilter]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

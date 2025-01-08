@@ -1,5 +1,6 @@
 using CloudWork.Common.DB;
 using CloudWork.Common.Extensions;
+using CloudWork.Filter;
 using CloudWork.Repository.Base;
 using CloudWork.Repository.UnitOfWork;
 using CloudWork.Service;
@@ -14,7 +15,12 @@ namespace CloudWork
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<TimerFilterAttribute>();
+            });
+            builder.Services.AddScoped<TimerFilterAttribute>();
+
             builder.Services.AddDbContext<CloudWorkDbContext>(options =>
             {
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -34,6 +40,10 @@ namespace CloudWork
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
+            }
+            else
+            {
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseStaticFiles();
