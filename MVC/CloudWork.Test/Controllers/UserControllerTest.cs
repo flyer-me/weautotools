@@ -31,12 +31,12 @@ namespace CloudWork.Test.Controllers
             var sessions = new List<User>();
             sessions.Add(new User()
             {
-                Id = 1,
+                Id = "1",
                 UserName = "Test One"
             });
             sessions.Add(new User()
             {
-                Id = 2,
+                Id = "2",
                 UserName = "Test Two"
             });
             return sessions;

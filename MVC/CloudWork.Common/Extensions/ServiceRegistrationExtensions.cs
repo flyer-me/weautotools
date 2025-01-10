@@ -15,9 +15,10 @@ namespace CloudWork.Common.Extensions
         /// <remarks>
         /// - 如果同一个接口被多个服务实现，则最后一个注册的服务将覆盖之前的注册。
         /// </remarks>
-        public static void RegisterByServiceAttribute(this IServiceCollection services)
+        public static void RegisterByServiceAttribute(this IServiceCollection services, string assembly)
         {
-            var types = GetAllAssembly().SelectMany(x => x.DefinedTypes)
+            //var types = GetAllAssembly().SelectMany(x => x.DefinedTypes)
+            var types = Assembly.Load(assembly).DefinedTypes
                 .Where(t => t.IsClass && !t.IsAbstract
                 && t.GetCustomAttributes(typeof(ServiceAttribute), false).Length > 0
                 && !t.IsGenericType);

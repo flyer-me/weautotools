@@ -7,7 +7,7 @@
         public ProgramLanguage Language { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
 
-        public int UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
         public int QuestionId { get; set; }
         public virtual User User { get; set; } = null!;
         public virtual Question Question { get; set; } = null!;

@@ -8,7 +8,7 @@ namespace CloudWork.Service.Interface
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<TEntity?> GetByIdAsync(int id);
+        Task<TEntity?> GetByIdAsync(object id);
 
         /// <summary>
         /// 获取所有实体

@@ -1,16 +1,18 @@
 ﻿using CloudWork.Model;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CloudWork.Common.DB
 {
-    public class CloudWorkDbContext : DbContext
+    public class CloudWorkDbContext : IdentityDbContext<User>
     {
 #pragma warning disable CS8618
         public CloudWorkDbContext(DbContextOptions<CloudWorkDbContext> options) : base(options) { }
 #pragma warning restore CS8618
 
-        public DbSet<User> Users { get; set; }
+        public override DbSet<User> Users { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<TestCase> TestCases { get; set; }

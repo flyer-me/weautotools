@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
-using CloudWork.Repository.Base;
+using CloudWork.Filter;
 
 namespace CloudWork.Controllers
 {
+    [TypeFilter(typeof(RedirectToLoginOnUnauthorizedFilter))]
     public class TestCasesController : Controller
     {
         private readonly ITestCaseService _service;

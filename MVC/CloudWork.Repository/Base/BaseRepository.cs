@@ -19,7 +19,7 @@ namespace CloudWork.Repository.Base
             return await DbSet.ToListAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id)
+        public async Task<TEntity?> GetByIdAsync(object id)
         {
             return await DbSet.FindAsync(id);
         }

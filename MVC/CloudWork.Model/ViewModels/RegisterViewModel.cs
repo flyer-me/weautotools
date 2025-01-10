@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CloudWork.Model.ViewModels
 {
-    public class RegistrationViewModel
+    public class RegisterViewModel
     {
         [Required(ErrorMessage = "名称必填")]
         [StringLength(20, MinimumLength = 3, ErrorMessage = "用户名长度必须在3到20个字符之间")]

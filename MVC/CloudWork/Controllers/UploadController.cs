@@ -8,37 +8,35 @@ namespace BlogManagementApp.Controllers
     {
         private readonly IWebHostEnvironment _environment;
 
-        public UploadController(IWebHostEnvironment environment, ILogger<UploadController> logger)
+        public UploadController(IWebHostEnvironment environment)
         {
             _environment = environment;
         }
 
         //POST file/upload
         [HttpPost]
-        [IgnoreAntiforgeryToken] // Disable CSRF for this endpoint
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> FileUpload(IFormFile upload)
         {
             try
             {
                 if (upload == null || upload.Length == 0)
                 {
-                    return BadRequest(new { error = new { message = "No file uploaded." } });
+                    return BadRequest(new { error = new { message = "不能处理空文件" } });
                 }
 
-                // Validate file type (allow only images)
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                 var extension = Path.GetExtension(upload.FileName).ToLowerInvariant();
-
-                if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
+                /*
+                var disallowedExtensions = new[] { ".sh", ".bat", ".exe", ".js" };
+                if (string.IsNullOrEmpty(extension) || disallowedExtensions.Contains(extension))
                 {
-                    return BadRequest(new { error = new { message = "Invalid file type." } });
+                    return BadRequest(new { error = new { message = "不支持的文件类型" } });
                 }
+                */
 
-                // Generate unique file name
-                var uniqueFileName = Guid.NewGuid().ToString() + extension;
+                var uniqueFileName = upload.FileName + Guid.NewGuid().ToString() + extension;
                 var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads");
 
-                // Ensure the uploads folder exists
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -46,7 +44,6 @@ namespace BlogManagementApp.Controllers
 
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                // Save the file
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await upload.CopyToAsync(stream);
@@ -58,18 +55,16 @@ namespace BlogManagementApp.Controllers
                     url = Url.Content($"~/uploads/{uniqueFileName}")
                 };
 
-                // Return the expected response format for CKEditor
                 return Ok(response);
-
                 // return Ok(new { uploaded = true, url = Url.Content($"~/uploads/{uniqueFileName}") });
             }
             catch (IOException)
             {
-                return StatusCode(500, new { error = new { message = "An error occurred while saving the file. Please try again." } });
+                return StatusCode(500, new { error = new { message = "远程服务处理文件出错，请重试" } });
             }
             catch (Exception)
             {
-                return StatusCode(500, new { error = new { message = "An unexpected error occurred. Please try again later." } });
+                return StatusCode(500, new { error = new { message = "发生未知错误，请稍后" } });
             }
         }
     }

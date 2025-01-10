@@ -14,7 +14,7 @@ namespace CloudWork.Repository.Base
         /// </summary>
         /// <param name="id"></param>
         /// <returns>单个实体，或null</returns>
-        Task<TEntity?> GetByIdAsync(int id);
+        Task<TEntity?> GetByIdAsync(object id);
 
         /// <summary>
         /// 添加实体

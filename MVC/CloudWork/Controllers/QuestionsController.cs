@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CloudWork.Controllers
 {
@@ -14,6 +15,8 @@ namespace CloudWork.Controllers
         }
 
         // GET: Questions
+        [AllowAnonymous]
+        [ResponseCache(CacheProfileName = "Default")]
         public async Task<IActionResult> Index()
         {
             IEnumerable<Question> questions = await _service.GetAllAsync();
@@ -21,6 +24,8 @@ namespace CloudWork.Controllers
         }
 
         // GET: Questions/Details/5
+        [AllowAnonymous]
+        [ResponseCache(CacheProfileName = "Default")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

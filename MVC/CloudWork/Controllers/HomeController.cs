@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudWork.Controllers
 {
-    [TimerFilter]
+    [TimerFilter]  // 此处ActionFilter已经全局注册，可以省略
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -18,6 +18,11 @@ namespace CloudWork.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public string Login()
+        {
+            return "This is the Login Page";
         }
 
         public IActionResult Privacy()

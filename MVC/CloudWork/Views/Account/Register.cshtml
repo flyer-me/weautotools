@@ -1,14 +1,14 @@
-﻿@model CloudWork.Model.ViewModels.RegistrationViewModel
+﻿@model CloudWork.Model.ViewModels.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Registration";
+    ViewData["Title"] = "Register";
 }
 
 <h2>注册</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Registration" method="post">
+        <form asp-action="Register" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">

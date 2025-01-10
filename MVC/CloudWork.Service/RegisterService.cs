@@ -13,18 +13,18 @@ using System.Threading.Tasks;
 
 namespace CloudWork.Service
 {
-    public interface IRegistrationService
+    public interface IRegisterService
     {
         Task<IEnumerable<string>> GenerateUniqueUserNamesAsync(string userName, int count = 3);
     }
 
     [Service]
-    public class RegistrationService : IRegistrationService
+    public class RegisterService : IRegisterService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly int MAX_SUGGESTIONS = 10;
         private readonly int MAX_RANDOM = 1000;
-        public RegistrationService(IUnitOfWork unitOfWork)
+        public RegisterService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

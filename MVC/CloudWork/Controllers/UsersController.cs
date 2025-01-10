@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
+using CloudWork.Filter;
 
 namespace CloudWork.Controllers
 {
+    [TypeFilter(typeof(RedirectToLoginOnUnauthorizedFilter))]
     public class UsersController : Controller
     {
         private readonly IGenericService<User> _userService;
@@ -80,7 +82,7 @@ namespace CloudWork.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserName,PasswordHash,Email")] User user)
+        public async Task<IActionResult> Edit(string id, [Bind("UserName,PasswordHash,Email")] User user)
         {
             if (id != user.Id)
             {
@@ -142,7 +144,7 @@ namespace CloudWork.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool UserExists(string id)
         {
             return _userService.GetByIdAsync(id).Result != null;
         }

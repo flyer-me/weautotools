@@ -19,7 +19,7 @@ namespace CloudWork.Service
             return await Repository.GetAllAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id)
+        public async Task<TEntity?> GetByIdAsync(object id)
         {
             return await Repository.GetByIdAsync(id);
         }

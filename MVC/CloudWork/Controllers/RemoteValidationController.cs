@@ -8,8 +8,8 @@ namespace CloudWork.Controllers
     public class RemoteValidationController : Controller
     {
         private readonly CloudWorkDbContext _context;
-        private readonly IRegistrationService _registerationServices;
-        public RemoteValidationController(CloudWorkDbContext context, IRegistrationService registeredServices)
+        private readonly IRegisterService _registerationServices;
+        public RemoteValidationController(CloudWorkDbContext context, IRegisterService registeredServices)
         {
             _context = context;
             _registerationServices = registeredServices;
