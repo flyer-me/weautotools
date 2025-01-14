@@ -1,6 +1,5 @@
 ﻿using CloudWork.Common;
 using CloudWork.Model;
-using CloudWork.Repository.Base;
 using CloudWork.Repository.UnitOfWork;
 using CloudWork.Service.Interface;
 

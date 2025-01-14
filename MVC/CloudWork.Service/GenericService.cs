@@ -1,7 +1,6 @@
 ﻿using CloudWork.Service.Interface;
 using CloudWork.Repository.Base;
 using CloudWork.Common;
-using CloudWork.Repository.UnitOfWork;
 namespace CloudWork.Service
 {
     [Service]

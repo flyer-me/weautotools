@@ -1,11 +1,6 @@
 ﻿using CloudWork.Common.DB;
 using CloudWork.Model;
 using CloudWork.Repository.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CloudWork.Repository
 {

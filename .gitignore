@@ -5,7 +5,7 @@
 # Custom define
 *.db-shm
 *.db-wal
-/CloudWork/dev.db
+dev.db
 # User-specific files
 *.rsuser
 *.suo
@@ -364,4 +364,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/MVC/CloudWork/dev.db
