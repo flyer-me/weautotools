@@ -1,5 +1,6 @@
 ﻿using CloudWork.Model;
 using CloudWork.Model.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,6 +56,49 @@ namespace CloudWork.Controllers
                 }
             }
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(HomeController.Index), "Home");
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    // two-factor authentication case
+                }
+                if (result.IsLockedOut)
+                {
+                    // Handle lockout scenario
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "失败");
+                    return View(model);
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("index", "home");
         }
     }
 }

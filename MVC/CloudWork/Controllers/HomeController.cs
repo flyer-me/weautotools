@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using CloudWork.Filter;
 using CloudWork.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudWork.Controllers
@@ -20,11 +21,7 @@ namespace CloudWork.Controllers
             return View();
         }
 
-        public string Login()
-        {
-            return "This is the Login Page";
-        }
-
+        [Authorize]
         public IActionResult Privacy()
         {
             return View();

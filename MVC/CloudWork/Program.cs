@@ -49,10 +49,14 @@ namespace CloudWork
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 0;
             })
                 .AddEntityFrameworkStores<CloudWorkDbContext>()
                 .AddDefaultTokenProviders();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+            });
 
             builder.Logging.AddConsole();
 
