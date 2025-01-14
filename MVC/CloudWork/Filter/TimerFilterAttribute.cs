@@ -6,22 +6,21 @@ namespace CloudWork.Filter
 {
     public class TimerFilterAttribute : ActionFilterAttribute
     {
-        private Stopwatch _timer;
+        private const string TimerKey = "Timer";
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            _timer = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
+            context.HttpContext.Items[TimerKey] = stopwatch;
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            _timer.Stop();
-            var executionTime = _timer.Elapsed.TotalMilliseconds;
-
-            if (context.Result is ViewResult viewResult && viewResult.ViewData != null)
+            if (context.HttpContext.Items.TryGetValue(TimerKey, out object timerObj) && timerObj is Stopwatch stopwatch)
             {
-                viewResult.ViewData["ExecutionTime"] = $"{executionTime} ms";
+                stopwatch.Stop();
+                var executionTime = stopwatch.Elapsed.TotalMilliseconds;
+                context.HttpContext.Items["ExecutionTime"] = executionTime;
             }
-            context.HttpContext.Items["ExecutionTime"] = executionTime;
 
             base.OnActionExecuted(context);
         }

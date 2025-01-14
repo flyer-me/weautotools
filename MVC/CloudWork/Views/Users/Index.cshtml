@@ -8,16 +8,13 @@
 
 <p>
     <a asp-action="Create">Create New</a>
-	<a asp-controller="Registration" asp-action="index">Register</a>
+    <a asp-controller="Account" asp-action="Register">Register</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.UserName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PasswordHash)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Email)
@@ -30,9 +27,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PasswordHash)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)

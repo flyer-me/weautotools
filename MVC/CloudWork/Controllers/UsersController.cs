@@ -6,7 +6,7 @@ using CloudWork.Filter;
 
 namespace CloudWork.Controllers
 {
-    [TypeFilter(typeof(RedirectToLoginOnUnauthorizedFilter))]
+    [TypeFilter(typeof(RedirectOnUnauthorizedFilter))]
     public class UsersController : Controller
     {
         private readonly IGenericService<User> _userService;
@@ -16,13 +16,13 @@ namespace CloudWork.Controllers
             _userService = baseService;
         }
 
-        // GET: Users
+        // GET: UserNames
         public async Task<IActionResult> Index()
         {
             return View(await _userService.GetAllAsync());
         }
 
-        // GET: Users/Details/5
+        // GET: UserNames/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,13 +39,13 @@ namespace CloudWork.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
+        // GET: UserNames/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
+        // POST: UserNames/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -61,7 +61,7 @@ namespace CloudWork.Controllers
             return View(user);
         }
 
-        // GET: Users/Edit/5
+        // GET: UserNames/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,7 +77,7 @@ namespace CloudWork.Controllers
             return View(user);
         }
 
-        // POST: Users/Edit/5
+        // POST: UserNames/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -112,7 +112,7 @@ namespace CloudWork.Controllers
             return View(user);
         }
 
-        // GET: Users/Delete/5
+        // GET: UserNames/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,7 +129,7 @@ namespace CloudWork.Controllers
             return View(user);
         }
 
-        // POST: Users/Delete/5
+        // POST: UserNames/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

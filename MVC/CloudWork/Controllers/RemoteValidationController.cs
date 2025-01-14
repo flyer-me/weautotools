@@ -1,5 +1,4 @@
-﻿using CloudWork.Common.DB;
-using CloudWork.Service;
+﻿using CloudWork.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,9 +6,9 @@ namespace CloudWork.Controllers
 {
     public class RemoteValidationController : Controller
     {
-        private readonly CloudWorkDbContext _context;
+        private readonly AppDbContext _context;
         private readonly IRegisterService _registerationServices;
-        public RemoteValidationController(CloudWorkDbContext context, IRegisterService registeredServices)
+        public RemoteValidationController(AppDbContext context, IRegisterService registeredServices)
         {
             _context = context;
             _registerationServices = registeredServices;

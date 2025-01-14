@@ -1,5 +1,4 @@
 ﻿using CloudWork.Common;
-using CloudWork.Common.DB;
 using CloudWork.Model;
 using CloudWork.Repository.Base;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -9,7 +8,7 @@ namespace CloudWork.Repository.UnitOfWork
     [Service]
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly CloudWorkDbContext _context;
+        private readonly AppDbContext _context;
         private IDbContextTransaction? _transaction;
 
         private TestCaseRepository? _testCases;
@@ -18,7 +17,7 @@ namespace CloudWork.Repository.UnitOfWork
         private BaseRepository<Submission>? _submissions;
         private BaseRepository<SubmissionResult>? _submissionResults;
 
-        public UnitOfWork(CloudWorkDbContext context)
+        public UnitOfWork(AppDbContext context)
         {
             _context = context;
         }

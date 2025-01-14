@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace CloudWork.Filter
 {
-    public class RedirectToLoginOnUnauthorizedFilter : IAuthorizationFilter
+    public class RedirectOnUnauthorizedFilter : IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
@@ -13,7 +13,7 @@ namespace CloudWork.Filter
                 // If not authenticated, redirect to the login page
                 context.Result = new RedirectToRouteResult(new RouteValueDictionary
                 {
-                    { "controller", "Home" },
+                    { "controller", "Account" },
                     { "action", "Login" }
                 });
             }
@@ -21,8 +21,11 @@ namespace CloudWork.Filter
 
         private bool IsAuthorized(ClaimsPrincipal user)
         {
-            // TODO: Custom Authorization Logic
-            return false;
+            if (user.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

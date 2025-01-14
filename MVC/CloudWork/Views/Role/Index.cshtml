@@ -1,0 +1,72 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdentityRole>
+
+@{
+	ViewBag.Title = "角色列表";
+}
+
+<h1>All Roles</h1>
+
+@if (Model.Any())
+{
+	<a class="btn btn-primary mb-3" style="width:auto" asp-action="Create"
+	   asp-controller="role">添加</a>
+
+	foreach (var role in Model)
+	{
+		<div class="card mb-3">
+			<div class="card-header">
+				Role Id : @role.Id
+			</div>
+			<div class="card-body">
+				<h5 class="card-title">@role.Name</h5>
+			</div>
+			<div class="card-footer">
+				<form method="post" asp-action="Delete" asp-route-id="@role.Id">
+					<a asp-controller="role" asp-action="edit" asp-route-id="@role.Id" class="btn btn-primary">Edit</a>
+					<span id="confirmDeleteSpan_@role.Id" style="display:none">
+						<span>确认删除</span>
+						<button type="submit" class="btn btn-danger">确认</button>
+						<a href="#" class="btn btn-primary"
+						   onclick="confirmDelete('@role.Id', false)">取消</a>
+					</span>
+					<span id="deleteSpan_@role.Id">
+						<a href="#" class="btn btn-danger"
+						   onclick="confirmDelete('@role.Id', true)">删除</a>
+					</span>
+				</form>
+			</div>
+		</div>
+	}
+}
+else
+{
+	<div class="card">
+		<div class="card-header">
+			当前不存在Role
+		</div>
+		<div class="card-body">
+			<h5 class="card-title">
+				使用按钮新建Role
+			</h5>
+			<a class="btn btn-primary" style="width:auto"
+			   asp-controller="Role" asp-action="Create">
+				新建
+			</a>
+		</div>
+	</div>
+}
+
+<script>
+	function confirmDelete(uniqueId, isTrue) {
+		var deleteSpan = 'deleteSpan_' + uniqueId;
+		var confirmDeleteSpan = 'confirmDeleteSpan_' + uniqueId;
+		if (isTrue) {
+			$('#' + deleteSpan).hide();
+			$('#' + confirmDeleteSpan).show();
+		} else {
+			$('#' + deleteSpan).show();
+			$('#' + confirmDeleteSpan).hide();
+		}
+	}
+</script>

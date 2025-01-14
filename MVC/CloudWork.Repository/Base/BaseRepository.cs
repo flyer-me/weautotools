@@ -1,14 +1,13 @@
-﻿using CloudWork.Common.DB;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 namespace CloudWork.Repository.Base
 {
     public class BaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : class
     {
-        protected CloudWorkDbContext DbContext { get; }
+        protected AppDbContext DbContext { get; }
         protected DbSet<TEntity> DbSet {  get; }
 
-        public BaseRepository(CloudWorkDbContext context)
+        public BaseRepository(AppDbContext context)
         {
             this.DbContext = context;
             DbSet = this.DbContext.Set<TEntity>();

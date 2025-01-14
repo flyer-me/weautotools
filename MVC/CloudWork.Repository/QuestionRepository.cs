@@ -1,5 +1,4 @@
-﻿using CloudWork.Common.DB;
-using CloudWork.Model;
+﻿using CloudWork.Model;
 using CloudWork.Repository.Base;
 
 namespace CloudWork.Repository
@@ -7,6 +6,6 @@ namespace CloudWork.Repository
     public interface IQuestionRepository : IBaseRepository<Question> { }
     public class QuestionRepository : BaseRepository<Question>, IQuestionRepository
     {
-        public QuestionRepository(CloudWorkDbContext context) : base(context) { }
+        public QuestionRepository(AppDbContext context) : base(context) { }
     }
 }

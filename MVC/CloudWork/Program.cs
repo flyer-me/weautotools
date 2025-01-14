@@ -1,4 +1,3 @@
-using CloudWork.Common.DB;
 using CloudWork.Common.Extensions;
 using CloudWork.Filter;
 using CloudWork.Model;
@@ -32,12 +31,12 @@ namespace CloudWork
 
             builder.Services.Configure<FormOptions>(options =>
                 {
-                    options.MultipartBodyLengthLimit = 3_000_000; // 3MB
+                    options.MultipartBodyLengthLimit = 10_000_000; // 10MB
                 });
 
             builder.Services.AddScoped<TimerFilterAttribute>();
 
-            builder.Services.AddDbContext<CloudWorkDbContext>(options =>
+            builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("CloudWork"));
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"), b => b.MigrationsAssembly("CloudWork"));
@@ -50,7 +49,7 @@ namespace CloudWork
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 6;
             })
-                .AddEntityFrameworkStores<CloudWorkDbContext>()
+                .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
             builder.Services.ConfigureApplicationCookie(options =>

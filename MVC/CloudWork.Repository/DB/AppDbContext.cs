@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CloudWork.Common.DB
+namespace CloudWork
 {
-    public class CloudWorkDbContext : IdentityDbContext<User>
+    public class AppDbContext : IdentityDbContext<User>
     {
 #pragma warning disable CS8618
-        public CloudWorkDbContext(DbContextOptions<CloudWorkDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 #pragma warning restore CS8618
 
         public override DbSet<User> Users { get; set; }

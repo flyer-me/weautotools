@@ -7,7 +7,7 @@ using CloudWork.Filter;
 
 namespace CloudWork.Controllers
 {
-    [TypeFilter(typeof(RedirectToLoginOnUnauthorizedFilter))]
+    [TypeFilter(typeof(RedirectOnUnauthorizedFilter))]
     public class TestCasesController : Controller
     {
         private readonly ITestCaseService _service;

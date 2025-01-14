@@ -1,5 +1,4 @@
-﻿using CloudWork.Common.DB;
-using CloudWork.Model;
+﻿using CloudWork.Model;
 using CloudWork.Repository.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +6,7 @@ namespace CloudWork.Repository
 {
     public class TestCaseRepository : BaseRepository<TestCase>, ITestCaseRepository
     {
-        public TestCaseRepository(CloudWorkDbContext context) : base(context) { }
+        public TestCaseRepository(AppDbContext context) : base(context) { }
 
         public async Task<IEnumerable<TestCase>> GetAllTestCasesAsync()
         {
