@@ -43,7 +43,14 @@ namespace CloudWork
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"), b => b.MigrationsAssembly("CloudWork"));
             });
 
-            builder.Services.AddIdentity<User, IdentityRole>()
+            builder.Services.AddIdentity<User, IdentityRole>(options => {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 0;
+            })
                 .AddEntityFrameworkStores<CloudWorkDbContext>()
                 .AddDefaultTokenProviders();
 
