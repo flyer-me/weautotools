@@ -32,7 +32,7 @@ namespace CloudWork.Repository.Base
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task DeleteAsync(int id);
+        Task DeleteAsync(object id);
         /// <summary>
         /// 删除实体
         /// </summary>

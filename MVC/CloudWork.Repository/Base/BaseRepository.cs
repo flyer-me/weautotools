@@ -33,7 +33,7 @@ namespace CloudWork.Repository.Base
             await DbSet.AddRangeAsync(entities);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(object id)
         {
             var entity = await DbSet.FindAsync(id);
             if (entity != null)

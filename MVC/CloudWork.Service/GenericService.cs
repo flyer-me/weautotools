@@ -42,7 +42,7 @@ namespace CloudWork.Service
             Repository.Update(entity);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(object id)
         {
             await Repository.DeleteAsync(id);
         }

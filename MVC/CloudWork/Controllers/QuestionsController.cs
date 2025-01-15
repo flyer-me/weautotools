@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CloudWork.Controllers
 {
+    [Authorize(Roles = "Admin, Editor")]
     public class QuestionsController : Controller
     {
         private readonly IGenericService<Question> _service;

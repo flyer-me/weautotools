@@ -27,6 +27,8 @@ namespace CloudWork
                     VaryByHeader = "User-Agent, Accept-Language",
                     NoStore = false
                 });
+
+                options.Filters.Add<TimerFilterAttribute>();
             });
 
             builder.Services.Configure<FormOptions>(options =>
@@ -43,11 +45,11 @@ namespace CloudWork
             });
 
             builder.Services.AddIdentity<User, IdentityRole>(options => {
-                options.Password.RequireDigit = true;
+                options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 6;
+                options.Password.RequiredLength = 3;
             })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();

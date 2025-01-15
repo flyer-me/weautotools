@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CloudWork.Controllers
 {
-    [TimerFilter]  // 此处ActionFilter已经全局注册，可以省略
+    [TimerFilter]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

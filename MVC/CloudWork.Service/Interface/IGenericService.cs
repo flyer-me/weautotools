@@ -32,7 +32,7 @@ namespace CloudWork.Service.Interface
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Task 影响行数</returns>
-        Task DeleteAsync(int id);
+        Task DeleteAsync(object id);
         /// <summary>
         /// 保存到数据库
         /// </summary>

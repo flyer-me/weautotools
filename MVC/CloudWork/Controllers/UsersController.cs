@@ -3,34 +3,34 @@ using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
 using CloudWork.Filter;
+using Microsoft.AspNetCore.Identity;
 
 namespace CloudWork.Controllers
 {
     [TypeFilter(typeof(RedirectOnUnauthorizedFilter))]
     public class UsersController : Controller
     {
-        private readonly IGenericService<User> _userService;
-
-        public UsersController(IGenericService<User> baseService)
+        private readonly UserManager<User> _userManager;
+        public UsersController(UserManager<User> userManager)
         {
-            _userService = baseService;
+            _userManager = userManager;
         }
 
         // GET: UserNames
         public async Task<IActionResult> Index()
         {
-            return View(await _userService.GetAllAsync());
+            return View(await _userManager.Users.ToListAsync());
         }
 
         // GET: UserNames/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var user = await _userService.GetByIdAsync(id.Value);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -40,36 +40,37 @@ namespace CloudWork.Controllers
         }
 
         // GET: UserNames/Create
+        [NonAction]
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: UserNames/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
         [ValidateAntiForgeryToken]
+        [NonAction]
         public async Task<IActionResult> Create([Bind("UserName,PasswordHash,Email")] User user)
         {
             if (ModelState.IsValid)
             {
-                await _userService.AddAsync(user);
-                await _userService.SaveAsync();
-                return RedirectToAction(nameof(Index));
+                var result =  await _userManager.CreateAsync(user, user.PasswordHash ?? string.Empty);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(user);
         }
 
         // GET: UserNames/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var user = await _userService.GetByIdAsync(id.Value);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -82,7 +83,7 @@ namespace CloudWork.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("UserName,PasswordHash,Email")] User user)
+        public async Task<IActionResult> Edit(string id, [Bind("UserName,Email")] User user)
         {
             if (id != user.Id)
             {
@@ -91,36 +92,30 @@ namespace CloudWork.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
                 {
-                    _userService.Update(user);
-                    await _userService.SaveAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+
+                foreach (var error in result.Errors)
                 {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
-                return RedirectToAction(nameof(Index));
             }
+
             return View(user);
         }
 
         // GET: UserNames/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var user = await _userService.GetByIdAsync(id.Value);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -132,21 +127,19 @@ namespace CloudWork.Controllers
         // POST: UserNames/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var user = await _userService.GetByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                await _userService.DeleteAsync(id);
-                await _userService.SaveAsync();
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool UserExists(string id)
-        {
-            return _userService.GetByIdAsync(id).Result != null;
+            return View(user);
         }
     }
 }

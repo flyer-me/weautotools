@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using CloudWork.Model;
 using CloudWork.Service.Interface;
 using CloudWork.Filter;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CloudWork.Controllers
 {
-    [TypeFilter(typeof(RedirectOnUnauthorizedFilter))]
+    [Authorize(Roles = "Admin, Editor")]
     public class TestCasesController : Controller
     {
         private readonly ITestCaseService _service;
