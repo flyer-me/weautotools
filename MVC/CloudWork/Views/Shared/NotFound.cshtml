@@ -1,0 +1,45 @@
+﻿@{
+	ViewData["Title"] = "页面未找到";
+}
+
+<section class="not-found">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 text-center">
+				<h1 class="display-4">404</h1>
+				<p class="lead">抱歉，您查找的页面无法找到。</p>
+				<p>这可能是由于拼写错误或者该页面已经被移除。</p>
+
+				<form method="get" action="@Url.Action("Index", "Home")" class="d-inline-block">
+					<button type="submit" class="btn btn-primary">返回首页</button>
+				</form>
+
+				<a href="javascript:history.back()" class="btn btn-secondary d-inline-block ms-2">返回上一页</a>
+
+				<br /><br />
+
+				<p>如果您认为这是一个错误，请联系网站管理员。</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style scoped>
+	.not-found {
+		padding-top: 50px;
+		padding-bottom: 50px;
+	}
+
+		.not-found h1 {
+			font-size: 150px;
+			line-height: 150px;
+			margin-bottom: 20px;
+			font-weight: 700;
+			color: #333;
+		}
+
+		.not-found p.lead {
+			font-size: 24px;
+			margin-bottom: 20px;
+		}
+</style>

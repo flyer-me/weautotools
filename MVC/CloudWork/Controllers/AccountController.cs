@@ -51,13 +51,18 @@ namespace CloudWork.Controllers
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    // 将新用户添加到 "User" 角色
-                    if (await _roleManager.RoleExistsAsync("User"))
+                    // 管理员注册后重定向到用户列表
+                    if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        return Redirect(nameof(Users));
+                    }
+                    // 新用户添加到 "User" 角色
+                    else if (await _roleManager.RoleExistsAsync("User"))
                     {
                         await _userManager.AddToRoleAsync(user, "User");
                     }
 
-                    return RedirectToAction("Index", "Home");
+                    return View("Dashboard", user);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -78,7 +83,6 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -122,10 +126,106 @@ namespace CloudWork.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Users()
+        {
+            var users = _userManager.Users;
+            return View(users);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditUser(string UserId)
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"找不到用户：{UserId}";
+                return View("NotFound");
+            }
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                Claims = userClaims.Select(c => c.Value).ToList(),
+                Roles = userRoles
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.Id);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"找不到用户：{model.Id}";
+                return View("NotFound");
+            }
+            else
+            {
+                user.Email = model.Email;
+                user.UserName = model.UserName;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Users));
+                }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string UserId)
+        {
+            var user = await _userManager.FindByIdAsync(UserId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"找不到用户：{UserId}";
+                return View("NotFound");
+            }
+            else
+            {
+                var result = await _userManager.DeleteAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Users));
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+
+                return View("Users");
+            }
         }
     }
 }

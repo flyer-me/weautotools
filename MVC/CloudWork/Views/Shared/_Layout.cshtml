@@ -30,10 +30,17 @@
                         </li>
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Role" asp-action="index">
-                                    Role管理
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    数据管理
                                 </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item" asp-controller="Account"
+                                       asp-action="Users">Users</a>
+                                    <a class="dropdown-item" asp-controller="Role"
+                                       asp-action="Index">Roles</a>
+                                </ul>
                             </li>
                         }
                     </ul>
