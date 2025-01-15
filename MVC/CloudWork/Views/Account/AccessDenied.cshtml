@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "不允许的访问";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <!-- Title -->
+            <h1 class="display-4 text-danger mb-4">不允许的访问</h1>
+
+            <!-- Subtitle -->
+            <p class="lead text-muted mb-5">您没有权限访问该页面资源。</p>
+
+            <!-- Image -->
+            <img src="~/Images/AccessDenied.png"
+                 alt="Access Denied"
+                 class="img-fluid mb-5"
+                 style="max-height: 300px;" />
+
+            <!-- Action or Guidance -->
+            <p class="mb-3">如果您认为这是一个错误，请联系管理员或尝试返回上一页。</p>
+            <a href="javascript:history.back()" class="btn btn-secondary">返回上一页</a>
+        </div>
+    </div>
+</div>
