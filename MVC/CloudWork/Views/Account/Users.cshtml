@@ -24,7 +24,7 @@
 			</div>
 			<div class="card-footer">
 				<form method="post" asp-action="DeleteUser" asp-route-UserId="@user.Id">
-					<a asp-action="EditUser" asp-controller="Account" asp-route-UserId="@user.Id" class="btn btn-primary">编辑</a>
+					<a asp-action="EditUser" asp-controller="Account" asp-route-userId="@user.Id" class="btn btn-primary">编辑</a>
 					<span id="confirmDeleteSpan_@user.Id" style="display:none">
 						<span>操作确认</span>
 						<button type="submit" class="btn btn-danger">确认</button>

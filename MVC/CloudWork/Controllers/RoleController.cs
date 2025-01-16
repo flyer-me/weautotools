@@ -163,12 +163,12 @@ namespace CloudWork.Controllers
             }
 
             ViewBag.RollName = role.Name;
-            var model = new List<UserRoleViewModel>();
+            var model = new List<UsersForRoleViewModel>();
 
             foreach (var user in _userManager.Users)
             {
                 bool isSelected = await _userManager.IsInRoleAsync(user, role.Name);
-                var userRoleViewModel = new UserRoleViewModel
+                var userRoleViewModel = new UsersForRoleViewModel
                 {
                     UserId = user.Id,
                     UserName = user.UserName,
@@ -182,7 +182,7 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditUsersInRole(List<UserRoleViewModel> model, string id)
+        public async Task<IActionResult> EditUsersInRole(List<UsersForRoleViewModel> model, string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CloudWork.Model.ViewModels
 {
-    public class UserRoleViewModel
+    public class UsersForRoleViewModel
     {
         public string UserId { get; set; } = string.Empty;
         public string? UserName { get; set; }

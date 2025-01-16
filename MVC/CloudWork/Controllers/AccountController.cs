@@ -226,5 +226,72 @@ namespace CloudWork.Controllers
                 return View("Users");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> EditUserRoles(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) {
+                ViewBag.ErrorMessage = $"找不到用户：{userId}";
+                return View("NotFound");
+            }
+
+            ViewBag.userId = userId;    // User -- Role 一对多关系避免重复
+            ViewBag.userName = user.UserName;
+
+            var model = new List<RolesForUserViewModel>();
+            foreach (var role in _roleManager.Roles)
+            {
+                var rolesForUserViewModel = new RolesForUserViewModel
+                {
+                    RoleId = role.Id,
+                    RoleName = role.Name ?? string.Empty
+                };
+
+                if (await _userManager.IsInRoleAsync(user, role.Name ?? string.Empty))
+                {
+                    rolesForUserViewModel.IsSelected = true;
+                }
+
+                model.Add(rolesForUserViewModel);
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUserRoles(List<RolesForUserViewModel> model, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"找不到用户：{userId}";
+                return View("NotFound");
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var result = await _userManager.RemoveFromRolesAsync(user, roles);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("", "删除用户角色失败");
+                return View(model);
+            }
+
+            List<string> RolesToBeAssigned = model.Where(x => x.IsSelected).Select(y => y.RoleName).ToList();
+
+            if (RolesToBeAssigned.Count != 0)
+            {
+                result = await _userManager.AddToRolesAsync(user, RolesToBeAssigned);
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "添加选定的角色到用户失败");
+                    return View(model);
+                }
+            }
+
+            return RedirectToAction("EditUser", new { UserId = userId });
+        }
     }
 }
