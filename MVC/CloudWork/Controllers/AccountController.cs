@@ -189,10 +189,10 @@ namespace CloudWork.Controllers
                     return RedirectToAction(nameof(Users));
                 }
 
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
 
                 return View(model);
             }
@@ -234,7 +234,8 @@ namespace CloudWork.Controllers
         public async Task<IActionResult> EditUserRoles(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) {
+            if (user == null)
+            {
                 ViewBag.ErrorMessage = $"找不到账户：{userId}";
                 return View("NotFound");
             }
@@ -318,7 +319,19 @@ namespace CloudWork.Controllers
             };
 
             var existingUserClaims = await _userManager.GetClaimsAsync(user);
-
+            /* 以下是根据Role间接获取声明
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var roleName in userRoles)
+            {
+                var role = await _roleManager.FindByNameAsync(roleName);
+                if (role != null)
+                {
+                    var roleClaims = await _roleManager.GetClaimsAsync(role);
+                    existingUserClaims = existingUserClaims.Concat(roleClaims).ToList();
+                }
+            }
+            existingUserClaims = existingUserClaims.Distinct().ToList();
+            */
             foreach (Claim claim in Claims.GetAllClaims())
             {
                 UserClaim userClaim = new UserClaim
