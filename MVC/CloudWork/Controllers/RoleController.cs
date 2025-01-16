@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CloudWork.Controllers
 {
@@ -12,6 +13,7 @@ namespace CloudWork.Controllers
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
+
         public RoleController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             _roleManager = roleManager;
@@ -67,11 +69,14 @@ namespace CloudWork.Controllers
                 return View("Error");
             }
 
+            var claims = await _roleManager.GetClaimsAsync(role);
+
             var model = new EditRoleViewModel
             {
                 Id = role.Id,
                 RoleName = role.Name,
-                UserNames = new List<string>()
+                UserNames = new List<string>(),
+                Claims = claims.Select(c => c.Value).ToList()
             };
 
             foreach (var user in _userManager.Users)
@@ -83,7 +88,6 @@ namespace CloudWork.Controllers
             }
 
             return View(model);
-            // return View(role);
         }
 
         [HttpPost]
@@ -97,7 +101,7 @@ namespace CloudWork.Controllers
                     ModelState.AddModelError(role.Id, "找不到");
                     return View("NotFound");
                 }
-                
+
                 _role.Name = role.RoleName;
                 IdentityResult result = await _roleManager.UpdateAsync(_role);
 
@@ -209,9 +213,97 @@ namespace CloudWork.Controllers
                 {
                     continue;
                 }
+                await _userManager.UpdateSecurityStampAsync(user);  // 更新安全戳
             }
 
             return RedirectToAction("Edit", new { id });
+        }
+
+        /// <summary>
+        /// 编辑角色声明Get方法，获取当前角色，所有声明，当前角色的声明将被选中
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> EditRoleClaims(string roleId)
+        {
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"找不到Id为 {roleId} 的Role";
+                return View("NotFound");
+            }
+
+            ViewBag.RoleName = role.Name;
+            var model = new RoleClaimsViewModel
+            {
+                RoleId = role.Id
+            };
+
+            var claimsInRole = await _roleManager.GetClaimsAsync(role);
+
+            foreach (Claim claim in Claims.GetAllClaims())
+            {
+                RoleClaim roleClaim = new RoleClaim
+                {
+                    ClaimType = claim.Type
+                };
+
+                if (claimsInRole.Any(c => c.Type == claim.Type))
+                {
+                    roleClaim.IsSelected = true;
+                }
+                model.Claims.Add(roleClaim);
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditRoleClaims(RoleClaimsViewModel model)
+        {
+            var role = await _roleManager.FindByIdAsync(model.RoleId);
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"找不到Id为 {model.RoleId} 的Role";
+                return View("NotFound");
+            }
+
+            var claimsInRole = await _roleManager.GetClaimsAsync(role);
+
+            for (int i = 0; i < model.Claims.Count; i++)
+            {
+                Claim claim = new Claim(model.Claims[i].ClaimType, model.Claims[i].ClaimType);
+                IdentityResult result;
+
+                if (model.Claims[i].IsSelected && !claimsInRole.Any(c => c.Type == model.Claims[i].ClaimType))
+                {
+                    result = await _roleManager.AddClaimAsync(role, claim);
+                }
+                else if (!model.Claims[i].IsSelected && claimsInRole.Any(c => c.Type == model.Claims[i].ClaimType))
+                {
+                    result = await _roleManager.RemoveClaimAsync(role, claim);
+                }
+                else
+                {
+                    continue;
+                }
+
+                if (result.Succeeded)
+                {
+                    if (i < (model.Claims.Count - 1))
+                        continue;
+                }
+                else
+                {
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View(model);
+                }
+            }
+            return RedirectToAction("Edit", new { id = model.RoleId });
         }
     }
 }

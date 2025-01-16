@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CloudWork.Model.ViewModels
 {
@@ -11,8 +6,8 @@ namespace CloudWork.Model.ViewModels
     {
         public EditUserViewModel()
         {
-            Claims = new List<string>();
-            Roles = new List<string>();
+            Claims = [];
+            Roles = [];
         }
         [Required]
         public string Id { get; set; } = string.Empty;

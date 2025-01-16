@@ -33,10 +33,10 @@
 
     <div class="card">
         <div class="card-header">
-            <h3>账户</h3>
+            <h3>包含账户</h3>
         </div>
         <div class="card-body">
-            @if (Model.UserNames != null && Model.UserNames.Any())
+            @if (Model.UserNames.Any())
             {
                 foreach (var user in Model.UserNames)
                 {
@@ -53,6 +53,31 @@
             <a asp-controller="Role" asp-action="EditUsersInRole"
                asp-route-id="@Model.Id" class="btn btn-primary">
                 编辑Role内账户
+            </a>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>角色的声明</h3>
+        </div>
+        <div class="card-body">
+            @if (Model.Claims.Any())
+            {
+                foreach (var claim in Model.Claims)
+                {
+                    <h5 class="card-title">@claim</h5>
+                }
+            }
+            else
+            {
+                <h5 class="card-title">无</h5>
+            }
+        </div>
+        <div class="card-footer">
+            <a asp-action="EditRoleClaims" asp-controller="Role" asp-route-RoleId="@Model.Id"
+               style="width:auto" class="btn btn-primary">
+                管理 Claim
             </a>
         </div>
     </div>

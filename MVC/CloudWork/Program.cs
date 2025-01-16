@@ -31,12 +31,6 @@ namespace CloudWork
                 options.Filters.Add<TimerFilterAttribute>();
             });
 
-            builder.Services.AddAuthorizationBuilder()
-                .AddPolicy("ChangeRole",
-                policy => policy.RequireClaim("Create Role")
-                                .RequireClaim("Edit Role")
-                                .RequireClaim("Delete Role"));
-
             builder.Services.Configure<FormOptions>(options =>
                 {
                     options.MultipartBodyLengthLimit = 10_000_000; // 10MB
@@ -60,6 +54,15 @@ namespace CloudWork
             })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("ChangeRole",
+                policy => policy.RequireClaim("Create Role")
+                                .RequireClaim("Edit Role")
+                                .RequireClaim("Delete Role"));
+
+            builder.Services.Configure<SecurityStampValidatorOptions>(o =>
+                   o.ValidationInterval = TimeSpan.FromMinutes(15));
 
             builder.Services.ConfigureApplicationCookie(options =>
             {

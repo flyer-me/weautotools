@@ -110,7 +110,7 @@ namespace CloudWork.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "失败");
+                    ModelState.AddModelError(string.Empty, $"失败");
                     return View(model);
                 }
             }
@@ -199,6 +199,7 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -229,6 +230,7 @@ namespace CloudWork.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditUserRoles(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -261,6 +263,7 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditUserRoles(List<RolesForUserViewModel> model, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -291,11 +294,12 @@ namespace CloudWork.Controllers
                     return View(model);
                 }
             }
-
+            await _userManager.UpdateSecurityStampAsync(user);  // 更新安全戳
             return RedirectToAction("EditUser", new { userId });
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditUserClaims(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -334,6 +338,7 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditUserClaims(UserClaimsViewModel model)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
@@ -368,7 +373,7 @@ namespace CloudWork.Controllers
                     return View(model);
                 }
             }
-
+            await _userManager.UpdateSecurityStampAsync(user);  // 更新安全戳
             return RedirectToAction("EditUser", new { userId = model.UserId });
         }
     }

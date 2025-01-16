@@ -15,7 +15,7 @@ namespace CloudWork.Filter
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
-            if (context.HttpContext.Items.TryGetValue(TimerKey, out object timerObj) && timerObj is Stopwatch stopwatch)
+            if (context.HttpContext.Items.TryGetValue(TimerKey, out var timerObj) && timerObj is Stopwatch stopwatch)
             {
                 stopwatch.Stop();
                 var executionTime = stopwatch.Elapsed.TotalMilliseconds;
