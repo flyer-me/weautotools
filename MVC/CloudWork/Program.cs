@@ -31,6 +31,12 @@ namespace CloudWork
                 options.Filters.Add<TimerFilterAttribute>();
             });
 
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("ChangeRole",
+                policy => policy.RequireClaim("Create Role")
+                                .RequireClaim("Edit Role")
+                                .RequireClaim("Delete Role"));
+
             builder.Services.Configure<FormOptions>(options =>
                 {
                     options.MultipartBodyLengthLimit = 10_000_000; // 10MB
@@ -44,7 +50,8 @@ namespace CloudWork
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"), b => b.MigrationsAssembly("CloudWork"));
             });
 
-            builder.Services.AddIdentity<User, IdentityRole>(options => {
+            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            {
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;

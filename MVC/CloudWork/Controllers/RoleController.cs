@@ -115,6 +115,7 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "ChangeRole")]
         public async Task<IActionResult> Delete(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);

@@ -60,7 +60,7 @@
     </div>
     <div class="card mt-3">
         <div class="card-header">
-            <h3>用户认证</h3>
+            <h3>用户声明</h3>
         </div>
         <div class="card-body">
             @if (Model.Claims.Any())
@@ -72,12 +72,13 @@
             }
             else
             {
-                <h5 class="card-title">None at the moment</h5>
+                <h5 class="card-title">无</h5>
             }
         </div>
         <div class="card-footer">
-            <a href="#" style="width:auto" class="btn btn-primary">
-                编辑认证
+            <a asp-action="EditUserClaims" asp-controller="Account" asp-route-UserId="@Model.Id"
+            style="width:auto" class="btn btn-primary">
+                编辑声明
             </a>
         </div>
     </div>

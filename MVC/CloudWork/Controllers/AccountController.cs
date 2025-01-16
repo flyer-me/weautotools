@@ -3,6 +3,7 @@ using CloudWork.Model.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CloudWork.Controllers
 {
@@ -37,7 +38,7 @@ namespace CloudWork.Controllers
             {
                 if (!model.AgreePolicy)
                 {
-                    ModelState.AddModelError("AgreePolicy", "需要同意用户条款和查看隐私政策");
+                    ModelState.AddModelError("AgreePolicy", "需要同意账户条款和查看隐私政策");
                     return View(model);
                 }
                 var user = new User
@@ -49,12 +50,12 @@ namespace CloudWork.Controllers
                 var result = await _userManager.CreateAsync(user, model.PasswordHash);
                 if (result.Succeeded)
                 {
-                    // 管理员注册后重定向到用户列表
+                    // 管理员注册后重定向到账户列表
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
                         return Redirect(nameof(Users));
                     }
-                    // 新用户添加到 "User" 角色
+                    // 新账户添加到 "User" 角色
                     else if (await _roleManager.RoleExistsAsync("User"))
                     {
                         await _userManager.AddToRoleAsync(user, "User");
@@ -140,13 +141,13 @@ namespace CloudWork.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditUser(string UserId)
+        public async Task<IActionResult> EditUser(string userId)
         {
-            var user = await _userManager.FindByIdAsync(UserId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"找不到用户：{UserId}";
+                ViewBag.ErrorMessage = $"找不到账户：{userId}";
                 return View("NotFound");
             }
 
@@ -173,7 +174,7 @@ namespace CloudWork.Controllers
 
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"找不到用户：{model.Id}";
+                ViewBag.ErrorMessage = $"找不到账户：{model.Id}";
                 return View("NotFound");
             }
             else
@@ -198,13 +199,13 @@ namespace CloudWork.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteUser(string UserId)
+        public async Task<IActionResult> DeleteUser(string userId)
         {
-            var user = await _userManager.FindByIdAsync(UserId);
+            var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"找不到用户：{UserId}";
+                ViewBag.ErrorMessage = $"找不到账户：{userId}";
                 return View("NotFound");
             }
             else
@@ -232,7 +233,7 @@ namespace CloudWork.Controllers
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
-                ViewBag.ErrorMessage = $"找不到用户：{userId}";
+                ViewBag.ErrorMessage = $"找不到账户：{userId}";
                 return View("NotFound");
             }
 
@@ -266,7 +267,7 @@ namespace CloudWork.Controllers
 
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"找不到用户：{userId}";
+                ViewBag.ErrorMessage = $"找不到账户：{userId}";
                 return View("NotFound");
             }
             var roles = await _userManager.GetRolesAsync(user);
@@ -275,7 +276,7 @@ namespace CloudWork.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", "删除用户角色失败");
+                ModelState.AddModelError("", "删除账户角色失败");
                 return View(model);
             }
 
@@ -286,12 +287,89 @@ namespace CloudWork.Controllers
                 result = await _userManager.AddToRolesAsync(user, RolesToBeAssigned);
                 if (!result.Succeeded)
                 {
-                    ModelState.AddModelError("", "添加选定的角色到用户失败");
+                    ModelState.AddModelError("", "添加选定的角色到账户失败");
                     return View(model);
                 }
             }
 
-            return RedirectToAction("EditUser", new { UserId = userId });
+            return RedirectToAction("EditUser", new { userId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditUserClaims(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"找不到账户：{userId}";
+                return View("NotFound");
+            }
+
+            ViewBag.UserName = user.UserName;
+
+            var model = new UserClaimsViewModel
+            {
+                UserId = userId
+            };
+
+            var existingUserClaims = await _userManager.GetClaimsAsync(user);
+
+            foreach (Claim claim in Claims.GetAllClaims())
+            {
+                UserClaim userClaim = new UserClaim
+                {
+                    ClaimType = claim.Type
+                };
+
+                if (existingUserClaims.Any(c => c.Type == claim.Type))
+                {
+                    userClaim.IsSelected = true;
+                }
+
+                model.Cliams.Add(userClaim);
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUserClaims(UserClaimsViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"找不到账户：{model.UserId}";
+                return View("NotFound");
+            }
+
+            var claims = await _userManager.GetClaimsAsync(user);
+            var result = await _userManager.RemoveClaimsAsync(user, claims);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("", "账户移除声明出错");
+                return View(model);
+            }
+
+
+            var AllSelectedClaims = model.Cliams.Where(c => c.IsSelected)
+                        .Select(c => new Claim(c.ClaimType, c.ClaimType))
+                        .ToList();
+
+            if (AllSelectedClaims.Count != 0)
+            {
+                result = await _userManager.AddClaimsAsync(user, AllSelectedClaims);
+
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError("", "账户增加声明出错");
+                    return View(model);
+                }
+            }
+
+            return RedirectToAction("EditUser", new { userId = model.UserId });
         }
     }
 }
