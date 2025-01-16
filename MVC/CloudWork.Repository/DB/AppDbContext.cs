@@ -1,7 +1,9 @@
 ﻿using CloudWork.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Reflection.Emit;
 
 namespace CloudWork
 {
@@ -23,19 +25,26 @@ namespace CloudWork
             // optionsBuilder.UseLazyLoadingProxies();
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
             // 模型约束和关系
-            modelBuilder.Entity<User>(entity =>
+            builder.Entity<User>(entity =>
             {
                 entity.HasIndex(u => u.UserName);
                 entity.HasIndex(u => u.PhoneNumber);
                 entity.Property(u => u.IsDeleted).HasDefaultValue(false);
             });
 
-            modelBuilder.Entity<Question>(entity =>
+            // Role保留
+            builder.Entity<IdentityUserRole<string>>()
+                .HasOne<IdentityRole>()
+                .WithMany()
+                .HasForeignKey(ur => ur.RoleId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Question>(entity =>
             {
                 entity.Property(p => p.IsPublic).HasDefaultValue(true);
                 entity.HasIndex(entity => entity.Title);
@@ -45,31 +54,23 @@ namespace CloudWork
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Submission>(entity =>
+            builder.Entity<Submission>(entity =>
             {
                 entity.HasOne(s => s.User)
                       .WithMany(u => u.Submissions)
                       .HasForeignKey(s => s.UserId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(s => s.Question)
                       .WithMany(p => p.Submissions)
                       .HasForeignKey(s => s.QuestionId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(s => s.Evaluation)
                       .WithOne(se => se.Submission)
                       .HasForeignKey<SubmissionResult>(se => se.SubmissionId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
             });
-
-            modelBuilder.Entity<TestCase>(entity =>
-            {
-                entity.HasOne(tc => tc.Question)
-                      .WithMany(p => p.TestCases)
-                      .HasForeignKey(tc => tc.QuestionId);
-            });
-
         }
     }
 }

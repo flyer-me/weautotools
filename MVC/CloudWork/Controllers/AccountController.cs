@@ -21,7 +21,7 @@ namespace CloudWork.Controllers
 
         public IActionResult Index()
         {
-            return NotFound();
+            return View("NotFound");
         }
 
         [HttpGet]
@@ -49,8 +49,6 @@ namespace CloudWork.Controllers
                 var result = await _userManager.CreateAsync(user, model.PasswordHash);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-
                     // 管理员注册后重定向到用户列表
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
@@ -62,6 +60,7 @@ namespace CloudWork.Controllers
                         await _userManager.AddToRoleAsync(user, "User");
                     }
 
+                    await _signInManager.SignInAsync(user, isPersistent: false);
                     return View("Dashboard", user);
                 }
                 foreach (var error in result.Errors)
@@ -128,7 +127,7 @@ namespace CloudWork.Controllers
         [HttpGet]
         public IActionResult AccessDenied()
         {
-            return View();
+            return View("AccessDenied");
         }
 
         [HttpGet]

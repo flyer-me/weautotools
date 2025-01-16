@@ -29,14 +29,14 @@ namespace CloudWork.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var testCase = await _service.GetTestCaseWithQuestionAsync(id.Value);
 
             if (testCase == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(testCase);
@@ -81,13 +81,13 @@ namespace CloudWork.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var testCase = await _service.GetTestCaseWithQuestionAsync(id.Value);
             if (testCase == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
             IEnumerable<Question> questions = await _service.GetQuestionsAsync();
             ViewData["QuestionId"] = new SelectList(questions, "Id", nameof(Question.Title), testCase.QuestionId);
@@ -103,7 +103,7 @@ namespace CloudWork.Controllers
         {
             if (id != testCase.Id)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             if (ModelState.IsValid)
@@ -119,7 +119,7 @@ namespace CloudWork.Controllers
                     var test = await _service.GetByIdAsync(id);
                     if (test == null)
                     {
-                        return NotFound();
+                        return View("NotFound");
                     }
                     else
                     {
@@ -137,13 +137,13 @@ namespace CloudWork.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var testCase = await _service.GetTestCaseWithQuestionAsync(id.Value);
             if (testCase == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(testCase);

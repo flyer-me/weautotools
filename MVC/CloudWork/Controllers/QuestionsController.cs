@@ -31,13 +31,13 @@ namespace CloudWork.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var question = await _service.GetByIdAsync(id.Value);
             if (question == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(question);
@@ -70,13 +70,13 @@ namespace CloudWork.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var question = await _service.GetByIdAsync(id.Value);
             if (question == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
             return View(question);
         }
@@ -90,7 +90,7 @@ namespace CloudWork.Controllers
         {
             if (id != question.Id)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             if (ModelState.IsValid)
@@ -105,7 +105,7 @@ namespace CloudWork.Controllers
                     var que = await _service.GetByIdAsync(question.Id);
                     if (que == null)
                     {
-                        return NotFound();
+                        return View("NotFound");
                     }
                     else
                     {
@@ -122,13 +122,13 @@ namespace CloudWork.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var question = await _service.GetByIdAsync(id.Value);
             if (question == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(question);

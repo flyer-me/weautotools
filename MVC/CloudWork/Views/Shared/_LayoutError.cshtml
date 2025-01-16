@@ -1,0 +1,31 @@
+﻿@{
+	Layout = "_Layout"; // 指定使用 _Layout.cshtml 布局
+}
+
+<div>
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-6 text-center">
+				@RenderBody()
+				@if (ViewBag.ErrorTitle == null)
+				{
+					<h4 class="text-danger">
+						发生了错误，您可以
+					</h4>
+				}
+				else
+				{
+					<h1 class="text-danger">@ViewBag.ErrorTitle</h1>
+					<h6 class="text-danger">@ViewBag.ErrorMessage</h6>
+				}
+
+				<form method="get" action="@Url.Action("Index", "Home")" class="d-inline-block">
+					<button type="submit" class="btn btn-primary">返回首页</button>
+				</form>
+
+				<a href="javascript:history.back();this.disabled = true;" class="btn btn-secondary d-inline-block ms-2">返回上一页</a>
+			</div>
+		</div>
+	</div>
+</div>
+

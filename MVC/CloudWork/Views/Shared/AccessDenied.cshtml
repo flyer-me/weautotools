@@ -1,5 +1,6 @@
 ﻿@{
 	ViewData["Title"] = "不允许的访问";
+	Layout = "_LayoutError";
 }
 
 <div class="container mt-5">
@@ -7,16 +8,6 @@
 		<div class="col-md-6 text-center">
 			<h1 class="display-4 text-danger mb-4">慢一些</h1>
 			<p class="lead text-muted mb-5">您没有权限访问该页面资源。</p>
-
-			<form method="get" action="@Url.Action("Index", "Home")" class="d-inline-block">
-				<button type="submit" class="btn btn-primary">返回首页</button>
-			</form>
-
-			<a href="javascript:history.back()" class="btn btn-secondary d-inline-block ms-2">返回上一页</a>
-
-			<br /><br />
-			<p class="mb-3">如果您认为这是一个错误，请联系管理员或尝试返回上一页。</p>
-			<a href="javascript:history.back()" class="btn btn-secondary">返回上一页</a>
 		</div>
 	</div>
 </div>

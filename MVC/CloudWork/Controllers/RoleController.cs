@@ -95,7 +95,7 @@ namespace CloudWork.Controllers
                 if (_role == null)
                 {
                     ModelState.AddModelError(role.Id, "找不到");
-                    return NotFound();
+                    return View("NotFound");
                 }
                 
                 _role.Name = role.RoleName;
@@ -121,22 +121,32 @@ namespace CloudWork.Controllers
             if (role == null)
             {
                 ViewBag.ErrorMessage = $"找不到Id为 {id} 的Role";
-                return NotFound();
+                return View("NotFound");
             }
 
-            var result = await _roleManager.DeleteAsync(role);
-            if (result.Succeeded)
+            try
             {
-                // Role deletion successful
-                return RedirectToAction("Index");
-            }
+                var result = await _roleManager.DeleteAsync(role);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
 
-            foreach (var error in result.Errors)
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
+                return View("Index", await _roleManager.Roles.ToListAsync());
+            }
+            catch (DbUpdateException ex)
             {
-                ModelState.AddModelError("", error.Description);
+                ViewBag.Error = ex.Message;
+                ViewBag.ErrorTitle = $"{role.Name} Role 已被使用";
+                ViewBag.ErrorMessage = $"{role.Name} 不能被删除，需要先移除其中的所有账户";
+                return View("Error");
+                throw;
             }
-
-            return View("Index", await _roleManager.Roles.ToListAsync());
         }
 
         [HttpGet]
@@ -149,7 +159,7 @@ namespace CloudWork.Controllers
             if (role == null)
             {
                 ViewBag.ErrorMessage = $"找不到Id为 {id} 的Role";
-                return NotFound();
+                return View("NotFound");
             }
 
             ViewBag.RollName = role.Name;
@@ -179,7 +189,7 @@ namespace CloudWork.Controllers
             if (role == null)
             {
                 ViewBag.ErrorMessage = $"找不到Id为 {id} 的Role";
-                return NotFound();
+                return View("NotFound");
             }
 
             foreach (var userRole in model)
