@@ -6,6 +6,8 @@
 *.db-shm
 *.db-wal
 dev.db
+appsettings.*.json
+!appsettings.json
 # User-specific files
 *.rsuser
 *.suo
@@ -365,3 +367,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /MVC/CloudWork/Migrations
+/MVC/CloudWork/appsettings.Development.json

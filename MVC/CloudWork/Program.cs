@@ -44,6 +44,13 @@ namespace CloudWork
                 //options.UseSqlServer(builder.Configuration.GetConnectionString("WSLConnection"), b => b.MigrationsAssembly("CloudWork"));
             });
 
+            builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = builder.Configuration["Google:ClientId"] ?? string.Empty;
+                    options.ClientSecret = builder.Configuration["Google:ClientSecret"] ?? string.Empty;
+                });
+
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = false;

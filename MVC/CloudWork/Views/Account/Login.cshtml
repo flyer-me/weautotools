@@ -1,36 +1,56 @@
 ﻿@model CloudWork.Model.ViewModels.LoginViewModel
 
 @{
-    ViewBag.Title = "用户登录";
-	string ReturnUrl = ViewBag.ReturnUrl;
+	ViewBag.Title = "用户登录";
 }
 
-<h1>User Login</h1>
-
 <div class="row">
-    <div class="col-md-12">
-        <form method="post">
-            <input type="hidden" asp-for="ReturnUrl" />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label asp-for="RememberMe">
-                        <input asp-for="RememberMe" />
-                        @Html.DisplayNameFor(m => m.RememberMe)
-                    </label>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-    </div>
+	<div class="col-md-6">
+		<h1>登录</h1>
+		<hr />
+		<form method="post">
+			<input type="hidden" asp-for="ReturnUrl" />
+			<div asp-validation-summary="All" class="text-danger"></div>
+			<div class="form-group">
+				<label asp-for="Email"></label>
+				<input asp-for="Email" class="form-control" />
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Password"></label>
+				<input asp-for="Password" class="form-control" />
+				<span asp-validation-for="Password" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<div class="checkbox">
+					<label asp-for="RememberMe">
+						<input asp-for="RememberMe" />
+						@Html.DisplayNameFor(m => m.RememberMe)
+					</label>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Login</button>
+		</form>
+	</div>
+	<div class="col-md-6">
+		<h1>其他登录</h1>
+		<hr />
+		@if (Model.ExternalLogins == null || Model.ExternalLogins.Count == 0)
+		{
+			<div>暂无其他登录方式</div>
+		}
+		else
+		{
+			<div>
+				@foreach (var provider in Model.ExternalLogins)
+				{
+					<a type="button" href="@Url.Action("ExternalLogin", "Account", new { provider = provider.Name, returnUrl = Model.ReturnUrl })"
+					   class="btn btn-primary external-login-btn"
+					   title="使用 @provider.DisplayName 账户登录">
+						@provider.DisplayName
+					</a>
+				}
+			</div>
+		}
+	</div>
 </div>

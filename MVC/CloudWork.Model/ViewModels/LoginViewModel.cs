@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Authentication;
+using System.ComponentModel.DataAnnotations;
 
 namespace CloudWork.Model.ViewModels
 {
@@ -13,7 +14,7 @@ namespace CloudWork.Model.ViewModels
 
         [Display(Name = "记住我")]
         public bool RememberMe { get; set; }
-
         public string? ReturnUrl { get; set; }
+        public IList<AuthenticationScheme>? ExternalLogins { get; set; }
     }
 }

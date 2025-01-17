@@ -1,6 +1,7 @@
 ﻿using CloudWork.Model;
 using CloudWork.Model.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -73,11 +74,13 @@ namespace CloudWork.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string? returnUrl = null)
+        public async Task<IActionResult> Login(string? returnUrl)
         {
+            returnUrl = returnUrl ?? Url.Content("~/");
             var model = new LoginViewModel
             {
-                ReturnUrl = returnUrl
+                ReturnUrl = returnUrl,  // 使用传递的URL或当前URL
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
             };
             return View(model);
         }
@@ -102,20 +105,83 @@ namespace CloudWork.Controllers
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    // two-factor authentication case
                 }
                 if (result.IsLockedOut)
                 {
-                    // Handle lockout scenario
                 }
                 else
                 {
+                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
                     ModelState.AddModelError(string.Empty, $"失败");
                     return View(model);
                 }
             }
-
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             return View(model);
+        }
+
+        /// <summary>
+        /// 外部登录 - 重定向到外部登录提供程序
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { ReturnUrl = returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
+
+        /// <summary>
+        /// 外部登录回调
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <param name="remoteError"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl, string? remoteError)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/"); // 如果没有返回URL，则返回主页
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"外部登录提供程序错误：{remoteError}");
+                return View("Login", new LoginViewModel { ReturnUrl = returnUrl });
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                ModelState.AddModelError(string.Empty, "加载外部登录信息时出错");
+                return View("Login", new LoginViewModel { ReturnUrl = returnUrl });
+            }
+
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+
+            var userEmail = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (userEmail is null)
+            {
+                ModelState.AddModelError(string.Empty, "没有接收到可用的Email凭据");
+                return View("Login", new LoginViewModel { ReturnUrl = returnUrl });
+            }
+
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                user = new User { UserName = userEmail, Email = userEmail };
+                await _userManager.CreateAsync(user);
+            }
+
+            await _userManager.AddLoginAsync(user, info);   // 登录信息添加到账户或新建账户
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            Console.WriteLine(returnUrl);
+            return LocalRedirect(returnUrl);
         }
 
         [HttpPost]
