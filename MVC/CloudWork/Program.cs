@@ -45,10 +45,15 @@ namespace CloudWork
             });
 
             builder.Services.AddAuthentication()
+                .AddMicrosoftAccount(options =>
+                {
+                    options.ClientId = builder.Configuration["OAuth:Microsoft:ClientId"] ?? string.Empty;
+                    options.ClientSecret = builder.Configuration["OAuth:Microsoft:ClientSecret"] ?? string.Empty;
+                })
                 .AddGoogle(options =>
                 {
-                    options.ClientId = builder.Configuration["Google:ClientId"] ?? string.Empty;
-                    options.ClientSecret = builder.Configuration["Google:ClientSecret"] ?? string.Empty;
+                    options.ClientId = builder.Configuration["OAuth:Google:ClientId"] ?? string.Empty;
+                    options.ClientSecret = builder.Configuration["OAuth:Google:ClientSecret"] ?? string.Empty;
                 });
 
             builder.Services.AddIdentity<User, IdentityRole>(options =>
