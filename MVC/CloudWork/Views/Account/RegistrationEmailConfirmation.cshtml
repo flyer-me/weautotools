@@ -1,0 +1,32 @@
+﻿@model CloudWork.Model.User
+
+@{
+	ViewData["Title"] = "账户注册";
+}
+
+<div class="container mt-5">
+	<div class="row">
+		<div class="col-md-8 offset-md-2">
+			<div class="card shadow">
+				<div class="card-header">
+					<h3 class="card-title mb-0">
+						注册成功
+					</h3>
+				</div>
+				<div class="card-body">
+					<p>
+						已向注册邮箱发送账户激活链接，您需要点击链接以激活账户
+					</p>
+					<p>
+						如果您没有收到确认邮件或链接已过期，您可以点击下面的按钮重新发送确认邮件：
+					</p>
+					<a class="btn btn-primary"
+					   asp-controller="Account"
+					   asp-action="ResendConfirmationEmail">
+						重新发送
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

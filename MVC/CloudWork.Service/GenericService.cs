@@ -3,7 +3,6 @@ using CloudWork.Repository.Base;
 using CloudWork.Common;
 namespace CloudWork.Service
 {
-    [Service]
     public class GenericService<TEntity> : IGenericService<TEntity> where TEntity : class
     {
         private IBaseRepository<TEntity> Repository { get; }

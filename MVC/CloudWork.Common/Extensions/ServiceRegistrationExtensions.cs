@@ -16,10 +16,11 @@ namespace CloudWork.Common.Extensions
         public static void RegisterByServiceAttribute(this IServiceCollection services, string assembly)
         {
             //var types = GetAllAssembly().SelectMany(x => x.DefinedTypes)
+
             var types = Assembly.Load(assembly).DefinedTypes
                 .Where(t => t.IsClass && !t.IsAbstract
-                && t.GetCustomAttributes(typeof(ServiceAttribute), false).Length > 0
-                && !t.IsGenericType);
+                    && t.GetCustomAttributes(typeof(ServiceAttribute), false).Length > 0
+                    && !t.IsGenericType);
 
             foreach (var type in types)
             {

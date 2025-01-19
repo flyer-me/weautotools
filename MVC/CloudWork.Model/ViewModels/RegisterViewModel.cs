@@ -17,7 +17,7 @@ namespace CloudWork.Model.ViewModels
 
         public string PhoneNumber { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Gmail address is required.")]
+        [Required(ErrorMessage = "需要提供邮件")]
         //[EmailAddress]
         public string Email { get; set; } = string.Empty;
 

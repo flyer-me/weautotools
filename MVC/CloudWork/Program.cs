@@ -36,7 +36,7 @@ namespace CloudWork
                     options.MultipartBodyLengthLimit = 10_000_000; // 10MB
                 });
 
-            builder.Services.AddScoped<TimerFilterAttribute>();
+            //builder.Services.AddScoped<TimerFilterAttribute>();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
@@ -83,7 +83,7 @@ namespace CloudWork
 
             builder.Logging.AddConsole();
 
-            builder.Services.RegisterByServiceAttribute("CloudWork.Service");
+            builder.Services.RegisterByServiceAttribute("CloudWork.Service");   // 注册.Service下所有服务
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));

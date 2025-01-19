@@ -1,10 +1,12 @@
 ﻿using CloudWork.Model;
 using CloudWork.Model.ViewModels;
+using CloudWork.Service;
+using CloudWork.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 namespace CloudWork.Controllers
 {
@@ -13,12 +15,15 @@ namespace CloudWork.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<User> _signInManager;
-
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
+        private readonly IEmailSenderService _emailSender;
+        
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
+            RoleManager<IdentityRole> roleManager, IEmailSenderService emailSenderService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _emailSender = emailSenderService;
         }
 
         public IActionResult Index()
@@ -51,10 +56,21 @@ namespace CloudWork.Controllers
                 var result = await _userManager.CreateAsync(user, model.PasswordHash);
                 if (result.Succeeded)
                 {
+                    try
+                    {
+                        await SendConfirmationEmail(model.Email, user);
+                    }
+                    catch (Exception e)
+                    {
+                        ModelState.AddModelError(string.Empty, $"邮件发送失败：{e.Message}");
+                        return View(model);
+                    }
+
+
                     // 管理员注册后重定向到账户列表
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
-                        return Redirect(nameof(Users));
+                        return RedirectToAction(nameof(Users));
                     }
                     // 新账户添加到 "User" 角色
                     else if (await _roleManager.RoleExistsAsync("User"))
@@ -63,7 +79,7 @@ namespace CloudWork.Controllers
                     }
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return View("Dashboard", user);
+                    return View("RegistrationEmailConfirmation", user);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -85,6 +101,87 @@ namespace CloudWork.Controllers
             return View(model);
         }
 
+        private async Task SendConfirmationEmail(string email, User user)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var confirmationLink = Url.Action("ConfirmEmail", "Account",
+                new { UserId = user.Id, Token = token }, protocol: HttpContext.Request.Scheme);
+
+            var safeLink = HtmlEncoder.Default.Encode(confirmationLink);
+
+            await _emailSender.SendConfirmationEmailAsync(email, user.UserName, safeLink);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string UserId, string Token)
+        {
+            if (string.IsNullOrEmpty(UserId) || string.IsNullOrEmpty(Token))
+            {
+                ViewBag.ErrorMessage = "该链接无效，请重新请求确认邮件";
+                return View();
+            }
+
+            var user = await _userManager.FindByIdAsync(UserId);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "无法找到该链接对应的账户";
+                return View();
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, Token);
+            if (result.Succeeded)
+            {
+                ViewBag.Success = "账户验证成功";
+                return View();
+            }
+
+            ViewBag.ErrorMessage = "验证失败，请重新请求确认邮件";
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResendConfirmationEmail(bool isResend = true)
+        {
+            if (isResend)
+            {
+                ViewBag.Message = "重新发送确认邮件";
+            }
+            else
+            {
+                ViewBag.Message = "发送确认邮件";
+            }
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendConfirmationEmail(string Email)
+        {
+            var user = await _userManager.FindByEmailAsync(Email);
+            // 为未验证的账户重新发送
+            if (user != null && !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                try
+                {
+                    await SendConfirmationEmail(Email, user);
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, $"邮件发送失败：{e.Message}");
+                }
+                ViewBag.Sent = true;
+            }
+            ViewBag.Message = "重新发送确认邮件";
+            return View();
+        }
+
+        /// <summary>
+        /// 外部登录 - 重定向到外部登录提供程序
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -120,12 +217,6 @@ namespace CloudWork.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// 外部登录 - 重定向到外部登录提供程序
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <param name="returnUrl"></param>
-        /// <returns></returns>
         [HttpGet]
         public IActionResult ExternalLogin(string provider, string returnUrl)
         {
