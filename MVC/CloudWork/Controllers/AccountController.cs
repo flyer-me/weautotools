@@ -1,6 +1,5 @@
 ﻿using CloudWork.Model;
 using CloudWork.Model.ViewModels;
-using CloudWork.Service;
 using CloudWork.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,7 +15,7 @@ namespace CloudWork.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IEmailSenderService _emailSender;
-        
+
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
             RoleManager<IdentityRole> roleManager, IEmailSenderService emailSenderService)
         {
@@ -78,7 +77,6 @@ namespace CloudWork.Controllers
                         await _userManager.AddToRoleAsync(user, "User");
                     }
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
                     return View("RegistrationEmailConfirmation", user);
                 }
                 foreach (var error in result.Errors)
@@ -92,7 +90,7 @@ namespace CloudWork.Controllers
         [HttpGet]
         public async Task<IActionResult> Login(string? returnUrl)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/"); //默认返回主页
             var model = new LoginViewModel
             {
                 ReturnUrl = returnUrl,  // 使用传递的URL或当前URL
@@ -185,35 +183,49 @@ namespace CloudWork.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-                if (result.Succeeded)
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "错误的登录请求");
+                return View(model);
+            }
+
+            var checkSign = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+
+            if (checkSign.Succeeded)
+            {
+                if (!await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                }
-                if (result.RequiresTwoFactor)
-                {
-                }
-                if (result.IsLockedOut)
-                {
-                }
-                else
-                {
-                    model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    ModelState.AddModelError(string.Empty, $"失败");
+                    ModelState.AddModelError(string.Empty, "账户未验证，请验证邮箱");
                     return View(model);
                 }
+
+                await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
+
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                {
+                    return Redirect(model.ReturnUrl);
+                }
+
+                return RedirectToAction("Index", "Home");
             }
-            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            if (checkSign.RequiresTwoFactor)
+            {
+            }
+            if (checkSign.IsLockedOut)
+            {
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, $"登录失败");
+            }
             return View(model);
         }
 
@@ -226,7 +238,7 @@ namespace CloudWork.Controllers
         }
 
         /// <summary>
-        /// 外部登录回调
+        /// 外部登录，不进行邮箱验证
         /// </summary>
         /// <param name="returnUrl"></param>
         /// <param name="remoteError"></param>
@@ -234,6 +246,7 @@ namespace CloudWork.Controllers
         public async Task<IActionResult> ExternalLoginCallback(string? returnUrl, string? remoteError)
         {
             returnUrl = returnUrl ?? Url.Content("~/"); // 如果没有返回URL，则返回主页
+
             if (remoteError != null)
             {
                 ModelState.AddModelError(string.Empty, $"外部登录提供程序错误：{remoteError}");
@@ -244,17 +257,22 @@ namespace CloudWork.Controllers
             if (info == null)
             {
                 ModelState.AddModelError(string.Empty, "加载外部登录信息时出错");
-                return View("Login", new LoginViewModel { ReturnUrl = returnUrl });
+                return View("Login", new LoginViewModel
+                {
+                    ReturnUrl = returnUrl,
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+                });
             }
 
             var signInResult = await _signInManager.ExternalLoginSignInAsync(
                 info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
-            if (signInResult.Succeeded)
+            if (signInResult.Succeeded) // 已找到关联账户，完成登录
             {
                 return LocalRedirect(returnUrl);
             }
-
+            
+            // 需要关联账户：未关联或不存在
             var userEmail = info.Principal.FindFirstValue(ClaimTypes.Email);
             if (userEmail is null)
             {
@@ -266,12 +284,21 @@ namespace CloudWork.Controllers
             if (user == null)
             {
                 user = new User { UserName = userEmail, Email = userEmail };
-                await _userManager.CreateAsync(user);
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    foreach (var error in createResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View("Login", new LoginViewModel { ReturnUrl = returnUrl });
+                }
             }
 
-            await _userManager.AddLoginAsync(user, info);   // 登录信息添加到账户或新建账户
+            // 登录信息添加到账户或新建的账户
+            await _userManager.AddLoginAsync(user, info);
+
             await _signInManager.SignInAsync(user, isPersistent: false);
-            Console.WriteLine(returnUrl);
             return LocalRedirect(returnUrl);
         }
 
