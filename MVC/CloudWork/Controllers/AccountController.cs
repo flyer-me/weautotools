@@ -129,7 +129,7 @@ namespace CloudWork.Controllers
                 return View();
             }
 
-            var result = await _userManager.VerifyEmailAsync(user, Token);
+            var result = await _userManager.ConfirmEmailAsync(user, Token);
             if (result.Succeeded)
             {
                 ViewBag.Success = "账户验证成功";

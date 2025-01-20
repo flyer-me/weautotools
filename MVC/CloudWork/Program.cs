@@ -8,7 +8,9 @@ using CloudWork.Service.Interface;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 namespace CloudWork
 {
@@ -89,6 +91,19 @@ namespace CloudWork
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = builder.Configuration.GetValue<int>("RateLimit:PermitLimit"),
+                            Window = builder.Configuration.GetValue<TimeSpan>("RateLimit:Window")
+                        }));
+            });
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -103,6 +118,7 @@ namespace CloudWork
 
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
 
