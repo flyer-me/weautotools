@@ -3,7 +3,10 @@ using CloudWork.Model.ViewModels;
 using CloudWork.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -65,7 +68,6 @@ namespace CloudWork.Controllers
                         return View(model);
                     }
 
-
                     // 管理员注册后重定向到账户列表
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
@@ -77,7 +79,7 @@ namespace CloudWork.Controllers
                         await _userManager.AddToRoleAsync(user, "User");
                     }
 
-                    return View("RegistrationEmailConfirmation", user);
+                    return View("RegisterVerify", user);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -103,16 +105,16 @@ namespace CloudWork.Controllers
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var confirmationLink = Url.Action("ConfirmEmail", "Account",
+            var confirmationLink = Url.Action("VerifyEmail", "Account",
                 new { UserId = user.Id, Token = token }, protocol: HttpContext.Request.Scheme);
 
-            var safeLink = HtmlEncoder.Default.Encode(confirmationLink);
+            var safeLink = HtmlEncoder.Default.Encode(confirmationLink ?? string.Empty);
 
             await _emailSender.SendConfirmationEmailAsync(email, user.UserName, safeLink);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string UserId, string Token)
+        public async Task<IActionResult> VerifyEmail(string UserId, string Token)
         {
             if (string.IsNullOrEmpty(UserId) || string.IsNullOrEmpty(Token))
             {
@@ -127,19 +129,19 @@ namespace CloudWork.Controllers
                 return View();
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, Token);
+            var result = await _userManager.VerifyEmailAsync(user, Token);
             if (result.Succeeded)
             {
                 ViewBag.Success = "账户验证成功";
                 return View();
             }
 
-            ViewBag.ErrorMessage = "验证失败，请重新请求确认邮件";
+            ViewBag.ErrorMessage = "验证失败，请重试";
             return View();
         }
 
         [HttpGet]
-        public IActionResult ResendConfirmationEmail(bool isResend = true)
+        public IActionResult ResendVerifyEmail(bool isResend = true)
         {
             if (isResend)
             {
@@ -154,7 +156,7 @@ namespace CloudWork.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResendConfirmationEmail(string Email)
+        public async Task<IActionResult> ResendVerifyEmail(string Email)
         {
             var user = await _userManager.FindByEmailAsync(Email);
             // 为未验证的账户重新发送
@@ -168,9 +170,8 @@ namespace CloudWork.Controllers
                 {
                     ModelState.AddModelError(string.Empty, $"邮件发送失败：{e.Message}");
                 }
-                ViewBag.Sent = true;
             }
-            ViewBag.Message = "重新发送确认邮件";
+            ViewBag.Sent = true;
             return View();
         }
 
@@ -271,7 +272,7 @@ namespace CloudWork.Controllers
             {
                 return LocalRedirect(returnUrl);
             }
-            
+
             // 需要关联账户：未关联或不存在
             var userEmail = info.Principal.FindFirstValue(ClaimTypes.Email);
             if (userEmail is null)
@@ -310,6 +311,98 @@ namespace CloudWork.Controllers
         }
 
         [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        private async Task SendForgotPasswordEmail(string email, User user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResetLink = Url.Action(nameof(ResetPassword), "Account",
+                new { Email = email, Token = token }, protocol: HttpContext.Request.Scheme);
+
+            var safeLink = HtmlEncoder.Default.Encode(passwordResetLink ?? string.Empty);
+
+            await _emailSender.SendForgotPasswordEmailAsync(email, user.UserName, safeLink);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    try
+                    {
+                        await SendForgotPasswordEmail(model.Email, user);
+                    }
+                    catch (Exception e)
+                    {
+                        ModelState.AddModelError(string.Empty, $"邮件发送失败：{e.Message}");
+                        return View(model);
+                    }
+                }
+                return RedirectToAction(nameof(ResetPasswordEmailSent));  // 无论是否找到用户都返回相同的已发送视图
+            }
+            return View(model);
+        }
+
+        public ActionResult ResetPasswordEmailSent()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string Token, string Email)
+        {
+            if (Token == null || Email == null)
+            {
+                ViewBag.ErrorMessage = "此链接无效";
+                return View("Error");
+            }
+            else
+            {
+                ResetPasswordViewModel model = new()
+                {
+                    Token = Token,
+                    Email = Email
+                };
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    return View(model);
+                }
+
+                var result = await _userManager.ResetPasswordAsync(user, model.Token, model.PasswordHash);
+                if (result.Succeeded)
+                {
+                    model.IsSuccess = true;
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+                return View(model);
+            }
+            return View(model); // 非法输入重试
+        }
+
+        [HttpGet]
         public IActionResult AccessDenied()
         {
             return View("AccessDenied");
@@ -317,9 +410,9 @@ namespace CloudWork.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult Users()
+        public async Task<IActionResult> Users()
         {
-            var users = _userManager.Users;
+            var users = await _userManager.Users.ToListAsync();
             return View(users);
         }
 

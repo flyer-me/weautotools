@@ -1,5 +1,5 @@
 ﻿@{
-	ViewData["Title"] = "邮件确认 - CloudWork";
+	ViewData["Title"] = "验证邮件 - CloudWork";
 	var error = ViewBag.ErrorMessage as string;
 	var success = ViewBag.Success as string;
 }
@@ -33,7 +33,7 @@
 						</div>
 						<p>
 							如果链接过期或无法收到，请通过
-							<a href="@Url.Action("ResendConfirmationEmail", "Account")" class="font-weight-bold">
+							<a href="@Url.Action("ResendVerifyEmail", "Account")" class="font-weight-bold">
 								重新发送确认邮件
 							</a>
 						</p>

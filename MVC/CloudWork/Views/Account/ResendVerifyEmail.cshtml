@@ -16,7 +16,7 @@
 						如果您没有收到邮件，请重新输入邮件地址以接收链接
 					</p>
 
-					<form asp-action="ResendConfirmationEmail" asp-controller="Account" method="post">
+					<form asp-action="ResendVerifyEmail" asp-controller="Account" method="post">
 						<div class="form-group mb-3">
 							<label for="emailInput" class="form-label">邮件地址</label>
 							<input type="email"
@@ -31,7 +31,7 @@
 					@if (isEmailSent)
 					{
 						<div class="alert alert-success mt-3" role="alert">
-							邮件已发送，请检查您的收件箱
+							邮件已发送，请检查您的收件箱，或等待几分钟后再试
 						</div>
 					}
 				</div>

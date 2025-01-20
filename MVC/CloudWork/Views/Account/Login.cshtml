@@ -35,11 +35,15 @@
 					<div class="d-flex justify-content-between align-items-center">
 						<button type="submit" class="btn btn-success">登录</button>
 						<a class="btn btn-warning" asp-controller="Account"
-						   asp-action="ResendConfirmationEmail"
+						   asp-action="ResendVerifyEmail"
 						   asp-route-IsResend="false">验证邮箱</a>
 					</div>
-					<button type="submit" class="btn btn-primary">登录</button>
+					<!--<button type="submit" class="btn btn-primary">登录</button> -->
 				</form>
+				<div class="mt-3 d-flex justify-content-end">
+					<a asp-controller="Account" asp-action="Register" class="btn btn-link">注册</a>
+					<a asp-controller="Account" asp-action="ForgotPassword" class="btn btn-link">忘记密码</a>
+				</div>
 			</div>
 		</div>
 	</div>
