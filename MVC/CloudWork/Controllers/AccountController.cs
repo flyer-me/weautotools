@@ -7,8 +7,12 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Threading;
+using UAParser;
 
 namespace CloudWork.Controllers
 {
@@ -307,7 +311,7 @@ namespace CloudWork.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("index", "home");
+            return RedirectToAction("Index", "home");
         }
 
         [HttpGet]
@@ -400,6 +404,57 @@ namespace CloudWork.Controllers
                 return View(model);
             }
             return View(model); // 非法输入重试
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+
+                var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+
+                if (result.Succeeded)
+                {
+                    var location = await GetClientLocationAsync(HttpContext);
+                    var device = GetClientDeviceInfo(HttpContext);
+
+                    await _emailSender.SendPasswordChangedNotificationEmail(user.Email ?? "", user.UserName, location, device);
+                    await _signInManager.RefreshSignInAsync(user);
+                    return RedirectToAction(nameof(ChangePasswordConfirmation), "Account");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+            }
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePasswordConfirmation()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -665,6 +720,61 @@ namespace CloudWork.Controllers
             }
             await _userManager.UpdateSecurityStampAsync(user);  // 更新安全戳
             return RedirectToAction("EditUser", new { userId = model.UserId });
+        }
+
+        private async Task<string> GetClientLocationAsync(HttpContext httpContext)
+        {
+            try
+            {
+                var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
+
+                if (string.IsNullOrEmpty(ipAddress) || ipAddress == "::1" || ipAddress == "127.0.0.1")
+                {
+                    // 本地地址，获取公网IP
+                    using var client = new HttpClient();
+                    ipAddress = await client.GetStringAsync("https://api.ipify.org");
+                }
+
+                using var httpClient = new HttpClient();
+                var response = await httpClient.GetStringAsync($"http://ip-api.com/json/{ipAddress}");
+
+                var geoData = JsonConvert.DeserializeObject<Dictionary<string, object>>(response);
+                if (geoData != null && geoData.TryGetValue("city", out var city) &&
+                    geoData.TryGetValue("regionName", out var region) &&
+                    geoData.TryGetValue("country", out var country))
+                {
+                    return $"{country}, {region}, {city}";
+                }
+                return "Unknown";
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
+
+        private string GetClientDeviceInfo(HttpContext httpContext)
+        {
+            try
+            {
+                var userAgent = httpContext.Request.Headers.UserAgent.ToString();
+
+                if (string.IsNullOrEmpty(userAgent))
+                {
+                    return "Unknown Device";
+                }
+
+                var parser = Parser.GetDefault();
+                var clientInfo = parser.Parse(userAgent);
+                var os = clientInfo.OS.ToString();
+                var browser = clientInfo.UA.ToString();
+
+                return $"{browser}, {os}";
+            }
+            catch
+            {
+                return "Unknown Device";
+            }
         }
     }
 }

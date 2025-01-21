@@ -54,7 +54,7 @@ namespace CloudWork.Service
             _logger.LogInformation($"Email sent to {toEmail}");
         }
 
-        public Task SendConfirmationEmailAsync(string toEmail, string? userName, string safeLink)
+        public async Task SendConfirmationEmailAsync(string toEmail, string? userName, string safeLink)
         {
             var htmlMessage = $@"
                 <div style=""font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#333;"">
@@ -80,20 +80,20 @@ namespace CloudWork.Service
 
             var subject = "邮箱确认";
 
-            return SendEmailAsync(toEmail, subject, htmlMessage);
+            await SendEmailAsync(toEmail, subject, htmlMessage);
         }
 
-        public Task SendForgotPasswordEmailAsync(string toEmail, string? userName, string safeLink)
+        public async Task SendForgotPasswordEmailAsync(string toEmail, string? userName, string safeLink)
         {
             var htmlMessage = $@"
                 <div style=""font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #333; line-height: 1.5; padding: 20px;"">
-                    <h2 style=""color: #007bff; text-align: center;"">Password Reset Request</h2>
+                    <h2 style=""color: #007bff; text-align: center;"">密码重置</h2>
                     <p style=""margin-bottom: 20px;"">你好 {userName}</p>
-                    <p>We received a request to reset your password for your <strong>Dot Net Tutorials</strong> account. If you made this request, please click the button below to reset your password:</p>
+                    <p>我们向您发送邮件以帮助您完成对<strong>CloudWork</strong>账户密码的重设，请点击以更改密码：</p>
                     <div style=""text-align: center; margin: 20px 0;"">
                         <a href=""{safeLink}"" 
                            style=""background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;"">
-                            Reset Password
+                            重设密码
                         </a>
                     </div>
                     <p>如果点击链接无效，请复制并粘贴以下链接到浏览器地址栏：</p>
@@ -107,7 +107,31 @@ namespace CloudWork.Service
 
             var subject = "密码重置";
 
-            return SendEmailAsync(toEmail, subject, htmlMessage);
+            await SendEmailAsync(toEmail, subject, htmlMessage);
+        }
+
+        public async Task SendPasswordChangedNotificationEmail(string toEmail, string? userName, string location, string device)
+        {
+            var messageBody = $@"
+            <div style=""font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #333; line-height: 1.5; padding: 20px;"">
+                <h2 style=""color: #007bff; text-align: center;"">密码更改通知</h2>
+                <p style=""margin-bottom: 20px;"">你好 {userName},</p>
+    
+                <p>由于您在<strong>CloudWork</strong>进行了密码更改，我们向您发送此邮件进行提醒</p>
+    
+                <div style=""margin: 20px 0; padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 5px;"">
+                    <p><strong>时间：</strong> {DateTime.UtcNow:dddd, MMMM dd, yyyy HH:mm} UTC</p>
+                    <p><strong>位置：</strong> {location}</p>
+                    <p><strong>设备：</strong> {device}</p>
+                </div>
+    
+                <p>如果您没有进行此操作，请尽快更新您的账户密码。</p>
+                    <p>Thanks,<br />
+                    The CloudWork Team</p>
+            </div>";
+
+            var subject = "密码已更改";
+            await SendEmailAsync(toEmail, subject, messageBody);
         }
 
     }
