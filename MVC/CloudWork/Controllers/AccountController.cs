@@ -3,15 +3,11 @@ using CloudWork.Model.ViewModels;
 using CloudWork.Service.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using System.Threading;
 using UAParser;
 
 namespace CloudWork.Controllers
@@ -408,9 +404,14 @@ namespace CloudWork.Controllers
 
         [Authorize]
         [HttpGet]
-        public IActionResult ChangePassword()
+        public async Task<IActionResult> ChangePassword()
         {
-            return View();
+            User user = (await _userManager.GetUserAsync(User))!;
+            if (await _userManager.HasPasswordAsync(user))
+            {
+                return View();
+            }
+            return RedirectToAction(nameof(SetPassword), "Account");
         }
 
         [Authorize]
@@ -453,6 +454,59 @@ namespace CloudWork.Controllers
         [Authorize]
         [HttpGet]
         public IActionResult ChangePasswordConfirmation()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> SetPassword()
+        {
+            User user = (await _userManager.GetUserAsync(User))!;
+
+            if (await _userManager.HasPasswordAsync(user))
+            {
+                return RedirectToAction(nameof(ChangePassword), "Account");
+            }
+
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "错误用户");
+                    return View();
+                }
+
+                var result = await _userManager.AddPasswordAsync(user, model.Password);
+
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View();
+                }
+
+                await _signInManager.RefreshSignInAsync(user);
+
+                return RedirectToAction(nameof(SetPasswordConfirmation), "Account");
+            }
+
+            return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult SetPasswordConfirmation()
         {
             return View();
         }

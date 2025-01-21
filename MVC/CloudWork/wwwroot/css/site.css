@@ -1,22 +1,55 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #121212; /* 深灰色背景 */
+    color: #e0e0e0; /* 浅灰色文本 */
+}
+
+    .navbar .navbar-nav .nav-link:hover,
+    .navbar .navbar-nav .nav-link:focus {
+        color: #ffffff !important; /* 鼠标悬停时白色 */
+    }
+
+/* 导航栏按钮的颜色 */
+.navbar .navbar-toggler {
+    box-shadow: none;
+}
+
+/* 自定义卡片头部样式 */
+.card-header.bg-primary {
+    background-color: #4CAF50 !important;
+    color: white;
+}
+/* 卡片头部 */
+.bg-primary {
+    background-color: #4CAF50 !important;
+}
+
+/* 按钮背景颜色 */
+.btn-primary {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+}
+
+/* 确保文本颜色为白色 */
+.bg-primary, .btn-primary {
+    color: white !important;
 }

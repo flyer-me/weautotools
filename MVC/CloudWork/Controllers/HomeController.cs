@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using CloudWork.Filter;
-using CloudWork.Model;
-using Microsoft.AspNetCore.Authorization;
+using CloudWork.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CloudWork.Controllers
