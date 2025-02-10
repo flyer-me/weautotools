@@ -101,16 +101,78 @@ namespace CloudWork.Controllers
             return View(model);
         }
 
-        private async Task SendConfirmationEmail(string email, User user)
+        /// <summary>
+        /// 登录验证
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            var confirmationLink = Url.Action("VerifyEmail", "Account",
-                new { UserId = user.Id, Token = token }, protocol: HttpContext.Request.Scheme);
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "错误的登录请求");
+                return View(model);
+            }
 
-            var safeLink = HtmlEncoder.Default.Encode(confirmationLink ?? string.Empty);
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                ModelState.AddModelError(string.Empty, "因为多次登录失败，此账户暂时被锁定，请稍候");
+                return View(model);
+            }
 
-            await _emailSender.SendConfirmationEmailAsync(email, user.UserName, safeLink);
+            var passwordCheckResult = await _userManager.CheckPasswordAsync(user, model.Password);
+
+            if (!passwordCheckResult)
+            {
+                await _userManager.AccessFailedAsync(user);
+                var accessFailedCount = await _userManager.GetAccessFailedCountAsync(user);
+                var attemptsLeft = _userManager.Options.Lockout.MaxFailedAccessAttempts - accessFailedCount;
+                if (accessFailedCount != 0)
+                {
+                    ModelState.AddModelError(string.Empty, $"验证失败，{attemptsLeft}次后，账户将锁定");
+                }
+                else
+                {
+                    return RedirectToAction("AccountLocked", "Account");
+                }
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                ModelState.AddModelError(string.Empty, "账户未验证，请验证邮箱");
+                return View(model);
+            }
+
+            var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: true);
+
+            if (signInResult.Succeeded)
+            {
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                {
+                    return Redirect(model.ReturnUrl);
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            else if (signInResult.IsLockedOut)
+            {
+                return RedirectToAction("AccountLocked", "Account");
+            }
+            else if (signInResult.RequiresTwoFactor)
+            {
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "登录失败，请重试");
+            }
+            return View(model);
         }
 
         [HttpGet]
@@ -173,61 +235,6 @@ namespace CloudWork.Controllers
             }
             ViewBag.Sent = true;
             return View();
-        }
-
-        /// <summary>
-        /// 外部登录 - 重定向到外部登录提供程序
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <param name="returnUrl"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                ModelState.AddModelError(string.Empty, "错误的登录请求");
-                return View(model);
-            }
-
-            var checkSign = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
-
-            if (checkSign.Succeeded)
-            {
-                if (!await _userManager.IsEmailConfirmedAsync(user))
-                {
-                    ModelState.AddModelError(string.Empty, "账户未验证，请验证邮箱");
-                    return View(model);
-                }
-
-                await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
-
-                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                {
-                    return Redirect(model.ReturnUrl);
-                }
-
-                return RedirectToAction("Index", "Home");
-            }
-            if (checkSign.RequiresTwoFactor)
-            {
-            }
-            if (checkSign.IsLockedOut)
-            {
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, $"登录失败");
-            }
-            return View(model);
         }
 
         [HttpGet]
@@ -388,6 +395,10 @@ namespace CloudWork.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, model.Token, model.PasswordHash);
                 if (result.Succeeded)
                 {
+                    if (await _userManager.IsLockedOutAsync(user))
+                    {
+                        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+                    }
                     model.IsSuccess = true;
                 }
                 else
@@ -397,9 +408,8 @@ namespace CloudWork.Controllers
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
-                return View(model);
             }
-            return View(model); // 非法输入重试
+            return View(model);
         }
 
         [Authorize]
@@ -507,6 +517,12 @@ namespace CloudWork.Controllers
         [Authorize]
         [HttpGet]
         public IActionResult SetPasswordConfirmation()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult AccountLocked()
         {
             return View();
         }
@@ -776,7 +792,19 @@ namespace CloudWork.Controllers
             return RedirectToAction("EditUser", new { userId = model.UserId });
         }
 
-        private async Task<string> GetClientLocationAsync(HttpContext httpContext)
+        private async Task SendConfirmationEmail(string email, User user)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var confirmationLink = Url.Action("VerifyEmail", "Account",
+                new { UserId = user.Id, Token = token }, protocol: HttpContext.Request.Scheme);
+
+            var safeLink = HtmlEncoder.Default.Encode(confirmationLink ?? string.Empty);
+
+            await _emailSender.SendConfirmationEmailAsync(email, user.UserName, safeLink);
+        }
+
+        private static async Task<string> GetClientLocationAsync(HttpContext httpContext)
         {
             try
             {
@@ -807,7 +835,7 @@ namespace CloudWork.Controllers
             }
         }
 
-        private string GetClientDeviceInfo(HttpContext httpContext)
+        private static string GetClientDeviceInfo(HttpContext httpContext)
         {
             try
             {

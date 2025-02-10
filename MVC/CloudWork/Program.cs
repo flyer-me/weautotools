@@ -37,8 +37,6 @@ namespace CloudWork
                     options.MultipartBodyLengthLimit = 10_000_000; // 10MB
                 });
 
-            //builder.Services.AddScoped<TimerFilterAttribute>();
-
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("CloudWork"));
@@ -65,6 +63,8 @@ namespace CloudWork
                 options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 3;
                 options.User.RequireUniqueEmail = true;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.MaxFailedAccessAttempts = 5;
             })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();

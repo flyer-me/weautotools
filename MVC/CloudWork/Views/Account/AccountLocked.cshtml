@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "账户锁定";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3 class="mb-0">账户已暂时锁定</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-lock fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="card-title text-center">安全提示</h5>
+                    <p class="card-text">
+                        出于安全考虑，您的账户因为多次失败登录，已被暂时锁定。
+                    </p>
+                    <p class="card-text">
+                        通过以下方式重新访问账户：
+                    </p>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item">
+                            <strong>重设密码：</strong><a href="@Url.Action("ForgotPassword", "Account")" class="text-primary"></a>.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>等待一段时间（通常为15分钟）重试</strong>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>联系我们</strong> <a href="mailto:support" class="text-primary">support</a>.
+                        </li>
+                    </ul>
+                    <div class="text-center">
+                        <a href="@Url.Action("Support", "Home")" class="btn btn-outline-primary">支持</a>
+                        <a href="@Url.Action("Login", "Account")" class="btn btn-primary">转到登录</a>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    Thank you for your understanding and patience.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
