@@ -1,0 +1,18 @@
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace App.Core.Models
+{
+    public class User : IdentityUser
+    {
+        /*
+        public int Id { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        */
+        public bool IsDeleted { get; set; } = false;
+
+        public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
+    }
+}
