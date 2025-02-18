@@ -172,7 +172,7 @@ namespace CloudWork.Controllers
 
             foreach (var user in _userManager.Users)
             {
-                bool isSelected = await _userManager.IsInRoleAsync(user, role.Name);
+                bool isSelected = await _userManager.IsInRoleAsync(user, role.Name ?? string.Empty);
                 var userRoleViewModel = new UsersForRoleViewModel
                 {
                     UserId = user.Id,
@@ -201,19 +201,22 @@ namespace CloudWork.Controllers
             {
                 var user = await _userManager.FindByIdAsync(userRole.UserId);
 
-                if (userRole.IsSelected && !(await _userManager.IsInRoleAsync(user, role.Name)))
+                if (user is not null)
                 {
-                    await _userManager.AddToRoleAsync(user, role.Name);
+                    if (userRole.IsSelected && !(await _userManager.IsInRoleAsync(user, role.Name ?? string.Empty)))
+                    {
+                        await _userManager.AddToRoleAsync(user, role.Name ?? string.Empty);
+                    }
+                    else if (!userRole.IsSelected && await _userManager.IsInRoleAsync(user, role.Name ?? string.Empty))
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, role.Name ?? string.Empty);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    await _userManager.UpdateSecurityStampAsync(user);  // 更新安全戳
                 }
-                else if (!userRole.IsSelected && await _userManager.IsInRoleAsync(user, role.Name))
-                {
-                    await _userManager.RemoveFromRoleAsync(user, role.Name);
-                }
-                else
-                {
-                    continue;
-                }
-                await _userManager.UpdateSecurityStampAsync(user);  // 更新安全戳
             }
 
             return RedirectToAction("Edit", new { id });

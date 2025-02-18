@@ -5,16 +5,16 @@ namespace CloudWork.Service.Interface
     public interface ITestCaseService
     {
         Task<IEnumerable<TestCase>> GetTestCasesWithQuestionAsync();
-        Task<TestCase?> GetTestCaseWithQuestionAsync(int id);
+        Task<TestCase?> GetTestCaseWithQuestionAsync(object id);
         Task<IEnumerable<Question>> GetQuestionsAsync();
-        Task<Question?> GetQuestionAsync(int id);
+        Task<Question?> GetQuestionAsync(object id);
 
         /// <summary>
         /// id 获取实体
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<TestCase?> GetByIdAsync(int id);
+        Task<TestCase?> GetByIdAsync(object id);
 
         /// <summary>
         /// 获取所有实体
@@ -38,7 +38,7 @@ namespace CloudWork.Service.Interface
         /// </summary>
         /// <param name="id"></param>
         /// <returns>Task 影响行数</returns>
-        Task DeleteAsync(int id);
+        Task DeleteAsync(object id);
         /// <summary>
         /// 保存到数据库
         /// </summary>

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CloudWork
+namespace CloudWork.Repository.DB
 {
     public class AppDbContext : IdentityDbContext<User>
     {
@@ -16,7 +16,7 @@ namespace CloudWork
         public DbSet<Question> Questions { get; set; }
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<TestCase> TestCases { get; set; }
-        public DbSet<SubmissionResult> SubmissionEvaluations { get; set; }
+        public DbSet<SubmissionEvaluation> SubmissionEvaluations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -63,11 +63,6 @@ namespace CloudWork
                 entity.HasOne(s => s.Question)
                       .WithMany(p => p.Submissions)
                       .HasForeignKey(s => s.QuestionId)
-                      .OnDelete(DeleteBehavior.NoAction);
-
-                entity.HasOne(s => s.Evaluation)
-                      .WithOne(se => se.Submission)
-                      .HasForeignKey<SubmissionResult>(se => se.SubmissionId)
                       .OnDelete(DeleteBehavior.NoAction);
             });
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BlogManagementApp.Controllers
+namespace CloudWork.Controllers
 {
     [Route("file/[controller]")]
     [ApiController]

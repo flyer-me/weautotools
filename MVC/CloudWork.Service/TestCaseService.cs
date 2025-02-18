@@ -20,11 +20,11 @@ namespace CloudWork.Service
                 //.GetAsync(t => t, w => true, null, nameof(Question));
         }
 
-        public async Task<TestCase?> GetTestCaseWithQuestionAsync(int id)
+        public async Task<TestCase?> GetTestCaseWithQuestionAsync(object id)
         {
             return await _unitOfWork.TestCases.GetByIdAsync(id);
         }
-        public async Task<Question?> GetQuestionAsync(int id)
+        public async Task<Question?> GetQuestionAsync(object id)
         {
             return await _unitOfWork.Questions.GetByIdAsync(id);
         }
@@ -34,7 +34,7 @@ namespace CloudWork.Service
             return await _unitOfWork.Questions.GetAllAsync();
         }
 
-        public async Task<TestCase?> GetByIdAsync(int id)
+        public async Task<TestCase?> GetByIdAsync(object id)
         {
             return await _unitOfWork.TestCases.GetByIdAsync(id);
         }
@@ -54,7 +54,7 @@ namespace CloudWork.Service
             _unitOfWork.TestCases.Update(entity);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(object id)
         {
             await _unitOfWork.TestCases.DeleteAsync(id);
         }

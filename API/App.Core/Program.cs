@@ -5,7 +5,9 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; });
+// builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddOpenApi();
 builder.Services.AddIdentityCore<IdentityUser>()

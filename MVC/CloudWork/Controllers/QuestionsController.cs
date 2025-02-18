@@ -86,7 +86,7 @@ namespace CloudWork.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsPublic")] Question question)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Title,Description,IsPublic")] Question question)
         {
             if (id != question.Id)
             {

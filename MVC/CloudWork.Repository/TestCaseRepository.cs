@@ -1,5 +1,6 @@
 ﻿using CloudWork.Model;
 using CloudWork.Repository.Base;
+using CloudWork.Repository.DB;
 using Microsoft.EntityFrameworkCore;
 
 namespace CloudWork.Repository
@@ -13,7 +14,7 @@ namespace CloudWork.Repository
             return await DbContext.TestCases.Include(q => q.Question).ToListAsync();
         }
 
-        public async Task<TestCase?> GetTestCaseByIdAsync(int id)
+        public async Task<TestCase?> GetTestCaseByIdAsync(string id)
         {
             var testCase = await DbContext.TestCases
                 .Include(q => q.Question)

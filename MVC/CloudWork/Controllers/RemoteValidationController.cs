@@ -1,4 +1,5 @@
-﻿using CloudWork.Service;
+﻿using CloudWork.Repository.DB;
+using CloudWork.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

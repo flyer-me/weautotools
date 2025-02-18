@@ -13,6 +13,6 @@ namespace CloudWork.Repository
 
         /// <summary>根据Id获取TestCase附带导航属性</summary>
         /// <returns>Task TestCase?</returns>
-        Task<TestCase?> GetTestCaseByIdAsync(int id);
+        Task<TestCase?> GetTestCaseByIdAsync(string id);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CloudWork.Repository.DB;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 namespace CloudWork.Repository.Base
 {

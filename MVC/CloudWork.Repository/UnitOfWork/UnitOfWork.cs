@@ -1,6 +1,7 @@
 ﻿using CloudWork.Common;
 using CloudWork.Model;
 using CloudWork.Repository.Base;
+using CloudWork.Repository.DB;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CloudWork.Repository.UnitOfWork

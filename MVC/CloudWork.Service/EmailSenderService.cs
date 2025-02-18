@@ -5,7 +5,6 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using MailKit.Security;
-using CloudWork.Model;
 namespace CloudWork.Service
 {
     [Service]

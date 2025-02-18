@@ -1,5 +1,6 @@
 ﻿using CloudWork.Model;
 using CloudWork.Repository.Base;
+using CloudWork.Repository.DB;
 
 namespace CloudWork.Repository
 {

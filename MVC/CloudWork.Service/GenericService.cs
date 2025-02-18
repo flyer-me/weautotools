@@ -1,6 +1,5 @@
 ﻿using CloudWork.Service.Interface;
 using CloudWork.Repository.Base;
-using CloudWork.Common;
 namespace CloudWork.Service
 {
     public class GenericService<TEntity> : IGenericService<TEntity> where TEntity : class

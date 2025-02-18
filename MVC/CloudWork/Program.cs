@@ -2,6 +2,7 @@ using CloudWork.Common.Extensions;
 using CloudWork.Filter;
 using CloudWork.Model;
 using CloudWork.Repository.Base;
+using CloudWork.Repository.DB;
 using CloudWork.Repository.UnitOfWork;
 using CloudWork.Service;
 using CloudWork.Service.Interface;
