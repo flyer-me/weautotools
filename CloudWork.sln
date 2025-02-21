@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{504FA00B-A167-4298-ADD6-1F2840ABBF1E}"
 	ProjectSection(SolutionItems) = preProject
 		setup\setup_docker_sqlserver.sh = setup\setup_docker_sqlserver.sh
+		setup_Juidge_env.sh = setup_Juidge_env.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Model", "MVC\CloudWork.Model\CloudWork.Model.csproj", "{70C2E18E-A2B1-4902-BF08-E13AD796AAFE}"
@@ -26,6 +27,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{0B9E3E61-FD08-455C-9C61-38F36EFAE271}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Core", "API\App.Core\App.Core.csproj", "{61BA9B80-131E-4D60-B24E-F02E10541752}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shell", "shell", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		cleancontainer.sh = cleancontainer.sh
+		compile.sh = compile.sh
+		startcontainer.sh = startcontainer.sh
+		runtests.sh = runtests.sh
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,5 +81,9 @@ Global
 		{B6DE4D51-4010-4C2A-ABF5-E7283602B78B} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
 		{DAC42905-15D5-44BB-B792-1179E9E97FCE} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
 		{5F2138D5-03CF-4BD6-BECF-88C02FFF3803} = {0B9E3E61-FD08-455C-9C61-38F36EFAE271}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {504FA00B-A167-4298-ADD6-1F2840ABBF1E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {143B74BD-E30E-4C8D-8C71-503692F96218}
 	EndGlobalSection
 EndGlobal

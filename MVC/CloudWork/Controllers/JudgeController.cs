@@ -22,7 +22,11 @@ namespace CloudWork.Controllers
         public async Task<IActionResult> SubmitCode(Submission submission)
         {
             var testCases = _dbContext.Questions.Find(submission.QuestionId)?.TestCases?.ToList();
-            var result = await CodeExecutionService.ExecuteCodeAsync(submission, testCases);
+            if (testCases == null)
+            {
+                return NotFound(new { success = false, message = "本题无测试用例" });
+            }
+            var result = await CodeExecutionService.JuidgeAsync(submission, testCases);
 
             // 根据执行结果判断是否正确
 
