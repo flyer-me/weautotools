@@ -8,7 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{504FA00B-A167-4298-ADD6-1F2840ABBF1E}"
 	ProjectSection(SolutionItems) = preProject
 		setup\setup_docker_sqlserver.sh = setup\setup_docker_sqlserver.sh
-		setup_Juidge_env.sh = setup_Juidge_env.sh
+		setup\setup_Juidge_env.sh = setup\setup_Juidge_env.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudWork.Model", "MVC\CloudWork.Model\CloudWork.Model.csproj", "{70C2E18E-A2B1-4902-BF08-E13AD796AAFE}"
