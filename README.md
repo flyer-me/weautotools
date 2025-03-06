@@ -1,6 +1,6 @@
 # CloudWork
 
-这是一个ASP.NET Core 示例项目，演示了基本功能和设计实现，目前为MVC模式，即将考虑Web API 模式。
+这是一个ASP.NET Core 示例项目，演示了基本功能和设计实现，目前为MVC模式，并将实现Web API 模式。
 
 ## 目录
 
