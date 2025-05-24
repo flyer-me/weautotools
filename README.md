@@ -1,6 +1,6 @@
 # CloudWork
 
-这是一个ASP.NET Core 示例项目，演示了基本功能和设计实现，目前为MVC模式，并将实现Web API 模式。
+这是一个ASP.NET Core 项目，演示了基本功能和设计实现，目前为MVC模式，并将实现Web API 模式。
 
 ## 目录
 
@@ -16,7 +16,7 @@
 
 ## 简介
 
-CloudWork 是一个基于 .NET 9 的 ASP.NET Core MVC Web应用程序，主要目的为演示。
+CloudWork 是一个基于 .NET 9 的 ASP.NET Core MVC Web应用程序，主要目的为演示，目前为开放阶段。当我们实现完全功能并完成备案等准备后，可能调整策略。
 
 ## 功能
 
