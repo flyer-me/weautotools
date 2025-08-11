@@ -1,9 +1,9 @@
-# 生成json的工具包
+# 鐢熸垚json鐨勫伐鍏峰寘
 sudo apt  install jq
 
 sudo mkdir -p /mnt/OJ
 # sudo mount -t tmpfs -o size=512m tmpfs /mnt/OJtmpfs
-# 工具shell
+# 宸ュ叿shell
 sudo mkdir shell
 cd shell
 chmod +x *.sh

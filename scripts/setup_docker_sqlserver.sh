@@ -1,26 +1,26 @@
-# Linux Docker °²×° SQLServer 2019
+# Linux Docker å®‰è£… SQLServer 2019
 
 #!/bin/bash
 
-# ¸üĞÂÈí¼ş°üÁĞ±íºÍ°²×°±ØÒªµÄÒÀÀµ°ü
+# æ›´æ–°è½¯ä»¶åŒ…åˆ—è¡¨å’Œå®‰è£…å¿…è¦çš„ä¾èµ–åŒ…
 sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
-# Ìí¼ÓDocker¹Ù·½GPGÃÜÔ¿
+# æ·»åŠ Dockerå®˜æ–¹GPGå¯†é’¥
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-# ÉèÖÃÎÈ¶¨µÄDocker²Ö¿â
+# è®¾ç½®ç¨³å®šçš„Dockerä»“åº“
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# ÔÙ´Î¸üĞÂAPT°üË÷Òı²¢°²×°DockerÒıÇæ
+# å†æ¬¡æ›´æ–°APTåŒ…ç´¢å¼•å¹¶å®‰è£…Dockerå¼•æ“
 sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# ÑéÖ¤dockerÊÇ·ñ°²×°ÕıÈ·
+# éªŒè¯dockeræ˜¯å¦å®‰è£…æ­£ç¡®
 sudo docker run hello-world
 
-# À­È¡×îĞÂµÄSQL Server¾µÏñ
+# æ‹‰å–æœ€æ–°çš„SQL Serveré•œåƒ
 sudo docker pull mcr.microsoft.com/mssql/server:2019-latest
 
-# ÔËĞĞSQL ServerÈİÆ÷£¬²¢ÉèÖÃÎª¿ª»ú×ÔÆô
+# è¿è¡ŒSQL Serverå®¹å™¨ï¼Œå¹¶è®¾ç½®ä¸ºå¼€æœºè‡ªå¯
 sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Asdf1234' \
   -p 1433:1433 --name sqlserver \
   --mount source=sqlserverdata,target=/var/opt/mssql \
@@ -28,6 +28,6 @@ sudo docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Asdf1234' \
 
 docker update --restart=always sqlserver
 
-# Êä³öÍê³ÉĞÅÏ¢
+# è¾“å‡ºå®Œæˆä¿¡æ¯
 docker ps
 echo "Docker and SQL Server 2019 setup completed.
