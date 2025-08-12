@@ -3,17 +3,28 @@
   <view class="home-container">
     <!-- 顶部搜索栏 -->
     <view class="search-bar">
-      <input class="search-input" placeholder="立即查找" />
+      <input
+        class="search-input"
+        placeholder="立即查找"
+        v-model="searchKeyword"
+        @focus="handleSearchFocus"
+        @confirm="handleSearch"
+      />
       <view class="search-icons">
-        <uni-icons type="more-filled" size="24" />
-        <uni-icons type="person" size="24" />
+        <uni-icons type="more-filled" size="24" @click="handleMoreClick" />
+        <uni-icons type="person" size="24" @click="handleProfileClick" />
       </view>
     </view>
 
     <!-- 轮播图 -->
     <swiper class="banner-swiper" circular indicator-dots autoplay>
       <swiper-item v-for="(item, idx) in banners" :key="idx">
-        <image :src="item" class="banner-img" mode="aspectFill" />
+        <image
+          :src="item.img"
+          class="banner-img"
+          mode="aspectFill"
+          @click="handleBannerClick(item, idx)"
+        />
       </swiper-item>
     </swiper>
 
@@ -27,7 +38,12 @@
 
     <!-- 商品列表 -->
     <view class="goods-list">
-      <view v-for="(item, idx) in goodsList" :key="idx" class="goods-card">
+      <view
+        v-for="(item, idx) in goodsList"
+        :key="idx"
+        class="goods-card"
+        @click="handleGoodsClick(item)"
+      >
         <image :src="item.img" class="goods-img" mode="aspectFill" />
         <view class="goods-info">
           <view class="goods-title">{{ item.title }}</view>
@@ -37,7 +53,12 @@
           <view class="goods-price">
             <text class="price">￥{{ item.price }}</text>
             <text class="origin-price">￥{{ item.originPrice }}</text>
-            <uni-icons type="cart" size="22" class="cart-icon" />
+            <uni-icons
+              type="cart"
+              size="22"
+              class="cart-icon"
+              @click.stop="handleAddToCart(item)"
+            />
           </view>
         </view>
       </view>
@@ -51,10 +72,16 @@
 
 <script setup>
 import TabBar from '@/components/TabBar.vue'
+import { navigate } from '@/utils/router.js'
 import { ref, computed } from 'vue'
+
+// 搜索关键词
+const searchKeyword = ref('')
+
+// 轮播图数据
 const banners = [
-  '/static/banner1.png',
-  '/static/banner2.png',
+  { img: '/static/banner1.png', title: '精选推荐', url: '/pages/category/category' },
+  { img: '/static/banner2.png', title: '热门活动', url: '/pages/activity/activity' },
 ]
 const tabs = ['精选推荐', '办公助手', 'Web自动化', '人气榜']
 const activeTab = ref(0)
@@ -127,6 +154,59 @@ const goodsMap = [
 ]
 
 const goodsList = computed(() => goodsMap[activeTab.value])
+
+// 搜索相关事件
+const handleSearchFocus = () => {
+  console.log('搜索框获得焦点')
+  navigate.toSearch()
+}
+
+const handleSearch = () => {
+  if (searchKeyword.value.trim()) {
+    console.log('搜索:', searchKeyword.value)
+    navigate.toSearch(searchKeyword.value)
+  }
+}
+
+// 顶部图标点击事件
+const handleMoreClick = () => {
+  uni.showActionSheet({
+    itemList: ['扫一扫', '消息通知', '设置'],
+    success: (res) => {
+      console.log('选择了第' + (res.tapIndex + 1) + '个按钮')
+    }
+  })
+}
+
+const handleProfileClick = () => {
+  navigate.toUser()
+}
+
+// 轮播图点击事件
+const handleBannerClick = (banner, index) => {
+  console.log('点击轮播图:', banner, index)
+  if (banner.url) {
+    if (banner.url.startsWith('/pages/category')) {
+      navigate.toCategory()
+    } else {
+      uni.navigateTo({ url: banner.url })
+    }
+  }
+}
+
+// 商品相关事件
+const handleGoodsClick = (goods) => {
+  console.log('点击商品:', goods)
+  navigate.toGoodsDetail(goods.id || 1)
+}
+
+const handleAddToCart = (goods) => {
+  console.log('添加到购物车:', goods)
+  uni.showToast({
+    title: '已添加到购物车',
+    icon: 'success'
+  })
+}
 </script>
 
 

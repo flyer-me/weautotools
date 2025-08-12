@@ -1,24 +1,31 @@
 <template>
   <view class="profile-container">
     <!-- 头部信息 -->
-    <view class="profile-header">
+    <view class="profile-header" @click="handleProfileClick">
       <image class="avatar" src="/static/avatar.png" />
       <view class="profile-info">
-        <view class="profile-name">TDesign <uni-icons type="medal" size="20" color="#FFD700" /></view>
+        <view class="profile-name">{{ userInfo.name }} <uni-icons type="medal" size="20" color="#FFD700" /></view>
+        <view class="profile-desc">{{ userInfo.desc }}</view>
       </view>
+      <uni-icons type="arrowright" size="18" color="#666" />
     </view>
 
     <!-- 我的订单 -->
     <view class="section-card">
       <view class="section-title-row">
         <text class="section-title">我的订单</text>
-        <view class="section-link">全部订单 <uni-icons type="arrowright" size="16" /></view>
+        <view class="section-link" @click="handleAllOrdersClick">全部订单 <uni-icons type="arrowright" size="16" /></view>
       </view>
       <view class="order-status-row">
-        <view class="order-status-item" v-for="item in orderStatus" :key="item.text">
+        <view
+          class="order-status-item"
+          v-for="item in orderStatus"
+          :key="item.text"
+          @click="handleOrderStatusClick(item)"
+        >
           <view class="icon-badge">
             <uni-icons :type="item.icon" size="32" />
-            <view v-if="item.badge" class="badge">1</view>
+            <view v-if="item.count > 0" class="badge">{{ item.count }}</view>
           </view>
           <text class="order-status-text">{{ item.text }}</text>
         </view>
@@ -27,26 +34,26 @@
 
     <!-- 其他信息卡片 -->
     <view class="section-card">
-      <view class="info-row">
+      <view class="info-row" @click="handleAddressClick">
         <text>收货地址</text>
         <uni-icons type="arrowright" size="18" />
       </view>
-      <view class="info-row">
+      <view class="info-row" @click="handleCouponClick">
         <text>优惠券</text>
-        <view class="info-value">10 <uni-icons type="arrowright" size="18" /></view>
+        <view class="info-value">{{ userStats.couponCount }} <uni-icons type="arrowright" size="18" /></view>
       </view>
-      <view class="info-row">
+      <view class="info-row" @click="handlePointsClick">
         <text>积分</text>
-        <view class="info-value">2</view>
+        <view class="info-value">{{ userStats.points }}</view>
       </view>
     </view>
 
     <view class="section-card">
-      <view class="info-row">
+      <view class="info-row" @click="handleHelpClick">
         <text>帮助中心</text>
         <uni-icons type="arrowright" size="18" />
       </view>
-      <view class="info-row">
+      <view class="info-row" @click="handleServiceClick">
         <text>客服电话</text>
         <uni-icons type="headphones" size="18" />
       </view>
@@ -61,14 +68,75 @@
 
 <script setup>
 import TabBar from '@/components/TabBar.vue'
+import { navigate } from '@/utils/router.js'
 import { ref } from 'vue'
+
+// 用户信息
+const userInfo = ref({
+  name: 'TDesign',
+  desc: '自动化专家 · VIP会员'
+})
+
+// 用户统计数据
+const userStats = ref({
+  couponCount: 10,
+  points: 2580
+})
+
+// 订单状态数据
 const orderStatus = [
-  { icon: 'wallet', text: '待付款', badge: true },
-  { icon: 'shop', text: '待发货', badge: true },
-  { icon: 'gift', text: '待收货', badge: true },
-  { icon: 'chat', text: '待评价', badge: false },
-  { icon: 'help', text: '退款/售后', badge: false },
+  { icon: 'wallet', text: '待付款', count: 2, status: 'pending' },
+  { icon: 'shop', text: '待发货', count: 1, status: 'processing' },
+  { icon: 'gift', text: '待收货', count: 3, status: 'shipping' },
+  { icon: 'chat', text: '待评价', count: 0, status: 'delivered' },
+  { icon: 'help', text: '退款/售后', count: 0, status: 'refund' },
 ]
+
+// 事件处理函数
+const handleProfileClick = () => {
+  navigate.toProfile()
+}
+
+const handleAllOrdersClick = () => {
+  navigate.toOrderList()
+}
+
+const handleOrderStatusClick = (item) => {
+  navigate.toOrderList(item.status)
+}
+
+const handleAddressClick = () => {
+  navigate.toAddress()
+}
+
+const handleCouponClick = () => {
+  navigate.toCoupon()
+}
+
+const handlePointsClick = () => {
+  navigate.toPoints()
+}
+
+const handleHelpClick = () => {
+  navigate.toHelp()
+}
+
+const handleServiceClick = () => {
+  uni.showModal({
+    title: '客服电话',
+    content: '400-123-4567',
+    showCancel: true,
+    cancelText: '取消',
+    confirmText: '拨打',
+    success: (res) => {
+      if (res.confirm) {
+        uni.makePhoneCall({
+          phoneNumber: '400-123-4567'
+        })
+      }
+    }
+  })
+}
 
 </script>
 
@@ -83,16 +151,27 @@ const orderStatus = [
   align-items: center;
   padding: 48rpx 32rpx 24rpx 32rpx;
   background: linear-gradient(120deg, #ffd6e0 0%, #f9e0ff 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:active {
+    opacity: 0.8;
+  }
+
   .avatar {
     width: 96rpx;
     height: 96rpx;
     border-radius: 50%;
     background: #fff;
     margin-right: 24rpx;
+    border: 3rpx solid rgba(255, 255, 255, 0.8);
   }
+
   .profile-info {
     display: flex;
     flex-direction: column;
+    flex: 1;
+
     .profile-name {
       font-size: 36rpx;
       font-weight: bold;
@@ -100,6 +179,13 @@ const orderStatus = [
       display: flex;
       align-items: center;
       gap: 8rpx;
+      margin-bottom: 8rpx;
+    }
+
+    .profile-desc {
+      font-size: 24rpx;
+      color: #666;
+      opacity: 0.8;
     }
   }
 }
