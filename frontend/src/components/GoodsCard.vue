@@ -13,13 +13,6 @@
       <view class="goods-price">
         <text class="price">￥{{ goods.price }}</text>
         <text v-if="goods.originPrice" class="origin-price">￥{{ goods.originPrice }}</text>
-        <uni-icons 
-          v-if="showCart"
-          type="cart" 
-          size="22" 
-          class="cart-icon" 
-          @click.stop="handleAddToCart"
-        />
       </view>
     </view>
   </view>
@@ -38,10 +31,7 @@ export default {
       default: 'vertical', // vertical | horizontal
       validator: (value) => ['vertical', 'horizontal'].includes(value)
     },
-    showCart: {
-      type: Boolean,
-      default: true
-    }
+
   },
   computed: {
     layoutClass() {
@@ -51,9 +41,6 @@ export default {
   methods: {
     handleClick() {
       this.$emit('click', this.goods)
-    },
-    handleAddToCart() {
-      this.$emit('add-to-cart', this.goods)
     }
   }
 }
@@ -176,15 +163,6 @@ export default {
     text-decoration: line-through;
   }
   
-  .cart-icon {
-    margin-left: auto;
-    color: #e60012;
-    padding: 8rpx;
-    
-    &:hover {
-      background: rgba(230, 0, 18, 0.1);
-      border-radius: 50%;
-    }
-  }
+
 }
 </style>

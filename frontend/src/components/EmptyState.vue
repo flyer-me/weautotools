@@ -25,8 +25,8 @@ export default {
   props: {
     type: {
       type: String,
-      default: 'default', // default | search | cart | order | network | data
-      validator: (value) => ['default', 'search', 'cart', 'order', 'network', 'data'].includes(value)
+      default: 'default', // default | search | order | network | data
+      validator: (value) => ['default', 'search', 'order', 'network', 'data'].includes(value)
     },
     title: {
       type: String,
@@ -54,7 +54,6 @@ export default {
       const iconMap = {
         default: 'info-filled',
         search: 'search',
-        cart: 'cart',
         order: 'list',
         network: 'wifi-off',
         data: 'folder-add'
@@ -70,7 +69,6 @@ export default {
       const titleMap = {
         default: '暂无数据',
         search: '没有找到相关内容',
-        cart: '购物车是空的',
         order: '暂无订单',
         network: '网络连接失败',
         data: '暂无数据'
@@ -83,7 +81,6 @@ export default {
       const descMap = {
         default: '暂时没有相关数据',
         search: '试试其他关键词吧',
-        cart: '快去挑选心仪的商品吧',
         order: '您还没有任何订单',
         network: '请检查网络连接后重试',
         data: '暂时没有相关数据'

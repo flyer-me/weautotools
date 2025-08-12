@@ -66,93 +66,53 @@
 import TabBar from '@/components/TabBar.vue'
 import MessageItem from '@/components/MessageItem.vue'
 import { ref, computed, onMounted } from 'vue'
+import { useMessage } from '@/composables/useMessage'
+import { MESSAGE_TYPE, MESSAGE_TYPE_TEXT } from '@/constants'
+
+// 使用消息管理Hook
+const {
+  messages,
+  loading,
+  refreshing,
+  hasMore,
+  messagesByType,
+  unreadCounts,
+  getMessageList,
+  markAsRead,
+  markAllAsRead,
+  refreshMessages
+} = useMessage()
 
 // 搜索关键词
 const searchKeyword = ref('')
 
-// 消息分类Tab
-const messageTabs = ref([
-  { key: 'all', name: '全部', count: 5 },
-  { key: 'chat', name: '聊天', count: 3 },
-  { key: 'system', name: '系统', count: 2 },
-  { key: 'service', name: '客服', count: 0 }
+// 消息分类Tab - 动态计算未读数量
+const messageTabs = computed(() => [
+  { key: 'all', name: '全部', count: unreadCounts.value.total },
+  { key: MESSAGE_TYPE.CHAT, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.CHAT], count: unreadCounts.value[MESSAGE_TYPE.CHAT] },
+  { key: MESSAGE_TYPE.SYSTEM, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.SYSTEM], count: unreadCounts.value[MESSAGE_TYPE.SYSTEM] },
+  { key: MESSAGE_TYPE.SERVICE, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.SERVICE], count: unreadCounts.value[MESSAGE_TYPE.SERVICE] }
 ])
 
 const activeTab = ref(0)
 
-// 刷新状态
-const refreshing = ref(false)
-const hasMore = ref(false) // 初始设置为false，因为模拟数据有限
-
-// 模拟消息数据
-const messages = ref([
-  {
-    id: 1,
-    senderName: '自动化专家',
-    avatar: '/static/avatar1.png',
-    lastMessage: '您好，这个RPA脚本还有库存吗？',
-    time: new Date().getTime() - 300000, // 5分钟前
-    unread: 2,
-    type: 'chat'
-  },
-  {
-    id: 2,
-    senderName: 'Excel大师',
-    avatar: '/static/avatar2.png',
-    lastMessage: '谢谢您的购买，有问题随时联系我',
-    time: new Date().getTime() - 1800000, // 30分钟前
-    unread: 1,
-    type: 'chat'
-  },
-  {
-    id: 3,
-    senderName: '系统消息',
-    avatar: '/static/system-avatar.png',
-    lastMessage: '您的订单已发货，请注意查收',
-    time: new Date().getTime() - 3600000, // 1小时前
-    unread: 1,
-    type: 'system'
-  },
-  {
-    id: 4,
-    senderName: 'Web爬虫专家',
-    avatar: '/static/avatar3.png',
-    lastMessage: '脚本已经优化完成，请查看',
-    time: new Date().getTime() - 7200000, // 2小时前
-    unread: 1,
-    type: 'chat'
-  },
-  {
-    id: 5,
-    senderName: '系统消息',
-    avatar: '/static/system-avatar.png',
-    lastMessage: '您有新的优惠券到账，快去使用吧',
-    time: new Date().getTime() - 86400000, // 1天前
-    unread: 1,
-    type: 'system'
-  }
-])
-
 // 过滤消息列表
 const filteredMessages = computed(() => {
-  let filtered = messages.value
-
-  // 根据Tab过滤
   const currentTab = messageTabs.value[activeTab.value]
-  if (currentTab.key !== 'all') {
-    filtered = filtered.filter(msg => msg.type === currentTab.key)
-  }
+  let filtered = currentTab.key === 'all'
+    ? messagesByType.value.all
+    : messagesByType.value[currentTab.key] || []
 
   // 根据搜索关键词过滤
   if (searchKeyword.value.trim()) {
     const keyword = searchKeyword.value.trim().toLowerCase()
-    filtered = filtered.filter(msg => 
+    filtered = filtered.filter(msg =>
       msg.senderName.toLowerCase().includes(keyword) ||
       msg.lastMessage.toLowerCase().includes(keyword)
     )
   }
 
-  return filtered.sort((a, b) => b.time - a.time)
+  return filtered
 })
 
 // formatTime 函数已在 MessageItem 组件中实现
@@ -163,37 +123,36 @@ const handleSearch = () => {
 }
 
 const handleRefresh = async () => {
-  refreshing.value = true
-  // 模拟刷新延迟
-  setTimeout(() => {
-    refreshing.value = false
-    uni.showToast({
-      title: '刷新成功',
-      icon: 'success'
-    })
-  }, 1000)
+  await refreshMessages()
+  uni.showToast({
+    title: '刷新成功',
+    icon: 'success'
+  })
 }
 
 const handleLoadMore = () => {
   if (!hasMore.value) return
-
   console.log('加载更多消息')
   // 在实际项目中，这里应该调用API加载更多消息
-  // 由于是模拟数据，直接设置为false
-  hasMore.value = false
 }
 
-const handleMessageClick = (message) => {
+const handleMessageClick = async (message) => {
   console.log('点击消息:', message)
+
+  // 标记消息为已读
+  if (!message.isRead && message.unreadCount > 0) {
+    await markAsRead(message.id, message.type)
+  }
+
   // 跳转到聊天详情页面
   uni.navigateTo({
     url: `/pages/chat-detail/chat-detail?id=${message.id}&name=${message.senderName}`
   })
 }
 
-// 页面加载时更新消息数量
-onMounted(() => {
-  updateMessageCounts()
+// 页面加载时初始化数据
+onMounted(async () => {
+  await getMessageList()
 })
 
 // 更新消息数量

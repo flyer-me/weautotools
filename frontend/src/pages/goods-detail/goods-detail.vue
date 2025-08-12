@@ -88,7 +88,6 @@
         </view>
       </view>
       <view class="action-right">
-        <button class="btn-cart" @click="handleAddToCart">加入购物车</button>
         <button class="btn-buy" @click="handleBuyNow">立即购买</button>
       </view>
     </view>
@@ -191,14 +190,7 @@ const handleShare = () => {
   })
 }
 
-// 加入购物车
-const handleAddToCart = () => {
-  console.log('加入购物车', selectedSpecs.value)
-  uni.showToast({
-    title: '已加入购物车',
-    icon: 'success'
-  })
-}
+
 
 // 立即购买
 const handleBuyNow = () => {
@@ -456,22 +448,14 @@ onMounted(() => {
   gap: 16rpx;
 }
 
-.btn-cart, .btn-buy {
+.btn-buy {
   padding: 16rpx 32rpx;
   border-radius: 48rpx;
   font-size: 28rpx;
   border: none;
   cursor: pointer;
-}
-
-.btn-cart {
-  background: #fff;
-  color: #ff4d4f;
-  border: 2rpx solid #ff4d4f;
-}
-
-.btn-buy {
   background: #ff4d4f;
   color: #fff;
+  flex: 1;
 }
 </style>

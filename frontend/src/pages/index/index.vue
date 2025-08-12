@@ -53,12 +53,6 @@
           <view class="goods-price">
             <text class="price">￥{{ item.price }}</text>
             <text class="origin-price">￥{{ item.originPrice }}</text>
-            <uni-icons
-              type="cart"
-              size="22"
-              class="cart-icon"
-              @click.stop="handleAddToCart(item)"
-            />
           </view>
         </view>
       </view>
@@ -200,13 +194,7 @@ const handleGoodsClick = (goods) => {
   navigate.toGoodsDetail(goods.id || 1)
 }
 
-const handleAddToCart = (goods) => {
-  console.log('添加到购物车:', goods)
-  uni.showToast({
-    title: '已添加到购物车',
-    icon: 'success'
-  })
-}
+
 </script>
 
 
@@ -328,10 +316,7 @@ const handleAddToCart = (goods) => {
           margin-left: 12rpx;
           text-decoration: line-through;
         }
-        .cart-icon {
-          margin-left: auto;
-          color: #e60012;
-        }
+
       }
     }
   }
