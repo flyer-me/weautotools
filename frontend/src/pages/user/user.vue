@@ -70,7 +70,15 @@
 import TabBar from '@/components/TabBar.vue'
 import { navigate } from '@/utils/router.js'
 import { getUserOrderStatusConfig } from '@/utils/orderStatus.js'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useOrder } from '@/composables/useOrder'
+import { useGlobalBadge } from '@/composables/useBadge'
+
+// 使用订单管理Hook
+const { getOrderStatusCounts } = useOrder()
+
+// 使用全局徽章Hook
+const { badgeState } = useGlobalBadge()
 
 // 用户信息
 const userInfo = ref({
@@ -84,26 +92,14 @@ const userStats = ref({
   points: 2580
 })
 
-// 订单状态数据 - 使用统一配置
-const orderStatus = ref([])
-
-// 模拟订单统计数据
-const mockOrderCounts = {
-  pending: 2,
-  processing: 1,
-  shipping: 3,
-  refund: 0,
-  completed: 0  // 评价状态
-}
-
-// 初始化订单状态数据
-const initOrderStatus = () => {
+// 订单状态数据 - 动态计算数量
+const orderStatus = computed(() => {
   const statusConfig = getUserOrderStatusConfig()
-  orderStatus.value = statusConfig.map(item => ({
+  return statusConfig.map(item => ({
     ...item,
-    count: mockOrderCounts[item.status] || 0
+    count: badgeState.order[item.status] || 0
   }))
-}
+})
 
 // 事件处理函数
 const handleProfileClick = () => {
@@ -152,8 +148,8 @@ const handleServiceClick = () => {
 }
 
 // 页面加载时初始化订单状态
-onMounted(() => {
-  initOrderStatus()
+onMounted(async () => {
+  await getOrderStatusCounts()
 })
 
 </script>

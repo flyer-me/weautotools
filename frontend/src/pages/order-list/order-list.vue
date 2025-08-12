@@ -91,6 +91,7 @@
 import { ref, onMounted, computed } from 'vue'
 import LoadingState from '@/components/LoadingState.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import { useOrder } from '@/composables/useOrder'
 import {
   getOrderListStatusTabs,
   getStatusText,
@@ -98,81 +99,40 @@ import {
   ORDER_STATUS
 } from '@/utils/orderStatus.js'
 
+// 使用订单管理Hook
+const {
+  orders,
+  loading,
+  orderCounts,
+  getOrderList,
+  cancelOrder,
+  confirmOrder,
+  getStatusText: getOrderStatusText,
+  getOrderActions: getOrderActionList
+} = useOrder()
+
 // 状态标签 - 使用统一配置
 const statusTabs = ref([])
 
-// 模拟订单统计数据
-const mockOrderCounts = {
-  pending: 2,
-  processing: 1,
-  shipping: 3,
-  refund: 0,
-  completed: 5  // 评价状态
-}
+// 当前状态
+const currentStatus = ref('all')
+
+// 订单列表 - 基于当前状态过滤
+const orderList = computed(() => {
+  if (currentStatus.value === 'all') {
+    return orders.value
+  }
+  return orders.value.filter(order => order.status === currentStatus.value)
+})
 
 // 初始化状态标签
 const initStatusTabs = () => {
   const tabs = getOrderListStatusTabs()
   statusTabs.value = tabs.map(tab => ({
     ...tab,
-    count: tab.value === 'all' ? 0 : (mockOrderCounts[tab.value] || 0)
+    count: tab.value === 'all' ? orders.value.length : (orderCounts.value[tab.value] || 0)
   }))
 }
-
-// 当前状态
-const currentStatus = ref('all')
-// 加载状态
-const loading = ref(false)
-// 订单列表
-const orderList = ref([])
-
-// 模拟订单数据
-const mockOrders = [
-  {
-    id: 1,
-    orderNo: '202401150001',
-    status: 'pending',
-    createTime: '2024-01-15 14:30:00',
-    totalAmount: 598,
-    totalQuantity: 2,
-    goodsList: [
-      {
-        id: 1,
-        title: 'Excel自动化处理工具专业版',
-        spec: '专业版 · 单用户授权',
-        price: 299,
-        quantity: 1,
-        img: '/static/goods1.png'
-      },
-      {
-        id: 2,
-        title: 'Word文档批量处理器',
-        spec: '标准版 · 单用户授权',
-        price: 299,
-        quantity: 1,
-        img: '/static/goods2.png'
-      }
-    ]
-  },
-  {
-    id: 2,
-    orderNo: '202401140002',
-    status: 'shipping',
-    createTime: '2024-01-14 10:15:00',
-    totalAmount: 199,
-    totalQuantity: 1,
-    goodsList: [
-      {
-        id: 3,
-        title: '网页数据抓取工具',
-        spec: '基础版 · 单用户授权',
-        price: 199,
-        quantity: 1,
-        img: '/static/goods1.png'
-      }
-    ]
-  }
-]
 
 // 注意：getStatusText 和 getOrderActions 现在从 orderStatus.js 导入
 
@@ -184,23 +144,15 @@ const switchStatus = (status) => {
 
 // 加载订单列表
 const loadOrderList = async () => {
-  loading.value = true
-  
-  // 模拟API请求
-  setTimeout(() => {
-    if (currentStatus.value === 'all') {
-      orderList.value = mockOrders
-    } else {
-      orderList.value = mockOrders.filter(order => order.status === currentStatus.value)
-    }
-    loading.value = false
-  }, 500)
+  await getOrderList(currentStatus.value)
+  // 更新状态标签的数量
+  initStatusTabs()
 }
 
 // 处理订单操作
-const handleOrderAction = (order, actionType) => {
+const handleOrderAction = async (order, actionType) => {
   console.log('订单操作:', order.id, actionType)
-  
+
   switch (actionType) {
     case 'pay':
       uni.navigateTo({
@@ -211,10 +163,12 @@ const handleOrderAction = (order, actionType) => {
       uni.showModal({
         title: '确认取消',
         content: '确定要取消这个订单吗？',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            uni.showToast({ title: '订单已取消', icon: 'success' })
-            loadOrderList()
+            const success = await cancelOrder(order.id)
+            if (success) {
+              initStatusTabs() // 更新状态标签数量
+            }
           }
         }
       })
@@ -223,10 +177,12 @@ const handleOrderAction = (order, actionType) => {
       uni.showModal({
         title: '确认收货',
         content: '确认已收到货吗？',
-        success: (res) => {
+        success: async (res) => {
           if (res.confirm) {
-            uni.showToast({ title: '确认收货成功', icon: 'success' })
-            loadOrderList()
+            const success = await confirmOrder(order.id)
+            if (success) {
+              initStatusTabs() // 更新状态标签数量
+            }
           }
         }
       })
@@ -237,7 +193,15 @@ const handleOrderAction = (order, actionType) => {
       })
       break
     case 'rebuy':
-      uni.showToast({ title: '已加入购物车', icon: 'success' })
+      uni.navigateTo({
+        url: `/pages/goods-detail/goods-detail?id=${order.goodsId}`
+      })
+      break
+    case 'logistics':
+      uni.showToast({ title: '查看物流功能开发中', icon: 'none' })
+      break
+    case 'contact':
+      uni.showToast({ title: '联系客服功能开发中', icon: 'none' })
       break
     default:
       uni.showToast({ title: `${actionType}功能开发中`, icon: 'none' })
@@ -259,10 +223,7 @@ const goShopping = () => {
 }
 
 // 页面加载
-onMounted(() => {
-  // 初始化状态标签
-  initStatusTabs()
-
+onMounted(async () => {
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const status = currentPage.options.status
@@ -271,7 +232,8 @@ onMounted(() => {
     currentStatus.value = status
   }
 
-  loadOrderList()
+  // 加载订单数据
+  await loadOrderList()
 })
 </script>
 
