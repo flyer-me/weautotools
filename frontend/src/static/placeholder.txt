@@ -1,0 +1,13 @@
+# 静态资源文件夹
+这个文件夹用于存放项目的静态资源，包括图片、图标等。
+
+## 目录结构
+- banner1.png - 轮播图1
+- banner2.png - 轮播图2  
+- goods1.png - 商品图片1
+- goods2.png - 商品图片2
+- avatar.png - 用户头像
+- category/ - 分类图标文件夹
+  - 1.png - Word生成图标
+  - 2.png - Word转换图标
+  - 3.png - Word压缩图标
