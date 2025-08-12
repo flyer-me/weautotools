@@ -14,11 +14,18 @@
 
 /* 颜色变量 */
 
-/* 行为相关颜色 */
+/* 主题色彩 */
 $uni-color-primary: #007aff;
-$uni-color-success: #4cd964;
-$uni-color-warning: #f0ad4e;
-$uni-color-error: #dd524d;
+$uni-color-secondary: #e60012;
+$uni-color-success: #52c41a;
+$uni-color-warning: #faad14;
+$uni-color-error: #ff4d4f;
+$uni-color-info: #1890ff;
+
+/* 行为相关颜色 */
+$uni-color-link: #1890ff;
+$uni-color-link-hover: #40a9ff;
+$uni-color-link-active: #096dd9;
 
 /* 文字基本颜色 */
 $uni-text-color: #333; // 基本色
@@ -28,13 +35,18 @@ $uni-text-color-placeholder: #808080;
 $uni-text-color-disable: #c0c0c0;
 
 /* 背景颜色 */
-$uni-bg-color: #fff;
-$uni-bg-color-grey: #f8f8f8;
+$uni-bg-color: #ffffff;
+$uni-bg-color-grey: #f5f5f5;
+$uni-bg-color-light: #fafbfc;
 $uni-bg-color-hover: #f1f1f1; // 点击状态颜色
-$uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
+$uni-bg-color-active: #e6f7ff; // 激活状态颜色
+$uni-bg-color-mask: rgba(0, 0, 0, 0.45); // 遮罩颜色
+$uni-bg-color-disabled: #f5f5f5; // 禁用状态颜色
 
 /* 边框颜色 */
-$uni-border-color: #c8c7cc;
+$uni-border-color: #d9d9d9;
+$uni-border-color-light: #f0f0f0;
+$uni-border-color-dark: #bfbfbf;
 
 /* 尺寸变量 */
 
@@ -47,6 +59,39 @@ $uni-font-size-lg: 16;
 $uni-img-size-sm: 20px;
 $uni-img-size-base: 26px;
 $uni-img-size-lg: 40px;
+
+/* 间距变量 */
+$uni-spacing-xs: 8rpx;
+$uni-spacing-sm: 16rpx;
+$uni-spacing-md: 24rpx;
+$uni-spacing-lg: 32rpx;
+$uni-spacing-xl: 48rpx;
+
+/* 圆角变量 */
+$uni-border-radius-sm: 6rpx;
+$uni-border-radius-base: 12rpx;
+$uni-border-radius-lg: 18rpx;
+$uni-border-radius-circle: 50%;
+
+/* 阴影变量 */
+$uni-box-shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+$uni-box-shadow-base: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+$uni-box-shadow-lg: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+
+/* 动画变量 */
+$uni-animation-duration-fast: 0.2s;
+$uni-animation-duration-base: 0.3s;
+$uni-animation-duration-slow: 0.5s;
+$uni-animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Z-index 层级 */
+$uni-z-index-dropdown: 1000;
+$uni-z-index-sticky: 1020;
+$uni-z-index-fixed: 1030;
+$uni-z-index-modal-backdrop: 1040;
+$uni-z-index-modal: 1050;
+$uni-z-index-popover: 1060;
+$uni-z-index-tooltip: 1070;
 
 /* Border Radius */
 $uni-border-radius-sm: 2px;
