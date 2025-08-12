@@ -25,6 +25,19 @@
 			}
 		},
 		{
+			"path": "pages/message/message",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/chat-detail/chat-detail",
+			"style": {
+				"navigationBarTitleText": "聊天",
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/goods-detail/goods-detail",
 			"style": {
 				"navigationBarTitleText": "商品详情"
@@ -65,6 +78,10 @@
 			{
 				"pagePath": "pages/category/category",
 				"text": "分类"
+			},
+			{
+				"pagePath": "pages/message/message",
+				"text": "消息"
 			},
 			{
 				"pagePath": "pages/user/user",

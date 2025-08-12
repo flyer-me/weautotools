@@ -8,6 +8,7 @@ export const ROUTES = {
   // 主要页面
   INDEX: '/pages/index/index',
   CATEGORY: '/pages/category/category',
+  MESSAGE: '/pages/message/message',
   USER: '/pages/user/user',
   
   // 商品相关
@@ -25,6 +26,9 @@ export const ROUTES = {
   COUPON: '/pages/coupon/coupon',
   POINTS: '/pages/points/points',
   
+  // 消息相关
+  CHAT_DETAIL: '/pages/chat-detail/chat-detail',
+
   // 其他
   HELP: '/pages/help/help',
   PAYMENT: '/pages/payment/payment',
@@ -35,6 +39,7 @@ export const ROUTES = {
 const TAB_PAGES = [
   ROUTES.INDEX,
   ROUTES.CATEGORY,
+  ROUTES.MESSAGE,
   ROUTES.USER
 ]
 
@@ -270,9 +275,16 @@ export const navigate = {
     return Router.navigateTo(ROUTES.REVIEW, { orderId })
   },
   
+  // 消息相关
+  toMessage: () => Router.switchTab(ROUTES.MESSAGE),
+  toChatDetail: (messageId, senderName) => {
+    return Router.navigateTo(ROUTES.CHAT_DETAIL, { id: messageId, name: senderName })
+  },
+
   // Tab页面跳转
   toIndex: () => Router.switchTab(ROUTES.INDEX),
   toCategory: () => Router.switchTab(ROUTES.CATEGORY),
+  toMessage: () => Router.switchTab(ROUTES.MESSAGE),
   toUser: () => Router.switchTab(ROUTES.USER),
   
   // 返回
