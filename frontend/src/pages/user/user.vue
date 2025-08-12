@@ -20,7 +20,7 @@
         <view
           class="order-status-item"
           v-for="item in orderStatus"
-          :key="item.text"
+          :key="item.status"
           @click="handleOrderStatusClick(item)"
         >
           <view class="icon-badge">
@@ -69,7 +69,8 @@
 <script setup>
 import TabBar from '@/components/TabBar.vue'
 import { navigate } from '@/utils/router.js'
-import { ref } from 'vue'
+import { getUserOrderStatusConfig } from '@/utils/orderStatus.js'
+import { ref, onMounted } from 'vue'
 
 // 用户信息
 const userInfo = ref({
@@ -83,14 +84,26 @@ const userStats = ref({
   points: 2580
 })
 
-// 订单状态数据
-const orderStatus = [
-  { icon: 'wallet', text: '待付款', count: 2, status: 'pending' },
-  { icon: 'shop', text: '待发货', count: 1, status: 'processing' },
-  { icon: 'gift', text: '待收货', count: 3, status: 'shipping' },
-  { icon: 'chat', text: '待评价', count: 0, status: 'delivered' },
-  { icon: 'help', text: '退款/售后', count: 0, status: 'refund' },
-]
+// 订单状态数据 - 使用统一配置
+const orderStatus = ref([])
+
+// 模拟订单统计数据
+const mockOrderCounts = {
+  pending: 2,
+  processing: 1,
+  shipping: 3,
+  refund: 0,
+  completed: 0  // 评价状态
+}
+
+// 初始化订单状态数据
+const initOrderStatus = () => {
+  const statusConfig = getUserOrderStatusConfig()
+  orderStatus.value = statusConfig.map(item => ({
+    ...item,
+    count: mockOrderCounts[item.status] || 0
+  }))
+}
 
 // 事件处理函数
 const handleProfileClick = () => {
@@ -124,19 +137,24 @@ const handleHelpClick = () => {
 const handleServiceClick = () => {
   uni.showModal({
     title: '客服电话',
-    content: '400-123-4567',
+    content: '-',
     showCancel: true,
     cancelText: '取消',
     confirmText: '拨打',
     success: (res) => {
       if (res.confirm) {
         uni.makePhoneCall({
-          phoneNumber: '400-123-4567'
+          phoneNumber: '-'
         })
       }
     }
   })
 }
+
+// 页面加载时初始化订单状态
+onMounted(() => {
+  initOrderStatus()
+})
 
 </script>
 

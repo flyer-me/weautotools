@@ -18,18 +18,18 @@
       <view v-if="loading" class="loading-container">
         <LoadingState type="skeleton" :count="3" />
       </view>
-      
+
       <view v-else-if="orderList.length === 0" class="empty-container">
         <EmptyState 
           type="order" 
           title="暂无订单" 
-          description="您还没有任何订单记录"
+          description="您还没有订单记录"
           :show-button="true"
-          button-text="去购物"
+          button-text="去浏览"
           @button-click="goShopping"
         />
       </view>
-      
+
       <view v-else>
         <view 
           v-for="order in orderList" 
@@ -44,7 +44,7 @@
               {{ getStatusText(order.status) }}
             </text>
           </view>
-          
+
           <!-- 商品列表 -->
           <view class="goods-list">
             <view 
@@ -63,13 +63,13 @@
               </view>
             </view>
           </view>
-          
+
           <!-- 订单信息 -->
           <view class="order-info">
             <text class="order-time">{{ order.createTime }}</text>
             <text class="order-total">共{{ order.totalQuantity }}件商品 合计：￥{{ order.totalAmount }}</text>
           </view>
-          
+
           <!-- 操作按钮 -->
           <view class="order-actions">
             <button 
@@ -91,15 +91,33 @@
 import { ref, onMounted, computed } from 'vue'
 import LoadingState from '@/components/LoadingState.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import {
+  getOrderListStatusTabs,
+  getStatusText,
+  getOrderActions,
+  ORDER_STATUS
+} from '@/utils/orderStatus.js'
 
-// 状态标签
-const statusTabs = ref([
-  { label: '全部', value: 'all', count: 0 },
-  { label: '待付款', value: 'pending', count: 2 },
-  { label: '待发货', value: 'processing', count: 1 },
-  { label: '待收货', value: 'shipping', count: 3 },
-  { label: '已完成', value: 'completed', count: 5 },
-])
+// 状态标签 - 使用统一配置
+const statusTabs = ref([])
+
+// 模拟订单统计数据
+const mockOrderCounts = {
+  pending: 2,
+  processing: 1,
+  shipping: 3,
+  refund: 0,
+  completed: 5  // 评价状态
+}
+
+// 初始化状态标签
+const initStatusTabs = () => {
+  const tabs = getOrderListStatusTabs()
+  statusTabs.value = tabs.map(tab => ({
+    ...tab,
+    count: tab.value === 'all' ? 0 : (mockOrderCounts[tab.value] || 0)
+  }))
+}
 
 // 当前状态
 const currentStatus = ref('all')
@@ -156,42 +174,7 @@ const mockOrders = [
   }
 ]
 
-// 获取状态文本
-const getStatusText = (status) => {
-  const statusMap = {
-    pending: '待付款',
-    processing: '待发货',
-    shipping: '待收货',
-    completed: '已完成',
-    cancelled: '已取消'
-  }
-  return statusMap[status] || '未知状态'
-}
-
-// 获取订单操作按钮
-const getOrderActions = (status) => {
-  const actionMap = {
-    pending: [
-      { type: 'cancel', text: '取消订单' },
-      { type: 'pay', text: '立即付款' }
-    ],
-    processing: [
-      { type: 'contact', text: '联系客服' }
-    ],
-    shipping: [
-      { type: 'logistics', text: '查看物流' },
-      { type: 'confirm', text: '确认收货' }
-    ],
-    completed: [
-      { type: 'review', text: '评价' },
-      { type: 'rebuy', text: '再次购买' }
-    ],
-    cancelled: [
-      { type: 'rebuy', text: '再次购买' }
-    ]
-  }
-  return actionMap[status] || []
-}
+// 注意：getStatusText 和 getOrderActions 现在从 orderStatus.js 导入
 
 // 切换状态
 const switchStatus = (status) => {
@@ -239,7 +222,7 @@ const handleOrderAction = (order, actionType) => {
     case 'confirm':
       uni.showModal({
         title: '确认收货',
-        content: '确认已收到商品吗？',
+        content: '确认已收到货吗？',
         success: (res) => {
           if (res.confirm) {
             uni.showToast({ title: '确认收货成功', icon: 'success' })
@@ -277,14 +260,17 @@ const goShopping = () => {
 
 // 页面加载
 onMounted(() => {
+  // 初始化状态标签
+  initStatusTabs()
+
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const status = currentPage.options.status
-  
+
   if (status && status !== 'all') {
     currentStatus.value = status
   }
-  
+
   loadOrderList()
 })
 </script>
@@ -383,25 +369,25 @@ onMounted(() => {
 .order-status {
   font-size: 26rpx;
   font-weight: bold;
-  
+
   &.status-pending {
     color: #faad14;
   }
-  
+
   &.status-processing {
     color: #1890ff;
   }
-  
+
   &.status-shipping {
     color: #52c41a;
   }
-  
+
   &.status-completed {
     color: #666;
   }
-  
-  &.status-cancelled {
-    color: #ff4d4f;
+
+  &.status-refund {
+    color: #722ed1;
   }
 }
 
@@ -441,6 +427,7 @@ onMounted(() => {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 

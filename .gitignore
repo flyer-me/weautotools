@@ -37,8 +37,8 @@ yarn-error.log*
 pnpm-debug.log*
 
 # 忽略编辑器和IDE生成的文件
-idea/
-vscode/
+.idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
@@ -60,7 +60,6 @@ dist
 *.local
 
 # Editor directories and files
-.idea
 *.suo
 *.ntvs*
 *.njsproj
