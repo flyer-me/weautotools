@@ -106,11 +106,6 @@ export const TAB_BAR_CONFIG = [
     icon: 'list'
   },
   {
-    pagePath: 'pages/message/message',
-    text: '消息',
-    icon: 'chat'
-  },
-  {
     pagePath: 'pages/user/user',
     text: '我的',
     icon: 'person'

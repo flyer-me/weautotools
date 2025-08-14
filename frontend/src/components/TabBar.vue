@@ -55,17 +55,15 @@ export default {
       }
     },
     getBadgeCount(pagePath) {
-      if (pagePath === 'pages/message/message') {
-        return this.tabBarBadges.message || 0
-      } else if (pagePath === 'pages/user/user') {
+      if (pagePath === 'pages/user/user') {
         return this.tabBarBadges.user || 0
       }
       return 0
     },
     shouldShowDot(pagePath) {
       const count = this.getBadgeCount(pagePath)
-      // 当数量为1且是消息类型时显示小红点，否则显示数字
-      return count === 1 && pagePath === 'pages/message/message'
+      // 当数量为1时显示小红点，否则显示数字
+      return count === 1
     },
     formatBadgeText(count) {
       if (count > 99) {

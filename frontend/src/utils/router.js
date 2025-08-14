@@ -281,14 +281,19 @@ export const navigate = {
   },
   
   // 消息相关
-  toMessage: () => Router.switchTab(ROUTES.MESSAGE),
+  toMessage: () => {
+    // 消息功能已移动到用户页面，显示提示
+    uni.showToast({
+      title: '功能开发中',
+      icon: 'none'
+    })
+  },
   toChatDetail: (messageId, senderName) => {
     return Router.navigateTo(ROUTES.CHAT_DETAIL, { id: messageId, name: senderName })
   },
 
   // Tab页面跳转
   toCategory: () => Router.switchTab(ROUTES.CATEGORY),
-  toMessage: () => Router.switchTab(ROUTES.MESSAGE),
   toUser: () => Router.switchTab(ROUTES.USER),
   
   // 返回

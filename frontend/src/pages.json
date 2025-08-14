@@ -62,10 +62,6 @@
 				"text": "工具"
 			},
 			{
-				"pagePath": "pages/message/message",
-				"text": "消息"
-			},
-			{
 				"pagePath": "pages/user/user",
 				"text": "我的"
 			}

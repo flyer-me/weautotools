@@ -23,6 +23,10 @@
     </view>
 
     <view class="section-card">
+      <view class="info-row" @click="handleMessageClick">
+        <text>消息</text>
+        <uni-icons type="chat" size="18" />
+      </view>
       <view class="info-row" @click="handleHelpClick">
         <text>帮助中心</text>
         <uni-icons type="arrowright" size="18" />
@@ -72,6 +76,13 @@ const handleProfileClick = () => {
 
 const handlePointsClick = () => {
   navigate.toPoints()
+}
+
+const handleMessageClick = () => {
+  uni.showToast({
+    title: '由于小程序限制，暂不开放',
+    icon: 'none'
+  })
 }
 
 const handleHelpClick = () => {
