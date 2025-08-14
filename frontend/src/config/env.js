@@ -15,21 +15,21 @@ const CURRENT_ENV = process.env.NODE_ENV === 'production' ? ENV_TYPES.PRODUCTION
 // 环境配置
 const ENV_CONFIG = {
   [ENV_TYPES.DEVELOPMENT]: {
-    API_BASE_URL: 'https://dev-api.weautomarket.com',
+    API_BASE_URL: 'https://dev-api.weautotools.com',
     API_VERSION: '/v1',
     API_TIMEOUT: 10000,
     DEBUG: true,
     LOG_LEVEL: 'debug'
   },
   [ENV_TYPES.TESTING]: {
-    API_BASE_URL: 'https://test-api.weautomarket.com',
+    API_BASE_URL: 'https://test-api.weautotools.com',
     API_VERSION: '/v1',
     API_TIMEOUT: 8000,
     DEBUG: true,
     LOG_LEVEL: 'info'
   },
   [ENV_TYPES.PRODUCTION]: {
-    API_BASE_URL: 'https://api.weautomarket.com',
+    API_BASE_URL: 'https://api.weautotools.com',
     API_VERSION: '/v1',
     API_TIMEOUT: 10000,
     DEBUG: false,

@@ -1,6 +1,6 @@
-# WeAutoMarket Frontend
+# WeAutoTools Frontend
 
-基于 uniapp + Vue3 的自动化包交易平台前端项目
+基于 uniapp + Vue3 的自动化工具平台前端项目
 
 ## 📁 项目结构
 

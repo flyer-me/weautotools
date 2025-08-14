@@ -8,7 +8,7 @@
 
 ### 2. 密码验证
 - 系统首先尝试调用API验证密码
-- API地址：`https://api.weautomarket.com/v1/dev/verify`
+- API地址：`https://api.weautotools.com/v1/dev/verify`
 - 请求方法：POST
 - 请求体：`{ "password": "用户输入的密码" }`
 
@@ -22,7 +22,7 @@
 
 ### 验证接口
 ```
-POST https://api.weautomarket.com/v1/dev/verify
+POST https://api.weautotools.com/v1/dev/verify
 Content-Type: application/json
 
 {

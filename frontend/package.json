@@ -1,6 +1,7 @@
 {
-  "name": "uni-preset-vue",
-  "version": "0.0.0",
+  "name": "weautotools-frontend",
+  "version": "1.0.0",
+  "description": "WeAutoTools 前端 - 基于uniapp的自动化工具平台",
   "scripts": {
     "dev:custom": "uni -p",
     "dev:h5": "uni",

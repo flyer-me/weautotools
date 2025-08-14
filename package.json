@@ -1,4 +1,13 @@
 {
+  "name": "weautotools",
+  "version": "1.0.0",
+  "description": "WeAutoTools - 自动化工具平台",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/flyer-me/weautotools.git"
+  },
+  "author": "flyer-me",
+  "license": "MIT",
   "devDependencies": {
     "sass": "^1.90.0"
   }

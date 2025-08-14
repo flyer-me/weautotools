@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.flyerme</groupId>
-	<artifactId>backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>backend</name>
-	<description>backend</description>
+	<artifactId>weautotools-backend</artifactId>
+	<version>1.0.0</version>
+	<name>weautotools-backend</name>
+	<description>WeAutoTools Backend - 自动化工具平台后端服务</description>
 	<url/>
 	<licenses>
 		<license/>

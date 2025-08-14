@@ -1,7 +1,7 @@
 {
-    "name" : "",
+    "name" : "WeAutoTools",
     "appid" : "",
-    "description" : "",
+    "description" : "自动化工具平台 - 提升工作效率的实用工具集合",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
