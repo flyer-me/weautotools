@@ -87,6 +87,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { navigate } from '@/utils/router.js'
+import { getFinalFeatureState, showFeatureDisabledToast } from '@/config/features'
 
 // 页面参数
 const chatInfo = ref({
@@ -216,7 +217,16 @@ const handleLoadHistory = () => {
 
 const handleSendMessage = () => {
   if (!inputText.value.trim()) return
-  
+
+  // 检查是否为系统客服聊天
+  const isSystemService = chatInfo.value.id === 'system' || chatInfo.value.name === '系统客服'
+
+  // 如果不是系统客服且用户间聊天功能被禁用
+  if (!isSystemService && !getFinalFeatureState('USER_CHAT')) {
+    showFeatureDisabledToast('USER_CHAT')
+    return
+  }
+
   const newMessage = {
     id: Date.now(),
     content: inputText.value.trim(),
@@ -225,24 +235,26 @@ const handleSendMessage = () => {
     avatar: '/static/my-avatar.png',
     type: 'text'
   }
-  
+
   messages.value.push(newMessage)
   inputText.value = ''
   scrollToBottom()
-  
-  // 模拟对方回复
-  setTimeout(() => {
-    const replyMessage = {
-      id: Date.now() + 1,
-      content: '收到，我稍后回复您',
-      time: new Date().getTime(),
-      isSelf: false,
-      avatar: chatInfo.value.avatar,
-      type: 'text'
-    }
-    messages.value.push(replyMessage)
-    scrollToBottom()
-  }, 1000)
+
+  // 模拟对方回复（仅系统客服）
+  if (isSystemService) {
+    setTimeout(() => {
+      const replyMessage = {
+        id: Date.now() + 1,
+        content: '您好，我是系统客服，有什么可以帮助您的吗？',
+        time: new Date().getTime(),
+        isSelf: false,
+        avatar: chatInfo.value.avatar,
+        type: 'text'
+      }
+      messages.value.push(replyMessage)
+      scrollToBottom()
+    }, 1000)
+  }
 }
 
 const handleVoiceInput = () => {

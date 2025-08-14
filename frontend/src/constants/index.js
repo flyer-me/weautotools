@@ -70,7 +70,6 @@ export const GOODS_CATEGORY_TEXT = {
 // 页面路径常量
 export const ROUTES = {
   // 主要页面
-  INDEX: '/pages/index/index',
   CATEGORY: '/pages/category/category',
   MESSAGE: '/pages/message/message',
   USER: '/pages/user/user',
@@ -102,13 +101,8 @@ export const ROUTES = {
 // TabBar配置
 export const TAB_BAR_CONFIG = [
   {
-    pagePath: 'pages/index/index',
-    text: '首页',
-    icon: 'home-filled'
-  },
-  {
     pagePath: 'pages/category/category',
-    text: '分类',
+    text: '工具',
     icon: 'list'
   },
   {

@@ -3,10 +3,11 @@
  * 统一管理页面跳转，提供更好的用户体验
  */
 
+import { isRouteDisabled, handleDisabledRoute } from '@/config/features'
+
 // 页面路径常量
 export const ROUTES = {
   // 主要页面
-  INDEX: '/pages/index/index',
   CATEGORY: '/pages/category/category',
   MESSAGE: '/pages/message/message',
   USER: '/pages/user/user',
@@ -37,7 +38,6 @@ export const ROUTES = {
 
 // Tab页面列表
 const TAB_PAGES = [
-  ROUTES.INDEX,
   ROUTES.CATEGORY,
   ROUTES.MESSAGE,
   ROUTES.USER
@@ -54,8 +54,13 @@ class Router {
    * @param {object} options 跳转选项
    */
   static navigateTo(url, params = {}, options = {}) {
+    // 检查路由是否被禁用
+    if (isRouteDisabled(url)) {
+      return Promise.reject(handleDisabledRoute(url))
+    }
+
     const fullUrl = this.buildUrl(url, params)
-    
+
     return new Promise((resolve, reject) => {
       uni.navigateTo({
         url: fullUrl,
@@ -282,7 +287,6 @@ export const navigate = {
   },
 
   // Tab页面跳转
-  toIndex: () => Router.switchTab(ROUTES.INDEX),
   toCategory: () => Router.switchTab(ROUTES.CATEGORY),
   toMessage: () => Router.switchTab(ROUTES.MESSAGE),
   toUser: () => Router.switchTab(ROUTES.USER),

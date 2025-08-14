@@ -72,13 +72,13 @@
 
           <!-- 操作按钮 -->
           <view class="order-actions">
-            <button 
-              v-for="action in getOrderActions(order.status)" 
+            <button
+              v-for="action in getFilteredOrderActions(order.status)"
               :key="action.type"
-              :class="['action-btn', `btn-${action.type}`]"
-              @click.stop="handleOrderAction(order, action.type)"
+              :class="['action-btn', `btn-${action.type}`, { 'btn-dev-disabled': action.disabled }]"
+              @click.stop="action.disabled ? handleDisabledFeatureClick(getFeatureNameByAction(action.type)) : handleOrderAction(order, action.type)"
             >
-              {{ action.text }}
+              {{ action.text }}{{ action.disabled ? ' (开发模式)' : '' }}
             </button>
           </view>
         </view>
@@ -98,6 +98,7 @@ import {
   getOrderActions,
   ORDER_STATUS
 } from '@/utils/orderStatus.js'
+import { getFinalFeatureState, showFeatureDisabledToast, handleDisabledFeatureClick, DEV_MODE } from '@/config/features'
 
 // 使用订单管理Hook
 const {
@@ -149,12 +150,74 @@ const loadOrderList = async () => {
   initStatusTabs()
 }
 
+// 根据操作类型获取功能名称
+const getFeatureNameByAction = (actionType) => {
+  switch (actionType) {
+    case 'pay':
+      return 'PAYMENT'
+    case 'cancel':
+    case 'confirm':
+    case 'refund':
+      return 'ORDER_ACTIONS'
+    case 'review':
+    case 'rebuy':
+      return 'TRADING'
+    default:
+      return 'TRADING'
+  }
+}
+
+// 获取过滤后的订单操作（根据功能开关）
+const getFilteredOrderActions = (orderStatus) => {
+  const allActions = getOrderActions(orderStatus)
+
+  // 开发模式下显示所有操作但标记禁用状态
+  if (DEV_MODE.enabled && DEV_MODE.auth.authenticated) {
+    return allActions.map(action => ({
+      ...action,
+      disabled: ['pay', 'cancel', 'confirm', 'refund', 'review', 'rebuy'].includes(action.type)
+    }))
+  }
+
+  // 正常模式下根据功能开关过滤
+  return allActions.filter(action => {
+    // 根据功能开关过滤操作
+    switch (action.type) {
+      case 'pay':
+        return getFinalFeatureState('PAYMENT') && getFinalFeatureState('ORDER_ACTIONS')
+      case 'cancel':
+      case 'confirm':
+      case 'refund':
+        return getFinalFeatureState('ORDER_ACTIONS')
+      case 'review':
+      case 'rebuy':
+        return getFinalFeatureState('TRADING')
+      case 'contact':
+        // 联系客服功能保留
+        return true
+      default:
+        return true
+    }
+  })
+}
+
 // 处理订单操作
 const handleOrderAction = async (order, actionType) => {
   console.log('订单操作:', order.id, actionType)
 
+  // 检查订单操作功能是否启用
+  if (['pay', 'cancel', 'confirm', 'refund'].includes(actionType) && !getFinalFeatureState('ORDER_ACTIONS')) {
+    showFeatureDisabledToast('ORDER_ACTIONS')
+    return
+  }
+
   switch (actionType) {
     case 'pay':
+      // 支付功能已禁用
+      if (!getFinalFeatureState('PAYMENT')) {
+        showFeatureDisabledToast('PAYMENT')
+        return
+      }
       uni.navigateTo({
         url: `/pages/payment/payment?orderId=${order.id}`
       })
@@ -188,11 +251,21 @@ const handleOrderAction = async (order, actionType) => {
       })
       break
     case 'review':
+      // 评价功能已禁用
+      if (!getFinalFeatureState('TRADING')) {
+        showFeatureDisabledToast('TRADING')
+        return
+      }
       uni.navigateTo({
         url: `/pages/review/review?orderId=${order.id}`
       })
       break
     case 'rebuy':
+      // 再次购买功能已禁用
+      if (!getFinalFeatureState('TRADING')) {
+        showFeatureDisabledToast('TRADING')
+        return
+      }
       uni.navigateTo({
         url: `/pages/goods-detail/goods-detail?id=${order.goodsId}`
       })
@@ -465,6 +538,17 @@ onMounted(async () => {
   
   &:active {
     opacity: 0.8;
+  }
+
+  &.btn-dev-disabled {
+    background: #fff2f0;
+    color: #ff4d4f;
+    border-color: #ff4d4f;
+    cursor: pointer;
+
+    &:active {
+      background: #ffe7e7;
+    }
   }
 }
 </style>

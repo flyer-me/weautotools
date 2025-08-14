@@ -47,7 +47,7 @@
       <view v-if="filteredMessages.length === 0" class="empty-state">
         <uni-icons type="chat" size="80" color="#ddd" />
         <text class="empty-text">暂无消息</text>
-        <text class="empty-desc">快去和卖家聊聊吧~</text>
+        <text class="empty-desc">暂时没有新消息</text>
       </view>
 
       <!-- 加载更多 -->
@@ -68,6 +68,7 @@ import MessageItem from '@/components/MessageItem.vue'
 import { ref, computed, onMounted } from 'vue'
 import { useMessage } from '@/composables/useMessage'
 import { MESSAGE_TYPE, MESSAGE_TYPE_TEXT } from '@/constants'
+import { getFinalFeatureState } from '@/config/features'
 
 // 使用消息管理Hook
 const {
@@ -87,12 +88,20 @@ const {
 const searchKeyword = ref('')
 
 // 消息分类Tab - 动态计算未读数量
-const messageTabs = computed(() => [
-  { key: 'all', name: '全部', count: unreadCounts.value.total },
-  { key: MESSAGE_TYPE.CHAT, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.CHAT], count: unreadCounts.value[MESSAGE_TYPE.CHAT] },
-  { key: MESSAGE_TYPE.SYSTEM, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.SYSTEM], count: unreadCounts.value[MESSAGE_TYPE.SYSTEM] },
-  { key: MESSAGE_TYPE.SERVICE, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.SERVICE], count: unreadCounts.value[MESSAGE_TYPE.SERVICE] }
-])
+const messageTabs = computed(() => {
+  const tabs = [
+    { key: 'all', name: '全部', count: unreadCounts.value.total },
+    { key: MESSAGE_TYPE.SYSTEM, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.SYSTEM], count: unreadCounts.value[MESSAGE_TYPE.SYSTEM] },
+    { key: MESSAGE_TYPE.SERVICE, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.SERVICE], count: unreadCounts.value[MESSAGE_TYPE.SERVICE] }
+  ]
+
+  // 如果用户间聊天功能启用，则显示聊天Tab
+  if (getFinalFeatureState('USER_CHAT')) {
+    tabs.splice(1, 0, { key: MESSAGE_TYPE.CHAT, name: MESSAGE_TYPE_TEXT[MESSAGE_TYPE.CHAT], count: unreadCounts.value[MESSAGE_TYPE.CHAT] })
+  }
+
+  return tabs
+})
 
 const activeTab = ref(0)
 
@@ -102,6 +111,15 @@ const filteredMessages = computed(() => {
   let filtered = currentTab.key === 'all'
     ? messagesByType.value.all
     : messagesByType.value[currentTab.key] || []
+
+  // 根据功能开关过滤用户间聊天消息
+  if (!getFinalFeatureState('USER_CHAT')) {
+    filtered = filtered.filter(msg =>
+      msg.type !== MESSAGE_TYPE.CHAT ||
+      msg.senderName === '系统客服' ||
+      msg.senderName.includes('客服')
+    )
+  }
 
   // 根据搜索关键词过滤
   if (searchKeyword.value.trim()) {

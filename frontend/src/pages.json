@@ -15,7 +15,7 @@
 		{
 			"path": "pages/category/category",
 			"style": {
-				"navigationBarTitleText": "分类"
+				"navigationBarTitleText": "工具"
 			}
 		},
 		{
@@ -55,6 +55,12 @@
 			"style": {
 				"navigationBarTitleText": "我的订单"
 			}
+		},
+		{
+			"path": "pages/dev-settings/dev-settings",
+			"style": {
+				"navigationBarTitleText": "开发者设置"
+			}
 		}
 	],
 	"globalStyle": {
@@ -72,12 +78,8 @@
 		"backgroundColor": "#ffffff",
 		"list": [
 			{
-				"pagePath": "pages/index/index",
-				"text": "首页"
-			},
-			{
 				"pagePath": "pages/category/category",
-				"text": "分类"
+				"text": "工具"
 			},
 			{
 				"pagePath": "pages/message/message",

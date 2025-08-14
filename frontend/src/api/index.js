@@ -121,25 +121,31 @@ export const orderApi = {
   })
 }
 
-// 商品相关API
-export const goodsApi = {
-  // 获取商品列表
-  getGoodsList: (params) => request('/goods', {
+// 工具相关API
+export const toolsApi = {
+  // 获取工具列表
+  getToolsList: (params) => request('/tools', {
     method: 'GET',
     data: params
   }),
-  
-  // 获取商品详情
-  getGoodsDetail: (goodsId) => request(`/goods/${goodsId}`),
-  
-  // 搜索商品
-  searchGoods: (keyword, params) => request('/goods/search', {
+
+  // 获取工具详情
+  getToolDetail: (toolId) => request(`/tools/${toolId}`),
+
+  // 搜索工具
+  searchTools: (keyword, params) => request('/tools/search', {
     method: 'GET',
     data: { keyword, ...params }
   }),
-  
-  // 获取商品分类
-  getCategories: () => request('/goods/categories')
+
+  // 获取工具分类
+  getToolCategories: () => request('/tools/categories'),
+
+  // 获取工具使用记录
+  getToolRecords: (params) => request('/tools/records', {
+    method: 'GET',
+    data: params
+  })
 }
 
 // 默认导出所有API
@@ -147,5 +153,5 @@ export default {
   user: userApi,
   message: messageApi,
   order: orderApi,
-  goods: goodsApi
+  tools: toolsApi
 }

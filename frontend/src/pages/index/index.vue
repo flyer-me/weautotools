@@ -50,9 +50,12 @@
           <view class="goods-tags">
             <text v-for="tag in item.tags" :key="tag" class="goods-tag">{{ tag }}</text>
           </view>
-          <view class="goods-price">
+          <view class="goods-price" v-if="getFinalFeatureState('TRADING')">
             <text class="price">￥{{ item.price }}</text>
             <text class="origin-price">￥{{ item.originPrice }}</text>
+          </view>
+          <view class="goods-price" v-else>
+            <text class="price-disabled">仅供展示</text>
           </view>
         </view>
       </view>
@@ -68,6 +71,7 @@
 import TabBar from '@/components/TabBar.vue'
 import { navigate } from '@/utils/router.js'
 import { ref, computed } from 'vue'
+import { getFinalFeatureState } from '@/config/features'
 
 // 搜索关键词
 const searchKeyword = ref('')
@@ -315,6 +319,11 @@ const handleGoodsClick = (goods) => {
           font-size: 24rpx;
           margin-left: 12rpx;
           text-decoration: line-through;
+        }
+        .price-disabled {
+          color: #999;
+          font-size: 28rpx;
+          font-style: italic;
         }
 
       }

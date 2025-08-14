@@ -10,38 +10,12 @@
       <uni-icons type="arrowright" size="18" color="#666" />
     </view>
 
-    <!-- 我的订单 -->
-    <view class="section-card">
-      <view class="section-title-row">
-        <text class="section-title">我的订单</text>
-        <view class="section-link" @click="handleAllOrdersClick">全部订单 <uni-icons type="arrowright" size="16" /></view>
-      </view>
-      <view class="order-status-row">
-        <view
-          class="order-status-item"
-          v-for="item in orderStatus"
-          :key="item.status"
-          @click="handleOrderStatusClick(item)"
-        >
-          <view class="icon-badge">
-            <uni-icons :type="item.icon" size="32" />
-            <view v-if="item.count > 0" class="badge">{{ item.count }}</view>
-          </view>
-          <text class="order-status-text">{{ item.text }}</text>
-        </view>
-      </view>
-    </view>
+    <!-- 我的订单 - 已隐藏 -->
+    <!-- 订单功能已隐藏以符合微信个人开发者要求 -->
 
     <!-- 其他信息卡片 -->
     <view class="section-card">
-      <view class="info-row" @click="handleAddressClick">
-        <text>收货地址</text>
-        <uni-icons type="arrowright" size="18" />
-      </view>
-      <view class="info-row" @click="handleCouponClick">
-        <text>优惠券</text>
-        <view class="info-value">{{ userStats.couponCount }} <uni-icons type="arrowright" size="18" /></view>
-      </view>
+      <!-- 收货地址和优惠券已隐藏以符合微信个人开发者要求 -->
       <view class="info-row" @click="handlePointsClick">
         <text>积分</text>
         <view class="info-value">{{ userStats.points }}</view>
@@ -59,67 +33,41 @@
       </view>
     </view>
 
-    <view class="version">当前版本 develop</view>
+    <view class="version" @click="handleVersionClick">当前版本 develop</view>
 
     <!-- 自定义 TabBar -->
     <TabBar :current="'pages/user/user'" />
+
+    <!-- 开发者密码验证弹窗 -->
+    <DevPasswordModal
+      :visible="showPasswordModal"
+      @close="showPasswordModal = false"
+      @success="handleDevModeSuccess"
+    />
   </view>
 </template>
 
 <script setup>
 import TabBar from '@/components/TabBar.vue'
+import DevPasswordModal from '@/components/DevPasswordModal.vue'
 import { navigate } from '@/utils/router.js'
-import { getUserOrderStatusConfig } from '@/utils/orderStatus.js'
-import { ref, computed, onMounted } from 'vue'
-import { useOrder } from '@/composables/useOrder'
-import { useGlobalBadge } from '@/composables/useBadge'
-
-// 使用订单管理Hook
-const { getOrderStatusCounts } = useOrder()
-
-// 使用全局徽章Hook
-const { badgeState } = useGlobalBadge()
+import { ref, onMounted } from 'vue'
+import { initDevModeFromStorage } from '@/config/features'
 
 // 用户信息
 const userInfo = ref({
   name: 'TDesign',
-  desc: '自动化专家 · VIP会员'
+  desc: '自动化专家'
 })
 
 // 用户统计数据
 const userStats = ref({
-  couponCount: 10,
   points: 2580
-})
-
-// 订单状态数据 - 动态计算数量
-const orderStatus = computed(() => {
-  const statusConfig = getUserOrderStatusConfig()
-  return statusConfig.map(item => ({
-    ...item,
-    count: badgeState.order[item.status] || 0
-  }))
 })
 
 // 事件处理函数
 const handleProfileClick = () => {
   navigate.toProfile()
-}
-
-const handleAllOrdersClick = () => {
-  navigate.toOrderList()
-}
-
-const handleOrderStatusClick = (item) => {
-  navigate.toOrderList(item.status)
-}
-
-const handleAddressClick = () => {
-  navigate.toAddress()
-}
-
-const handleCouponClick = () => {
-  navigate.toCoupon()
 }
 
 const handlePointsClick = () => {
@@ -133,7 +81,7 @@ const handleHelpClick = () => {
 const handleServiceClick = () => {
   uni.showModal({
     title: '客服电话',
-    content: '-',
+    content: '功能受限',
     showCancel: true,
     cancelText: '取消',
     confirmText: '拨打',
@@ -147,9 +95,39 @@ const handleServiceClick = () => {
   })
 }
 
-// 页面加载时初始化订单状态
-onMounted(async () => {
-  await getOrderStatusCounts()
+// 版本点击计数器（用于开发者设置入口）
+const versionClickCount = ref(0)
+const showPasswordModal = ref(false)
+
+// 处理版本点击
+const handleVersionClick = () => {
+  versionClickCount.value++
+
+  if (versionClickCount.value >= 5) {
+    versionClickCount.value = 0
+    showPasswordModal.value = true
+  }
+
+  // 3秒后重置计数
+  setTimeout(() => {
+    versionClickCount.value = 0
+  }, 3000)
+}
+
+// 处理开发者模式验证成功
+const handleDevModeSuccess = (result) => {
+  console.log('开发者模式已启用:', result)
+
+  // 跳转到开发者设置页面
+  uni.navigateTo({
+    url: '/pages/dev-settings/dev-settings'
+  })
+}
+
+// 页面加载时初始化
+onMounted(() => {
+  // 初始化开发模式状态
+  initDevModeFromStorage()
 })
 
 </script>
@@ -290,6 +268,19 @@ onMounted(async () => {
   color: #bbb;
   font-size: 24rpx;
   margin: 48rpx 0 0 0;
+}
+
+.disabled-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 16rpx;
+  gap: 12rpx;
+
+  .disabled-text {
+    color: #999;
+    font-size: 28rpx;
+  }
 }
 
 </style>

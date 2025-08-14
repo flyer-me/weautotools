@@ -88,7 +88,32 @@
         </view>
       </view>
       <view class="action-right">
-        <button class="btn-buy" @click="handleBuyNow">立即购买</button>
+        <!-- 正常模式下根据功能开关显示 -->
+        <button
+          v-if="!DEV_MODE.enabled && getFinalFeatureState('TRADING')"
+          class="btn-buy"
+          @click="handleBuyNow"
+        >
+          立即购买
+        </button>
+
+        <!-- 开发模式下显示但禁用 -->
+        <button
+          v-else-if="DEV_MODE.enabled && DEV_MODE.auth.authenticated"
+          class="btn-dev-disabled"
+          @click="handleDisabledFeatureClick('TRADING')"
+        >
+          立即购买 (开发模式)
+        </button>
+
+        <!-- 功能完全不可用 -->
+        <button
+          v-else
+          class="btn-disabled"
+          @click="showFeatureDisabledToast('TRADING')"
+        >
+          功能暂不可用
+        </button>
       </view>
     </view>
   </view>
@@ -96,6 +121,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { getFinalFeatureState, showFeatureDisabledToast, isFeatureClickable, handleDisabledFeatureClick, DEV_MODE } from '@/config/features'
 
 // 商品信息
 const goodsInfo = ref({
@@ -195,6 +221,11 @@ const handleShare = () => {
 // 立即购买
 const handleBuyNow = () => {
   console.log('立即购买', selectedSpecs.value)
+  // 检查交易功能是否启用
+  if (!getFinalFeatureState('TRADING')) {
+    showFeatureDisabledToast('TRADING')
+    return
+  }
   uni.navigateTo({
     url: `/pages/order-confirm/order-confirm?goodsId=${goodsInfo.value.id}`
   })
@@ -457,5 +488,32 @@ onMounted(() => {
   background: #ff4d4f;
   color: #fff;
   flex: 1;
+}
+
+.btn-disabled {
+  padding: 16rpx 32rpx;
+  border-radius: 48rpx;
+  font-size: 28rpx;
+  border: none;
+  cursor: not-allowed;
+  background: #d9d9d9;
+  color: #999;
+  flex: 1;
+}
+
+.btn-dev-disabled {
+  padding: 16rpx 32rpx;
+  border-radius: 48rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #ff4d4f;
+  cursor: pointer;
+  background: #fff2f0;
+  color: #ff4d4f;
+  flex: 1;
+  position: relative;
+
+  &:active {
+    background: #ffe7e7;
+  }
 }
 </style>
