@@ -10,7 +10,7 @@ frontend/src/
 │   └── index.js           # 统一的API接口定义
 ├── components/            # 通用组件
 │   ├── TabBar.vue        # 底部导航栏（支持红点徽章）
-│   ├── GoodsCard.vue     # 商品卡片组件
+│   ├── GoodsCard.vue     # 产品卡片组件
 │   ├── MessageItem.vue   # 消息项组件
 │   ├── EmptyState.vue    # 空状态组件
 │   └── LoadingState.vue  # 加载状态组件
@@ -27,7 +27,7 @@ frontend/src/
 │   ├── category/        # 分类页
 │   ├── message/         # 消息页
 │   ├── user/            # 用户页
-│   ├── goods-detail/    # 商品详情
+│   ├── goods-detail/    # 产品详情
 │   ├── search/          # 搜索页
 │   ├── order-list/      # 订单列表
 │   └── chat-detail/     # 聊天详情

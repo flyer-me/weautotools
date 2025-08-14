@@ -45,7 +45,7 @@ export const MESSAGE_TYPE_TEXT = {
   [MESSAGE_TYPE.PROMOTION]: '推广'
 }
 
-// 商品分类常量
+// 产品分类常量
 export const GOODS_CATEGORY = {
   WORD: 'word',
   EXCEL: 'excel',
@@ -56,7 +56,7 @@ export const GOODS_CATEGORY = {
   AUTOMATION: 'automation'
 }
 
-// 商品分类显示文本
+// 产品分类显示文本
 export const GOODS_CATEGORY_TEXT = {
   [GOODS_CATEGORY.WORD]: 'Word处理',
   [GOODS_CATEGORY.EXCEL]: 'Excel处理',
@@ -74,7 +74,7 @@ export const ROUTES = {
   MESSAGE: '/pages/message/message',
   USER: '/pages/user/user',
   
-  // 商品相关
+  // 产品相关
   GOODS_DETAIL: '/pages/goods-detail/goods-detail',
   SEARCH: '/pages/search/search',
   

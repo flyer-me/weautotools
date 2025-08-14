@@ -132,7 +132,7 @@ const mockMessages = [
   },
   {
     id: 4,
-    content: '当然有，我发个商品链接给您看看',
+    content: '当然有，我发个产品链接给您看看',
     time: new Date().getTime() - 540000,
     isSelf: false,
     avatar: '/static/avatar1.png',
@@ -285,7 +285,7 @@ const handleImagePicker = () => {
 
 const handleMoreTools = () => {
   uni.showActionSheet({
-    itemList: ['商品', '位置', '文件'],
+    itemList: ['产品', '位置', '文件'],
     success: (res) => {
       console.log('选择了工具:', res.tapIndex)
     }

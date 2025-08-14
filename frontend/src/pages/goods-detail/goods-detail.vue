@@ -1,13 +1,13 @@
 <template>
   <view class="goods-detail">
-    <!-- 商品图片轮播 -->
+    <!-- 产品图片轮播 -->
     <swiper class="goods-swiper" indicator-dots circular>
       <swiper-item v-for="(img, idx) in goodsInfo.images" :key="idx">
         <image :src="img" class="goods-image" mode="aspectFill" />
       </swiper-item>
     </swiper>
 
-    <!-- 商品基本信息 -->
+    <!-- 产品基本信息 -->
     <view class="goods-info-card">
       <view class="goods-price-row">
         <text class="current-price">￥{{ goodsInfo.price }}</text>
@@ -19,7 +19,7 @@
       <view class="goods-title">{{ goodsInfo.title }}</view>
       <view class="goods-subtitle">{{ goodsInfo.subtitle }}</view>
       
-      <!-- 商品规格选择 -->
+      <!-- 产品规格选择 -->
       <view class="goods-specs">
         <view class="spec-item" v-for="spec in goodsInfo.specs" :key="spec.name">
           <text class="spec-name">{{ spec.name }}</text>
@@ -37,9 +37,9 @@
       </view>
     </view>
 
-    <!-- 商品详情 -->
+    <!-- 产品详情 -->
     <view class="goods-detail-card">
-      <view class="card-title">商品详情</view>
+      <view class="card-title">产品详情</view>
       <view class="detail-content">
         <text class="detail-text">{{ goodsInfo.description }}</text>
         <view class="detail-features">
@@ -123,7 +123,7 @@
 import { ref, onMounted } from 'vue'
 import { getFinalFeatureState, showFeatureDisabledToast, isFeatureClickable, handleDisabledFeatureClick, DEV_MODE } from '@/config/features'
 
-// 商品信息
+// 产品信息
 const goodsInfo = ref({
   id: 1,
   title: 'Excel自动化处理工具',
@@ -231,14 +231,14 @@ const handleBuyNow = () => {
   })
 }
 
-// 获取商品详情
+// 获取产品详情
 onMounted(() => {
-  // 这里可以根据页面参数获取商品详情
+  // 这里可以根据页面参数获取产品详情
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const goodsId = currentPage.options.id
-  console.log('商品ID:', goodsId)
-  // 实际项目中这里会调用API获取商品详情
+  console.log('产品ID:', goodsId)
+  // 实际项目中这里会调用API获取产品详情
 })
 </script>
 

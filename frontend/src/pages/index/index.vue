@@ -36,7 +36,7 @@
       </view>
     </view>
 
-    <!-- 商品列表 -->
+    <!-- 产品列表 -->
     <view class="goods-list">
       <view
         v-for="(item, idx) in goodsList"
@@ -192,9 +192,9 @@ const handleBannerClick = (banner, index) => {
   }
 }
 
-// 商品相关事件
+// 产品相关事件
 const handleGoodsClick = (goods) => {
-  console.log('点击商品:', goods)
+  console.log('点击产品:', goods)
   navigate.toGoodsDetail(goods.id || 1)
 }
 

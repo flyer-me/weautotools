@@ -30,9 +30,9 @@ export const FEATURE_FLAGS = {
     reason: '符合微信个人开发者要求'
   },
   
-  // 商品展示功能（保留）
+  // 产品展示功能（保留）
   GOODS_DISPLAY: {
-    enabled: true,   // 保留商品展示功能
+    enabled: true,   // 保留产品展示功能
     reason: '符合微信个人开发者要求'
   },
   

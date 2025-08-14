@@ -45,7 +45,7 @@
             </text>
           </view>
 
-          <!-- 商品列表 -->
+          <!-- 产品列表 -->
           <view class="goods-list">
             <view 
               v-for="goods in order.goodsList" 
@@ -67,7 +67,7 @@
           <!-- 订单信息 -->
           <view class="order-info">
             <text class="order-time">{{ order.createTime }}</text>
-            <text class="order-total">共{{ order.totalQuantity }}件商品 合计：￥{{ order.totalAmount }}</text>
+            <text class="order-total">共{{ order.totalQuantity }}件产品 合计：￥{{ order.totalAmount }}</text>
           </view>
 
           <!-- 操作按钮 -->

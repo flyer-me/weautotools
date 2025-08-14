@@ -169,7 +169,7 @@ const featureNameMap = {
   TRADING: '交易功能',
   USER_CHAT: '用户间聊天',
   SYSTEM_SERVICE: '系统客服',
-  GOODS_DISPLAY: '商品展示',
+  GOODS_DISPLAY: '产品展示',
   ORDER_VIEW: '订单查看',
   ORDER_ACTIONS: '订单操作'
 }

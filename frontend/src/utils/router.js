@@ -12,7 +12,7 @@ export const ROUTES = {
   MESSAGE: '/pages/message/message',
   USER: '/pages/user/user',
   
-  // 商品相关
+  // 产品相关
   GOODS_DETAIL: '/pages/goods-detail/goods-detail',
   SEARCH: '/pages/search/search',
   
@@ -220,7 +220,7 @@ class Router {
  * 便捷跳转方法
  */
 export const navigate = {
-  // 商品详情
+  // 产品详情
   toGoodsDetail: (goodsId, params = {}) => {
     return Router.navigateTo(ROUTES.GOODS_DETAIL, { id: goodsId, ...params })
   },

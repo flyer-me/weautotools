@@ -6,7 +6,7 @@
         <uni-icons type="search" size="20" color="#999" />
         <input 
           class="search-input" 
-          placeholder="搜索商品" 
+          placeholder="搜索产品" 
           v-model="searchKeyword"
           @confirm="handleSearch"
           focus
@@ -87,10 +87,10 @@
 
       <!-- 结果统计 -->
       <view class="result-stats">
-        找到 {{ searchResults.length }} 个相关商品
+        找到 {{ searchResults.length }} 个相关产品
       </view>
 
-      <!-- 商品列表 -->
+      <!-- 产品列表 -->
       <view class="goods-list">
         <view 
           v-for="goods in searchResults" 
@@ -116,7 +116,7 @@
       <!-- 空状态 -->
       <view v-if="searchResults.length === 0" class="empty-state">
         <uni-icons type="search" size="80" color="#ccc" />
-        <text class="empty-text">没有找到相关商品</text>
+        <text class="empty-text">没有找到相关产品</text>
         <text class="empty-tip">试试其他关键词吧</text>
       </view>
     </view>
@@ -248,7 +248,7 @@ const showFilterModal = () => {
   })
 }
 
-// 商品点击
+// 产品点击
 const handleGoodsClick = (goods) => {
   uni.navigateTo({
     url: `/pages/goods-detail/goods-detail?id=${goods.id}`

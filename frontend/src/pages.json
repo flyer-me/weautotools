@@ -7,65 +7,45 @@
 	},
 	"pages": [
 		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "自动化市场"
-			}
-		},
-		{
 			"path": "pages/category/category",
-			"style": {
-				"navigationBarTitleText": "工具"
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/user/user",
-			"style": {
-				"navigationBarTitleText": "我的"
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/message/message",
-			"style": {
-				"navigationBarTitleText": "消息"
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/chat-detail/chat-detail",
 			"style": {
-				"navigationBarTitleText": "聊天",
 				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/goods-detail/goods-detail",
-			"style": {
-				"navigationBarTitleText": "商品详情"
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/search/search",
 			"style": {
-				"navigationBarTitleText": "搜索",
 				"navigationBarBackgroundColor": "#ffffff"
 			}
 		},
 		{
 			"path": "pages/order-list/order-list",
-			"style": {
-				"navigationBarTitleText": "我的订单"
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/dev-settings/dev-settings",
-			"style": {
-				"navigationBarTitleText": "开发者设置"
-			}
+			"style": {}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "自动化市场",
+		"navigationBarTitleText": "",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8",
 		"animationType": "slide-in-right",
