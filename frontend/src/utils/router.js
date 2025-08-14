@@ -4,37 +4,7 @@
  */
 
 import { isRouteDisabled, handleDisabledRoute } from '@/config/features'
-
-// 页面路径常量
-export const ROUTES = {
-  // 主要页面
-  CATEGORY: '/pages/category/category',
-  MESSAGE: '/pages/message/message',
-  USER: '/pages/user/user',
-  
-  // 产品相关
-  GOODS_DETAIL: '/pages/goods-detail/goods-detail',
-  SEARCH: '/pages/search/search',
-  
-  // 订单相关
-  ORDER_LIST: '/pages/order-list/order-list',
-  ORDER_DETAIL: '/pages/order-detail/order-detail',
-  ORDER_CONFIRM: '/pages/order-confirm/order-confirm',
-  
-  // 用户相关
-  PROFILE: '/pages/profile/profile',
-  ADDRESS: '/pages/address/address',
-  COUPON: '/pages/coupon/coupon',
-  POINTS: '/pages/points/points',
-  
-  // 消息相关
-  CHAT_DETAIL: '/pages/chat-detail/chat-detail',
-
-  // 其他
-  HELP: '/pages/help/help',
-  PAYMENT: '/pages/payment/payment',
-  REVIEW: '/pages/review/review'
-}
+import { ROUTES } from '@/constants'
 
 // Tab页面列表
 const TAB_PAGES = [
@@ -220,11 +190,16 @@ class Router {
  * 便捷跳转方法
  */
 export const navigate = {
+  // 产品展示页面（因审核规则隐藏）
+  toProductShowcase: () => {
+    return Router.navigateTo(ROUTES.PRODUCT_SHOWCASE)
+  },
+
   // 产品详情
   toGoodsDetail: (goodsId, params = {}) => {
     return Router.navigateTo(ROUTES.GOODS_DETAIL, { id: goodsId, ...params })
   },
-  
+
   // 搜索页面
   toSearch: (keyword = '') => {
     return Router.navigateTo(ROUTES.SEARCH, keyword ? { keyword } : {})

@@ -73,8 +73,9 @@ export const ROUTES = {
   CATEGORY: '/pages/category/category',
   MESSAGE: '/pages/message/message',
   USER: '/pages/user/user',
-  
+
   // 产品相关
+  PRODUCT_SHOWCASE: '/pages/product-showcase/product-showcase', // 产品展示页面（因审核规则隐藏）
   GOODS_DETAIL: '/pages/goods-detail/goods-detail',
   SEARCH: '/pages/search/search',
   

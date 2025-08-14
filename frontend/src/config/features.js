@@ -64,11 +64,8 @@ export const getFeatureDisabledReason = (featureName) => {
 // 显示功能禁用提示
 export const showFeatureDisabledToast = (featureName) => {
   const reason = getFeatureDisabledReason(featureName)
-  uni.showToast({
-    title: '功能暂不可用',
-    icon: 'none',
-    duration: 2000
-  })
+  const { showWarning } = require('@/utils/toast')
+  showWarning('功能暂不可用')
   console.log(`功能 ${featureName} 已禁用: ${reason}`)
 }
 
@@ -144,13 +141,9 @@ export const isFeatureClickable = (featureName) => {
 export const handleDisabledFeatureClick = (featureName) => {
   const feature = FEATURE_FLAGS[featureName]
   const reason = feature ? feature.reason : '功能未定义'
+  const { showAlert } = require('@/utils/toast')
 
-  uni.showModal({
-    title: '功能限制',
-    content: `${reason}\n\n当前未开放此功能。`,
-    showCancel: false,
-    confirmText: '我知道了'
-  })
+  showAlert(`${reason}\n\n当前未开放此功能。`, '功能限制')
 }
 
 // 生成本地密码（当前日期8位数字）
@@ -166,8 +159,9 @@ export const generateLocalPassword = () => {
 export const verifyDevPassword = async (password) => {
   try {
     // 首先尝试API验证
+    const { getApiUrl } = await import('@/config/env')
     const response = await uni.request({
-      url: 'https://api.weautomarket.com/v1/dev/verify',
+      url: getApiUrl('/dev/verify'),
       method: 'POST',
       data: { password },
       timeout: 3000,

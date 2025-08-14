@@ -1,4 +1,3 @@
-
 <template>
   <view class="home-container">
     <!-- 顶部搜索栏 -->
@@ -62,10 +61,9 @@
     </view>
 
     <!-- 自定义 TabBar -->
-    <TabBar :current="'pages/index/index'" />
+    <TabBar :current="'pages/product-showcase/product-showcase'" />
   </view>
 </template>
-
 
 <script setup>
 import TabBar from '@/components/TabBar.vue'
@@ -197,10 +195,7 @@ const handleGoodsClick = (goods) => {
   console.log('点击产品:', goods)
   navigate.toGoodsDetail(goods.id || 1)
 }
-
-
 </script>
-
 
 <style lang="scss" scoped>
 .home-container {
@@ -290,10 +285,10 @@ const handleGoodsClick = (goods) => {
         height: 72rpx;
         overflow: hidden;
         text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        line-clamp: 2;
       }
       .goods-tags {
         margin-bottom: 8rpx;
@@ -325,7 +320,6 @@ const handleGoodsClick = (goods) => {
           font-size: 28rpx;
           font-style: italic;
         }
-
       }
     }
   }
