@@ -2,7 +2,7 @@
 
 ## 概述
 
-CategoryIcon 是专为分类页面设计的图标组件，提供统一的图标显示和交互体验。组件基于 uni-icons，确保跨平台兼容性。
+CategoryIcon 是专为Category页面设计的图标组件。基于 uni-icons。
 
 ## 基础用法
 
