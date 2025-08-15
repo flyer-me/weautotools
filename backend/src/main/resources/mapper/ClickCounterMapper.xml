@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flyerme.weautotools.mapper.ClickCounterMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="ClickCounterResultMap" type="com.flyerme.weautotools.entity.ClickCounter">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="counter_name" property="counterName" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="click_count" property="clickCount" jdbcType="BIGINT"/>
+        <result column="enabled" property="enabled" jdbcType="BOOLEAN"/>
+        <result column="last_click_time" property="lastClickTime" jdbcType="TIMESTAMP"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, counter_name, description, click_count, enabled, last_click_time,
+        created_at, updated_at, deleted, version
+    </sql>
+
+    <!-- 复杂查询示例：分页查询计数器 -->
+    <select id="selectByPage" resultMap="ClickCounterResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM click_counter
+        WHERE deleted = 0
+        <if test="counterName != null and counterName != ''">
+            AND counter_name LIKE CONCAT('%', #{counterName}, '%')
+        </if>
+        <if test="enabled != null">
+            AND enabled = #{enabled}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 统计查询示例：按日期统计点击数 -->
+    <select id="selectClickStatsByDate" resultType="map">
+        SELECT
+            DATE(created_at) as date,
+            COUNT(*) as counter_count,
+            SUM(click_count) as total_clicks
+        FROM click_counter
+        WHERE deleted = 0
+        <if test="startDate != null">
+            AND created_at >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND created_at &lt;= #{endDate}
+        </if>
+        GROUP BY DATE(created_at)
+        ORDER BY date DESC
+    </select>
+
+    <!-- 批量操作示例：批量更新启用状态 -->
+    <update id="batchUpdateEnabled">
+        UPDATE click_counter
+        SET enabled = #{enabled}, updated_at = #{updatedAt}
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted = 0
+    </update>
+
+    <!-- 动态查询示例：根据条件查询 -->
+    <select id="selectByCondition" resultMap="ClickCounterResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM click_counter
+        <where>
+            deleted = 0
+            <if test="counterName != null and counterName != ''">
+                AND counter_name = #{counterName}
+            </if>
+            <if test="enabled != null">
+                AND enabled = #{enabled}
+            </if>
+            <if test="minClickCount != null">
+                AND click_count >= #{minClickCount}
+            </if>
+            <if test="maxClickCount != null">
+                AND click_count &lt;= #{maxClickCount}
+            </if>
+            <if test="startDate != null">
+                AND created_at >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND created_at &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderBy == 'clickCount'">
+                click_count DESC
+            </when>
+            <when test="orderBy == 'lastClickTime'">
+                last_click_time DESC
+            </when>
+            <otherwise>
+                created_at DESC
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>

@@ -1,4 +1,4 @@
-package com.flyerme.backend;
+package com.flyerme.weautotools;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

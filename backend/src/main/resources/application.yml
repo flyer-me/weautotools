@@ -1,0 +1,65 @@
+# WeAutoTools Backend Application Configuration
+spring:
+  application:
+    name: weautotools-backend
+  
+  # 数据源配置
+  datasource:
+    url: jdbc:postgresql://localhost:5432/weautotools
+    username: ${DB_USERNAME:weautotools}
+    password: ${DB_PASSWORD:weautotools123}
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  
+
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.flyerme.weautotools.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 日志配置
+logging:
+  level:
+    com.flyerme.weautotools: debug
+
+# 监控端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+---
+# 开发环境配置
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+---
+# 生产环境配置
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
