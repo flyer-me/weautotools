@@ -41,6 +41,54 @@
 		{
 			"path": "pages/dev-settings/dev-settings",
 			"style": {}
+		},
+		{
+			"path": "pages/tools/qr-generate/qr-generate",
+			"style": {
+				"navigationBarTitleText": "二维码生成",
+				"navigationBarBackgroundColor": "#007aff",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/tools/qr-decode/qr-decode",
+			"style": {
+				"navigationBarTitleText": "二维码识别",
+				"navigationBarBackgroundColor": "#007aff",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/tools/data-convert/data-convert",
+			"style": {
+				"navigationBarTitleText": "数据格式转换",
+				"navigationBarBackgroundColor": "#007aff",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/tools/image-process/image-process",
+			"style": {
+				"navigationBarTitleText": "图片处理",
+				"navigationBarBackgroundColor": "#007aff",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/test/test",
+			"style": {
+				"navigationBarTitleText": "功能测试",
+				"navigationBarBackgroundColor": "#28a745",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/qr-debug/qr-debug",
+			"style": {
+				"navigationBarTitleText": "二维码调试",
+				"navigationBarBackgroundColor": "#ff6b35",
+				"navigationBarTextStyle": "white"
+			}
 		}
 	],
 	"globalStyle": {

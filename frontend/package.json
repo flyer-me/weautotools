@@ -54,9 +54,19 @@
     "@dcloudio/uni-mp-xhs": "3.0.0-4070520250711001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-4070520250711001",
     "@dcloudio/uni-ui": "^1.5.10",
+    "compressorjs": "^1.2.1",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "js-yaml": "^4.1.0",
+    "jspdf": "^3.0.1",
+    "jsqr": "^1.4.0",
+    "mammoth": "^1.10.0",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
     "tdesign-icons-vue-next": "^0.3.7",
     "vue": "^3.4.21",
-    "vue-i18n": "^9.1.9"
+    "vue-i18n": "^9.1.9",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@dcloudio/types": "^3.4.8",

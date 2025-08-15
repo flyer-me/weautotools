@@ -178,32 +178,11 @@ const categories = ref([
     icon: 'images',
     sub: [
       {
-        name: '图片压缩',
-        icon: 'download-filled',
-        desc: '无损/有损压缩图片',
-        keywords: ['图片', '压缩', '优化', '无损', '有损'],
-        route: '/pages/tools/image-compress'
-      },
-      {
-        name: '格式转换',
-        icon: 'refresh-filled',
-        desc: '图片格式互相转换',
-        keywords: ['图片', '格式', '转换', 'JPG', 'PNG', 'WebP', 'GIF'],
-        route: '/pages/tools/image-convert'
-      },
-      {
-        name: '批量加水印',
-        icon: 'color',
-        desc: '批量添加文字/图片水印',
-        keywords: ['水印', '批量', '文字', '图片', '版权'],
-        route: '/pages/tools/watermark'
-      },
-      {
-        name: '批量重命名',
-        icon: 'compose',
-        desc: '图片文件批量重命名',
-        keywords: ['重命名', '批量', '文件名', '规则'],
-        route: '/pages/tools/batch-rename'
+        name: '图片处理',
+        icon: 'image',
+        desc: '图片压缩、格式转换、加水印、重命名',
+        keywords: ['图片', '压缩', '格式转换', '水印', '重命名', '批量处理'],
+        route: '/pages/tools/image-process/image-process'
       },
     ],
   },
@@ -236,7 +215,7 @@ const categories = ref([
         icon: 'gear',
         desc: 'JSON/XML/YAML格式互转',
         keywords: ['JSON', 'XML', 'YAML', '数据', '转换'],
-        route: '/pages/tools/json-convert'
+        route: '/pages/tools/data-convert/data-convert'
       },
     ],
   },
@@ -249,14 +228,14 @@ const categories = ref([
         icon: 'plus-filled',
         desc: '生成各种类型二维码',
         keywords: ['二维码', '生成', 'QR', '链接', '文本'],
-        route: '/pages/tools/qr-generate'
+        route: '/pages/tools/qr-generate/qr-generate'
       },
       {
         name: '二维码识别',
         icon: 'search',
         desc: '识别解析二维码内容',
         keywords: ['二维码', '识别', '解析', '扫描'],
-        route: '/pages/tools/qr-decode'
+        route: '/pages/tools/qr-decode/qr-decode'
       },
     ],
   },
