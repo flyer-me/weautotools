@@ -93,4 +93,46 @@ public interface ClickCounterMapper {
      */
     @Select("SELECT COUNT(*) FROM click_counter WHERE enabled = true AND deleted = 0")
     long countEnabled();
+
+    /**
+     * 检查计数器名称是否存在（排除指定ID）
+     */
+    @Select("SELECT COUNT(*) FROM click_counter WHERE counter_name = #{counterName} AND id != #{excludeId} AND deleted = 0")
+    long countByNameExcludeId(@Param("counterName") String counterName, @Param("excludeId") Long excludeId);
+
+    /**
+     * 批量查询计数器（分页）
+     */
+    @Select("SELECT * FROM click_counter WHERE deleted = 0 ORDER BY created_at DESC LIMIT #{limit} OFFSET #{offset}")
+    List<ClickCounter> selectByPage(@Param("offset") long offset, @Param("limit") int limit);
+
+    /**
+     * 根据条件查询计数器
+     */
+    @Select("<script>" +
+            "SELECT * FROM click_counter WHERE deleted = 0" +
+            "<if test='enabled != null'> AND enabled = #{enabled}</if>" +
+            "<if test='counterName != null and counterName != \"\"'> AND counter_name LIKE CONCAT('%', #{counterName}, '%')</if>" +
+            " ORDER BY created_at DESC" +
+            "</script>")
+    List<ClickCounter> selectByCondition(@Param("enabled") Boolean enabled, @Param("counterName") String counterName);
+
+    /**
+     * 统计总点击数
+     */
+    @Select("SELECT COALESCE(SUM(click_count), 0) FROM click_counter WHERE deleted = 0")
+    long sumTotalClicks();
+
+    /**
+     * 获取点击数最多的计数器
+     */
+    @Select("SELECT * FROM click_counter WHERE deleted = 0 ORDER BY click_count DESC LIMIT #{limit}")
+    List<ClickCounter> selectTopByClicks(@Param("limit") int limit);
+
+    /**
+     * 重置计数器点击数
+     */
+    @Update("UPDATE click_counter SET click_count = 0, last_click_time = NULL, updated_at = #{updatedAt}, version = version + 1 " +
+            "WHERE id = #{id} AND deleted = 0")
+    int resetClickCount(@Param("id") Long id, @Param("updatedAt") LocalDateTime updatedAt);
 }

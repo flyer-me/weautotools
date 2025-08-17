@@ -7,7 +7,7 @@
 - **Java**: OpenJDK 17 (LTS)
 - **框架**: Spring Boot 3.5.4
 - **数据库**: PostgreSQL
-- **ORM**: MyBatis 3.5.14 + JPA
+- **ORM**: MyBatis 3.5.14
 - **构建工具**: Maven
 
 ## 项目结构
@@ -105,9 +105,10 @@ GRANT ALL PRIVILEGES ON DATABASE weautotools TO weautotools;
 
 ### 数据库操作
 
-项目同时支持 MyBatis 和 JPA：
-- 简单 CRUD 操作推荐使用 MyBatis 注解
-- 复杂查询可以使用 MyBatis XML 或 JPA
+项目使用 MyBatis 作为唯一ORM框架：
+- 简单 CRUD 操作使用 MyBatis 注解
+- 复杂查询使用 MyBatis XML 映射文件
+- 动态SQL使用 MyBatis 脚本标签
 
 ### 配置理念
 
@@ -154,6 +155,14 @@ GRANT ALL PRIVILEGES ON DATABASE weautotools TO weautotools;
    ```
    PUT /api/click-counter/{id}     # 更新计数器
    DELETE /api/click-counter/{id}  # 删除计数器
+   POST /api/click-counter/{id}/reset  # 重置计数器
+   ```
+
+5. **高级查询**
+   ```
+   GET /api/click-counter/page?page=1&size=10  # 分页查询
+   GET /api/click-counter/search?enabled=true&counterName=test  # 条件查询
+   GET /api/click-counter/top?limit=5  # 获取点击数最多的计数器
    ```
 
 #### 数据库表结构

@@ -9,11 +9,7 @@ spring:
     username: ${DB_USERNAME:weautotools}
     password: ${DB_PASSWORD:weautotools123}
   
-  # JPA配置
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
+
   
 
 
@@ -48,10 +44,10 @@ spring:
   config:
     activate:
       on-profile: dev
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+
+logging:
+  level:
+    com.flyerme.weautotools.mapper: debug
 
 ---
 # 生产环境配置
@@ -59,7 +55,7 @@ spring:
   config:
     activate:
       on-profile: prod
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
+
+logging:
+  level:
+    com.flyerme.weautotools.mapper: info

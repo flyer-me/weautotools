@@ -65,6 +65,26 @@ public interface ClickCounterService {
     ClickCounterStatistics getStatistics();
 
     /**
+     * 分页查询计数器
+     */
+    List<ClickCounterResponse> getCountersByPage(int page, int size);
+
+    /**
+     * 根据条件查询计数器
+     */
+    List<ClickCounterResponse> getCountersByCondition(Boolean enabled, String counterName);
+
+    /**
+     * 获取点击数最多的计数器
+     */
+    List<ClickCounterResponse> getTopCountersByClicks(int limit);
+
+    /**
+     * 重置计数器点击数
+     */
+    ClickCounterResponse resetCounter(Long id);
+
+    /**
      * 计数器统计信息
      */
     class ClickCounterStatistics {

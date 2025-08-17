@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import java.util.List;
 
 /**
@@ -118,5 +120,47 @@ public class ClickCounterController {
     public Result<ClickCounterService.ClickCounterStatistics> getStatistics() {
         ClickCounterService.ClickCounterStatistics statistics = clickCounterService.getStatistics();
         return Result.success(statistics);
+    }
+
+    /**
+     * 分页查询计数器
+     */
+    @GetMapping("/page")
+    public Result<List<ClickCounterResponse>> getCountersByPage(
+            @RequestParam(defaultValue = "1") @Min(1) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+        List<ClickCounterResponse> responses = clickCounterService.getCountersByPage(page, size);
+        return Result.success(responses);
+    }
+
+    /**
+     * 根据条件查询计数器
+     */
+    @GetMapping("/search")
+    public Result<List<ClickCounterResponse>> searchCounters(
+            @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) String counterName) {
+        List<ClickCounterResponse> responses = clickCounterService.getCountersByCondition(enabled, counterName);
+        return Result.success(responses);
+    }
+
+    /**
+     * 获取点击数最多的计数器
+     */
+    @GetMapping("/top")
+    public Result<List<ClickCounterResponse>> getTopCounters(
+            @RequestParam(defaultValue = "10") @Min(1) @Max(50) int limit) {
+        List<ClickCounterResponse> responses = clickCounterService.getTopCountersByClicks(limit);
+        return Result.success(responses);
+    }
+
+    /**
+     * 重置计数器点击数
+     */
+    @PostMapping("/{id}/reset")
+    public Result<ClickCounterResponse> resetCounter(@PathVariable Long id) {
+        log.info("重置计数器请求: {}", id);
+        ClickCounterResponse response = clickCounterService.resetCounter(id);
+        return Result.success("计数器重置成功", response);
     }
 }

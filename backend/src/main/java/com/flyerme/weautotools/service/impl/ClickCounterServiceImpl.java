@@ -5,7 +5,7 @@ import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.entity.ClickCounter;
 import com.flyerme.weautotools.exception.BusinessException;
 import com.flyerme.weautotools.mapper.ClickCounterMapper;
-import com.flyerme.weautotools.repository.ClickCounterRepository;
+
 import com.flyerme.weautotools.service.ClickCounterService;
 import com.flyerme.weautotools.util.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 public class ClickCounterServiceImpl implements ClickCounterService {
 
     private final ClickCounterMapper clickCounterMapper;
-    private final ClickCounterRepository clickCounterRepository;
 
     @Override
     @Transactional
@@ -105,8 +104,8 @@ public class ClickCounterServiceImpl implements ClickCounterService {
 
         // 检查名称是否被其他计数器使用
         if (!counter.getCounterName().equals(request.getCounterName())) {
-            ClickCounter existing = clickCounterMapper.selectByName(request.getCounterName());
-            if (existing != null && !existing.getId().equals(id)) {
+            long count = clickCounterMapper.countByNameExcludeId(request.getCounterName(), id);
+            if (count > 0) {
                 throw new BusinessException("计数器名称已存在: " + request.getCounterName());
             }
         }
@@ -174,14 +173,53 @@ public class ClickCounterServiceImpl implements ClickCounterService {
     public ClickCounterStatistics getStatistics() {
         long totalCounters = clickCounterMapper.count();
         long enabledCounters = clickCounterMapper.countEnabled();
-        
-        // 计算总点击数
-        List<ClickCounter> allCounters = clickCounterMapper.selectAll();
-        long totalClicks = allCounters.stream()
-                .mapToLong(ClickCounter::getClickCount)
-                .sum();
+        long totalClicks = clickCounterMapper.sumTotalClicks();
 
         return new ClickCounterStatistics(totalCounters, enabledCounters, totalClicks);
+    }
+
+    @Override
+    public List<ClickCounterResponse> getCountersByPage(int page, int size) {
+        long offset = (long) (page - 1) * size;
+        List<ClickCounter> counters = clickCounterMapper.selectByPage(offset, size);
+        return counters.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClickCounterResponse> getCountersByCondition(Boolean enabled, String counterName) {
+        List<ClickCounter> counters = clickCounterMapper.selectByCondition(enabled, counterName);
+        return counters.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ClickCounterResponse> getTopCountersByClicks(int limit) {
+        List<ClickCounter> counters = clickCounterMapper.selectTopByClicks(limit);
+        return counters.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public ClickCounterResponse resetCounter(Long id) {
+        ClickCounter counter = clickCounterMapper.selectById(id);
+        if (counter == null) {
+            throw new BusinessException("计数器不存在: " + id);
+        }
+
+        int result = clickCounterMapper.resetClickCount(id, LocalDateTime.now());
+        if (result <= 0) {
+            throw new BusinessException("重置计数器失败");
+        }
+
+        // 重新查询更新后的数据
+        counter = clickCounterMapper.selectById(id);
+        log.info("重置计数器成功: {}", counter.getCounterName());
+        return convertToResponse(counter);
     }
 
     /**

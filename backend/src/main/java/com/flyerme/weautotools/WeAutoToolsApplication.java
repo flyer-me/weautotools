@@ -2,7 +2,6 @@ package com.flyerme.weautotools;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2025-08-15
  */
 @SpringBootApplication
-@EnableJpaAuditing
 @EnableTransactionManagement
 public class WeAutoToolsApplication {
 
