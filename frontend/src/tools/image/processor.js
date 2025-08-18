@@ -37,6 +37,87 @@ export class ImageProcessor extends BatchProcessor {
   }
 
   /**
+   * 按目标文件大小压缩图片
+   * @param {File} file 图片文件
+   * @param {number} targetSize 目标文件大小（字节）
+   * @param {Object} options 其他选项
+   * @returns {Promise} 压缩结果
+   */
+  async compressToTargetSize(file, targetSize, options = {}) {
+    const maxAttempts = 8
+    let currentQuality = 0.9
+    let minQuality = 0.1
+    let maxQuality = 1.0
+    let bestResult = null
+    let bestDiff = Infinity
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const compressedFile = await this.compressImage(file, {
+          ...options,
+          quality: currentQuality
+        })
+
+        const sizeDiff = Math.abs(compressedFile.size - targetSize)
+
+        // 如果找到更接近目标大小的结果，保存它
+        if (sizeDiff < bestDiff) {
+          bestDiff = sizeDiff
+          bestResult = compressedFile
+        }
+
+        // 如果文件大小在目标范围内（±5%），返回结果
+        if (compressedFile.size <= targetSize * 1.05 && compressedFile.size >= targetSize * 0.95) {
+          return compressedFile
+        }
+
+        // 调整质量参数
+        if (compressedFile.size > targetSize) {
+          maxQuality = currentQuality
+          currentQuality = (minQuality + currentQuality) / 2
+        } else {
+          minQuality = currentQuality
+          currentQuality = (currentQuality + maxQuality) / 2
+        }
+
+        // 如果质量范围太小，停止尝试
+        if (maxQuality - minQuality < 0.01) {
+          break
+        }
+      } catch (error) {
+        // 如果压缩失败，降低质量重试
+        currentQuality *= 0.8
+        if (currentQuality < 0.1) {
+          throw error
+        }
+      }
+    }
+
+    // 返回最接近目标大小的结果
+    return bestResult || file
+  }
+
+  /**
+   * 估算压缩后的文件大小
+   * @param {File} file 原始文件
+   * @param {number} quality 压缩质量 (0-1)
+   * @param {Object} options 其他选项
+   * @returns {Promise<number>} 估算的文件大小
+   */
+  async estimateCompressedSize(file, quality, options = {}) {
+    try {
+      const compressed = await this.compressImage(file, {
+        ...options,
+        quality: quality
+      })
+      return compressed.size
+    } catch (error) {
+      // 如果压缩失败，返回原始大小的估算值
+      return Math.floor(file.size * quality)
+    }
+  }
+
+  /**
    * 转换图片格式
    * @param {File} file 图片文件
    * @param {string} targetFormat 目标格式 (jpeg, png, webp)
@@ -432,10 +513,56 @@ export class ImageProcessor extends BatchProcessor {
    */
   getQualityPresets() {
     return [
-      { name: '高质量', value: 0.95, description: '文件较大，质量最佳' },
-      { name: '标准质量', value: 0.8, description: '平衡质量和大小' },
-      { name: '压缩优先', value: 0.6, description: '文件较小，质量一般' },
-      { name: '最大压缩', value: 0.3, description: '文件最小，质量较低' }
+      { name: '高质量', value: 0.9, description: '质量优先' },
+      { name: '标准', value: 0.8, description: '平衡模式' },
+      { name: '压缩', value: 0.6, description: '大小优先' }
     ]
+  }
+
+  /**
+   * 获取压缩模式选项
+   * @returns {Array} 压缩模式列表
+   */
+  getCompressionModes() {
+    return [
+      {
+        value: 'size',
+        label: '大小优先',
+        description: '设置目标文件大小',
+        icon: 'resize'
+      },
+      {
+        value: 'quality',
+        label: '质量优先',
+        description: '调整质量参数',
+        icon: 'tune'
+      }
+    ]
+  }
+
+  /**
+   * 格式化文件大小显示
+   * @param {number} bytes 字节数
+   * @returns {string} 格式化的大小字符串
+   */
+  formatFileSize(bytes) {
+    if (bytes === 0) return '0 B'
+
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  /**
+   * 计算压缩比例
+   * @param {number} originalSize 原始大小
+   * @param {number} compressedSize 压缩后大小
+   * @returns {number} 压缩比例（百分比）
+   */
+  calculateCompressionRatio(originalSize, compressedSize) {
+    if (originalSize === 0) return 0
+    return Math.round((1 - compressedSize / originalSize) * 100)
   }
 }

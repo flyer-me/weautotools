@@ -75,20 +75,36 @@
       >
         <!-- 文件信息 -->
         <view class="result-info">
-          <view class="result-icon">
-            <uni-icons 
-              :type="getResultIcon(result)" 
-              size="24" 
-              :color="result.success ? '#28a745' : '#dc3545'" 
+          <!-- 缩略图或图标 -->
+          <view class="result-thumbnail">
+            <image
+              v-if="result.success && result.thumbnail"
+              :src="result.thumbnail"
+              class="thumbnail-image"
+              mode="aspectFill"
             />
+            <view v-else class="result-icon">
+              <uni-icons
+                :type="getResultIcon(result)"
+                size="24"
+                :color="result.success ? '#28a745' : '#dc3545'"
+              />
+            </view>
           </view>
-          
+
           <view class="result-details">
-            <text class="result-filename">{{ result.file?.name || '未知文件' }}</text>
+            <!-- 原始文件名 -->
+            <text class="result-filename original">{{ result.file?.name || '未知文件' }}</text>
+
+            <!-- 处理后文件名 -->
+            <text v-if="result.success && result.file?.processedName" class="result-filename processed">
+              → {{ result.file.processedName }}
+            </text>
+
             <text class="result-status">
               {{ result.success ? '处理成功' : (result.error || '处理失败') }}
             </text>
-            
+
             <!-- 成功结果的额外信息 -->
             <view v-if="result.success && result.result" class="result-meta">
               <text v-if="result.originalSize && result.compressedSize" class="meta-item">
@@ -260,39 +276,54 @@ const formatFileSize = (size) => {
   display: flex;
   gap: 20rpx;
   margin-bottom: 30rpx;
-  
+
   .action-btn {
     display: flex;
     align-items: center;
-    gap: 10rpx;
-    padding: 20rpx 30rpx;
-    border-radius: 12rpx;
+    gap: 12rpx;
+    padding: 24rpx 36rpx;
+    border-radius: 16rpx;
     font-size: 28rpx;
+    font-weight: 500;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-2rpx);
+      box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+    }
+
     &.primary-btn {
-      background: #007aff;
+      background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
       color: white;
-      
+
       &:hover {
-        background: #0056b3;
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
       }
-      
+
       &:disabled {
         background: #ccc;
         cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
     }
-    
+
     &.secondary-btn {
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       color: #666;
       border: 2rpx solid #dee2e6;
-      
+
       &:hover {
-        background: #e9ecef;
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        border-color: #adb5bd;
       }
     }
   }
@@ -337,36 +368,73 @@ const formatFileSize = (size) => {
   display: flex;
   align-items: center;
   flex: 1;
-  
-  .result-icon {
+
+  .result-thumbnail {
     margin-right: 20rpx;
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 12rpx;
+    overflow: hidden;
+    background: #f8f9fa;
+    border: 2rpx solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .thumbnail-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .result-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
   }
-  
+
   .result-details {
     flex: 1;
-    
+
     .result-filename {
       display: block;
-      font-size: 28rpx;
-      color: #333;
+      font-size: 26rpx;
       font-weight: 500;
-      margin-bottom: 5rpx;
+      margin-bottom: 4rpx;
       word-break: break-all;
+      line-height: 1.3;
+
+      &.original {
+        color: #666;
+        font-size: 24rpx;
+      }
+
+      &.processed {
+        color: #007AFF;
+        font-weight: 600;
+        margin-bottom: 6rpx;
+      }
     }
-    
+
     .result-status {
       display: block;
-      font-size: 24rpx;
+      font-size: 22rpx;
       color: #666;
-      margin-bottom: 5rpx;
+      margin-bottom: 6rpx;
     }
-    
+
     .result-meta {
       .meta-item {
         display: inline-block;
-        font-size: 22rpx;
+        font-size: 20rpx;
         color: #999;
-        margin-right: 20rpx;
+        margin-right: 16rpx;
+        background: rgba(0, 0, 0, 0.05);
+        padding: 2rpx 8rpx;
+        border-radius: 6rpx;
       }
     }
   }
@@ -374,24 +442,44 @@ const formatFileSize = (size) => {
 
 .result-actions-item {
   display: flex;
-  gap: 10rpx;
-  
+  gap: 12rpx;
+
   .mini-btn {
-    width: 60rpx;
-    height: 60rpx;
-    border-radius: 8rpx;
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 12rpx;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    &.download-btn {
-      background: #007aff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      transform: translateY(-2rpx);
+      box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.2);
     }
-    
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+    }
+
+    &.download-btn {
+      background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
+
+      &:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+      }
+    }
+
     &.preview-btn {
-      background: #28a745;
+      background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+
+      &:hover {
+        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+      }
     }
   }
 }
@@ -442,14 +530,37 @@ const formatFileSize = (size) => {
   
   .result-item {
     padding: 20rpx;
-    
+
+    .result-info {
+      .result-thumbnail {
+        width: 64rpx;
+        height: 64rpx;
+        margin-right: 16rpx;
+      }
+    }
+
     .result-details {
       .result-filename {
-        font-size: 26rpx;
+        font-size: 24rpx;
+
+        &.original {
+          font-size: 22rpx;
+        }
+
+        &.processed {
+          font-size: 24rpx;
+        }
       }
-      
+
       .result-status {
-        font-size: 22rpx;
+        font-size: 20rpx;
+      }
+
+      .result-meta {
+        .meta-item {
+          font-size: 18rpx;
+          margin-right: 12rpx;
+        }
       }
     }
   }
