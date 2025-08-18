@@ -87,10 +87,20 @@
         <textarea
           v-model="inputContent"
           class="content-textarea"
-          placeholder="请输入要转换的数据..."
+          :placeholder="getInputPlaceholder()"
+          :maxlength="-1"
           @input="handleInputChange"
         />
-        
+
+        <!-- 格式提示 -->
+        <view v-if="!inputContent.trim()" class="format-hint">
+          <view class="hint-title">
+            <uni-icons type="info" size="14" color="#007aff" />
+            <text>{{ formatOptions[fromFormatIndex].label }} 格式说明</text>
+          </view>
+          <view class="hint-content">{{ getFormatHint() }}</view>
+        </view>
+
         <!-- 验证结果 -->
         <view v-if="validationResult" class="validation-result">
           <view 
@@ -135,6 +145,7 @@
           v-model="outputContent"
           class="content-textarea"
           placeholder="转换结果将显示在这里..."
+          :maxlength="-1"
           readonly
         />
       </view>
@@ -320,6 +331,26 @@ const handleInputChange = () => {
   outputContent.value = ''
 }
 
+const getInputPlaceholder = () => {
+  const format = formatOptions[fromFormatIndex.value].value
+  const examples = {
+    json: '请输入 JSON 数据，例如：\n{\n  "name": "示例",\n  "value": 123\n}',
+    yaml: '请输入 YAML 数据，例如：\nname: 示例\nvalue: 123\nlist:\n  - 项目1\n  - 项目2',
+    xml: '请输入 XML 数据，例如：\n<?xml version="1.0"?>\n<root>\n  <name>示例</name>\n  <value>123</value>\n</root>'
+  }
+  return examples[format] || '请输入要转换的数据...'
+}
+
+const getFormatHint = () => {
+  const format = formatOptions[fromFormatIndex.value].value
+  const hints = {
+    json: 'JSON 是一种轻量级的数据交换格式，使用键值对表示数据，注意字符串需要双引号包围。',
+    yaml: 'YAML 是一种人类可读的数据序列化标准，使用缩进表示层级关系，注意缩进必须使用空格。',
+    xml: 'XML 是一种标记语言，使用标签包围数据，每个开始标签都必须有对应的结束标签。'
+  }
+  return hints[format] || ''
+}
+
 const validateInput = async () => {
   if (!inputContent.value.trim()) {
     uni.showToast({
@@ -346,10 +377,15 @@ const validateInput = async () => {
     }
     
     validationResult.value = result
-    
+
+    const toastTitle = result.valid
+      ? `${format.toUpperCase()} 格式正确 ✓`
+      : `${format.toUpperCase()} 格式错误: ${result.message}`
+
     uni.showToast({
-      title: result.valid ? '格式正确' : '格式错误',
-      icon: result.valid ? 'success' : 'none'
+      title: toastTitle,
+      icon: result.valid ? 'success' : 'none',
+      duration: result.valid ? 1500 : 3000
     })
   } catch (error) {
     validationResult.value = {
@@ -375,21 +411,27 @@ const beautifyInput = () => {
         break
       default:
         uni.showToast({
-          title: '该格式不支持美化',
-          icon: 'none'
+          title: `${format.toUpperCase()} 格式暂不支持美化功能`,
+          icon: 'none',
+          duration: 2000
         })
         return
     }
-    
+
+    const originalLength = inputContent.value.length
     inputContent.value = beautified
+    const newLength = beautified.length
+
     uni.showToast({
-      title: '美化完成',
-      icon: 'success'
+      title: `${format.toUpperCase()} 美化完成 (${originalLength} → ${newLength} 字符)`,
+      icon: 'success',
+      duration: 2000
     })
   } catch (error) {
     uni.showToast({
-      title: error.message,
-      icon: 'none'
+      title: `美化失败: ${error.message}`,
+      icon: 'none',
+      duration: 3000
     })
   }
 }
@@ -411,25 +453,59 @@ const handleConvert = async () => {
   try {
     const fromFormat = formatOptions[fromFormatIndex.value].value
     const toFormat = formatOptions[toFormatIndex.value].value
-    
+
+    // 先验证输入格式
+    progressMessage.value = '验证输入格式...'
+    let validation
+    switch (fromFormat) {
+      case 'json':
+        validation = dataConverter.validateJson(inputContent.value)
+        break
+      case 'yaml':
+        validation = dataConverter.validateYaml(inputContent.value)
+        break
+      case 'xml':
+        validation = await dataConverter.validateXml(inputContent.value)
+        break
+    }
+
+    if (!validation.valid) {
+      throw new Error(`输入格式错误: ${validation.message}`)
+    }
+
+    // 执行转换
+    progressMessage.value = `正在转换 ${fromFormat.toUpperCase()} → ${toFormat.toUpperCase()}...`
     const result = await dataConverter.convert(inputContent.value, fromFormat, toFormat)
     outputContent.value = result
-    
+
     progressStatus.value = 'completed'
-    progressMessage.value = '转换完成'
-    
+    progressMessage.value = `转换完成 (${inputContent.value.length} → ${result.length} 字符)`
+
     uni.showToast({
-      title: '转换成功',
-      icon: 'success'
+      title: `${fromFormat.toUpperCase()} → ${toFormat.toUpperCase()} 转换成功`,
+      icon: 'success',
+      duration: 2000
     })
   } catch (error) {
     progressStatus.value = 'error'
     progressMessage.value = '转换失败'
-    errorMessage.value = error.message
-    
+
+    // 提供更详细的错误信息
+    let userFriendlyMessage = error.message
+    if (error.message.includes('JSON')) {
+      userFriendlyMessage = 'JSON 格式错误，请检查语法是否正确'
+    } else if (error.message.includes('YAML')) {
+      userFriendlyMessage = 'YAML 格式错误，请检查缩进和语法'
+    } else if (error.message.includes('XML')) {
+      userFriendlyMessage = 'XML 格式错误，请检查标签是否正确闭合'
+    }
+
+    errorMessage.value = userFriendlyMessage
+
     uni.showToast({
-      title: error.message,
-      icon: 'none'
+      title: userFriendlyMessage,
+      icon: 'none',
+      duration: 3000
     })
   } finally {
     isConverting.value = false
@@ -752,6 +828,30 @@ const handleClear = () => {
         color: #666;
       }
     }
+  }
+}
+
+.format-hint {
+  margin-top: 15rpx;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 12rpx;
+
+  .hint-title {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    font-size: 26rpx;
+    font-weight: 500;
+    color: #007aff;
+    margin-bottom: 10rpx;
+  }
+
+  .hint-content {
+    font-size: 24rpx;
+    color: #666;
+    line-height: 1.5;
   }
 }
 

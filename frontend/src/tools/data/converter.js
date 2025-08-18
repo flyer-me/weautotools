@@ -6,6 +6,7 @@
 import yaml from 'js-yaml'
 import { parseString as parseXML, Builder as XMLBuilder } from 'xml2js'
 import { FileProcessor } from '../base/FileProcessor.js'
+import { validateXml as validateXmlSafe, safeXmlToJson } from './xmlUtils.js'
 
 export class DataConverter extends FileProcessor {
   constructor() {
@@ -55,10 +56,14 @@ export class DataConverter extends FileProcessor {
   jsonToXml(jsonString, options = {}) {
     try {
       const jsonObj = JSON.parse(jsonString)
-      const builder = new XMLBuilder({ 
-        headless: false,
-        indent: '  ',
-        rootName: options.rootName || 'root',
+
+      // 如果 JSON 对象没有根节点，添加一个
+      const rootName = options.rootName || 'root'
+      const dataToConvert = typeof jsonObj === 'object' && !Array.isArray(jsonObj) && Object.keys(jsonObj).length === 1
+        ? jsonObj
+        : { [rootName]: jsonObj }
+
+      const builder = new XMLBuilder({
         renderOpts: {
           pretty: true,
           indent: '  ',
@@ -66,10 +71,13 @@ export class DataConverter extends FileProcessor {
         },
         xmldec: {
           version: '1.0',
-          encoding: 'UTF-8'
-        }
+          encoding: 'UTF-8',
+          standalone: true
+        },
+        headless: false
       })
-      return builder.build(jsonObj)
+
+      return builder.buildObject(dataToConvert)
     } catch (error) {
       throw new Error(`JSON转XML失败: ${error.message}`)
     }
@@ -82,22 +90,32 @@ export class DataConverter extends FileProcessor {
    * @returns {Promise<string>} JSON字符串
    */
   xmlToJson(xmlString, options = {}) {
-    return new Promise((resolve, reject) => {
-      const parseOptions = {
-        explicitArray: false,
-        ignoreAttrs: options.ignoreAttrs || false,
-        mergeAttrs: options.mergeAttrs || false,
-        explicitRoot: options.explicitRoot !== false,
-        ...options
-      }
-      
-      parseXML(xmlString, parseOptions, (err, result) => {
-        if (err) {
-          reject(new Error(`XML转JSON失败: ${err.message}`))
-        } else {
-          resolve(JSON.stringify(result, null, 2))
+    return new Promise(async (resolve, reject) => {
+      try {
+        // 使用安全的 XML 转 JSON 方法
+        const parseOptions = {
+          explicitArray: false,
+          ignoreAttrs: options.ignoreAttrs || false,
+          mergeAttrs: options.mergeAttrs || false,
+          explicitRoot: options.explicitRoot !== false,
+          trim: true,
+          normalize: true,
+          normalizeTags: false,
+          attrkey: '@',
+          charkey: '#text',
+          ...options
         }
-      })
+
+        // 创建 xml2js 解析器函数
+        const xml2jsParser = (xmlStr, callback) => {
+          parseXML(xmlStr, parseOptions, callback)
+        }
+
+        const result = await safeXmlToJson(xmlString, xml2jsParser)
+        resolve(result)
+      } catch (error) {
+        reject(new Error(`XML转JSON失败: ${error.message}`))
+      }
     })
   }
 
@@ -167,19 +185,8 @@ export class DataConverter extends FileProcessor {
   }
 
   validateXml(xmlString) {
-    return new Promise((resolve) => {
-      parseXML(xmlString, (err, result) => {
-        if (err) {
-          resolve({ 
-            valid: false, 
-            message: `XML格式错误: ${err.message}`,
-            line: err.line
-          })
-        } else {
-          resolve({ valid: true, message: 'XML格式正确' })
-        }
-      })
-    })
+    // 直接使用安全的 XML 验证方法
+    return validateXmlSafe(xmlString)
   }
 
   /**

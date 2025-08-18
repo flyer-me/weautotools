@@ -28,7 +28,7 @@
         <uni-icons type="chat" size="18" />
       </view>
       <view class="info-row" @click="handleHelpClick">
-        <text>帮助中心</text>
+        <text>帮助</text>
         <uni-icons type="arrowright" size="18" />
       </view>
       <view class="info-row" @click="handleServiceClick">
