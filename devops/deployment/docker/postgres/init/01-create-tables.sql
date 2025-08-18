@@ -1,3 +1,4 @@
+-- 将数据库初始化脚本内容复制到这里
 -- WeAutoTools 数据库表结构初始化脚本
 -- 执行前请确保已连接到 weautotools 数据库
 
@@ -34,13 +35,3 @@ COMMENT ON COLUMN click_counter.created_at IS '创建时间';
 COMMENT ON COLUMN click_counter.updated_at IS '更新时间';
 COMMENT ON COLUMN click_counter.deleted IS '逻辑删除标记(0:未删除,1:已删除)';
 COMMENT ON COLUMN click_counter.version IS '版本号(乐观锁)';
-
--- 验证表结构
-SELECT 
-    column_name,
-    data_type,
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_name = 'click_counter' 
-ORDER BY ordinal_position;

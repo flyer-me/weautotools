@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库服务
+  postgres:
+    image: postgres:15-alpine
+    container_name: weautotools-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: weautotools
+      POSTGRES_USER: weautotools
+      POSTGRES_PASSWORD: weautotools123
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weautotools"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存服务
+  redis:
+    image: redis:alpine
+    container_name: weautotools-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
