@@ -65,7 +65,7 @@ open class LockAspect {
             throw BusinessException("获取分布式锁被中断")
         } finally {
             // 自动释放锁
-            if (acquired && lock.autoRelease && redisLock.isHeldByCurrentThread) {
+            if (acquired && redisLock.isHeldByCurrentThread) {
                 redisLock.unlock()
                 logger.debug("释放分布式锁: {}", lockKey)
             }

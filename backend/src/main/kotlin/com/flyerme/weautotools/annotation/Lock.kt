@@ -3,12 +3,12 @@ package com.flyerme.weautotools.annotation
 import java.util.concurrent.TimeUnit
 
 /**
- * 分布式锁注解
+ * 分布式锁注解 (简化版)
  * 用于方法级别的分布式锁控制
  *
  * @author WeAutoTools Team
- * @version 1.0.0
- * @since 2025-08-17
+ * @version 2.0.0
+ * @since 2025-08-18
  */
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
@@ -43,11 +43,5 @@ annotation class Lock(
     /**
      * 获取锁失败时的错误消息
      */
-    val failMessage: String = "获取分布式锁失败，请稍后重试",
-
-    /**
-     * 是否自动释放锁，默认为true
-     * 如果为false，需要手动释放锁
-     */
-    val autoRelease: Boolean = true
+    val failMessage: String = "获取分布式锁失败，请稍后重试"
 )

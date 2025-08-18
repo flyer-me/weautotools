@@ -30,25 +30,14 @@ open class LockKeyGenerator {
 
     companion object {
         private val logger = LoggerFactory.getLogger(LockKeyGenerator::class.java)
-        private const val EXECUTION_PATH_VARIABLE = "executionPath"
-        private const val MAX_KEY_LENGTH = 250 // Redis key最大长度限制
+        private const val MAX_KEY_LENGTH = 250
 
         /**
-         * 静态工具方法：生成简单的锁key
+         * 生成简单的锁key
          */
         @JvmStatic
         fun generateSimpleKey(prefix: String, vararg parts: String): String {
             return "$prefix:${parts.joinToString(":")}"
-        }
-
-        @JvmStatic
-        fun generateUserKey(userId: Long): String {
-            return generateSimpleKey("lock", "user", userId.toString())
-        }
-
-        @JvmStatic
-        fun generateOrderKey(orderId: String): String {
-            return generateSimpleKey("lock", "order", orderId)
         }
 
         @JvmStatic
@@ -108,7 +97,7 @@ open class LockKeyGenerator {
         // 创建SpEL上下文
         val context: EvaluationContext = StandardEvaluationContext().apply {
             // 设置executionPath变量
-            setVariable(EXECUTION_PATH_VARIABLE, generateExecutionPath(method))
+            setVariable("executionPath", generateExecutionPath(method))
             
             // 设置方法参数
             paramNames?.forEachIndexed { index, paramName ->

@@ -1,6 +1,5 @@
 package com.flyerme.weautotools.util
 
-import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,10 +8,8 @@ import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
 /**
- * 分布式锁工具类 (Kotlin版本)
+ * 分布式锁工具类 (简化版)
  * 基于Redisson实现的分布式锁操作工具
- * 
- * 提供与Java版本完全兼容的API，同时增加Kotlin特性
  *
  * @author WeAutoTools Team
  * @version 2.0.0
@@ -26,7 +23,7 @@ open class DistributedLockUtil {
 
     companion object {
         private val logger = LoggerFactory.getLogger(DistributedLockUtil::class.java)
-        
+
         /**
          * 默认锁等待时间（秒）
          */
@@ -39,7 +36,6 @@ open class DistributedLockUtil {
 
         /**
          * 生成锁的key
-         * 兼容Java版本的静态方法
          */
         @JvmStatic
         fun generateLockKey(vararg parts: String): String {
@@ -134,44 +130,7 @@ open class DistributedLockUtil {
         }
     }
 
-    /**
-     * 尝试获取锁
-     * 兼容Java版本的API
-     *
-     * @param lockKey 锁的key
-     * @return 锁对象，需要手动释放
-     */
-    fun tryLock(lockKey: String): RLock? {
-        return tryLock(lockKey, DEFAULT_WAIT_TIME, DEFAULT_LEASE_TIME, TimeUnit.SECONDS)
-    }
 
-    /**
-     * 尝试获取锁
-     * 兼容Java版本的API
-     *
-     * @param lockKey 锁的key
-     * @param waitTime 等待时间
-     * @param leaseTime 锁持有时间
-     * @param timeUnit 时间单位
-     * @return 锁对象，需要手动释放
-     */
-    fun tryLock(lockKey: String, waitTime: Long, leaseTime: Long, timeUnit: TimeUnit): RLock? {
-        val lock = redissonClient.getLock(lockKey)
-        return try {
-            val acquired = lock.tryLock(waitTime, leaseTime, timeUnit)
-            if (acquired) {
-                logger.debug("成功获取分布式锁: {}", lockKey)
-                lock
-            } else {
-                logger.warn("获取分布式锁失败: {}", lockKey)
-                null
-            }
-        } catch (e: InterruptedException) {
-            Thread.currentThread().interrupt()
-            logger.error("获取分布式锁被中断: {}", lockKey, e)
-            throw RuntimeException("获取分布式锁被中断", e)
-        }
-    }
 
     /**
      * Kotlin风格的扩展方法

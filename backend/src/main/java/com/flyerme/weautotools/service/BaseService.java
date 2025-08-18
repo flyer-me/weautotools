@@ -77,27 +77,23 @@ public abstract class BaseService<T extends BaseEntity, R, S> {
      */
     @Transactional
     public S create(R request) {
-        String lockKey = DistributedLockUtil.generateLockKey(getEntityName(), "create");
-        
-        return distributedLockUtil.executeWithLock(lockKey, () -> {
-            // 验证请求参数
-            validateCreateRequest(request);
-            
-            // 检查业务规则
-            checkCreateBusinessRules(request);
-            
-            // 创建实体
-            T entity = createEntityFromRequest(request);
-            setCreateDefaults(entity);
-            
-            int result = insert(entity);
-            if (result <= 0) {
-                throw new BusinessException("创建" + getEntityName() + "失败");
-            }
-            
-            log.info("创建{}成功: {}", getEntityName(), entity.getId());
-            return convertToResponse(entity);
-        });
+        // 验证请求参数
+        validateCreateRequest(request);
+
+        // 检查业务规则
+        checkCreateBusinessRules(request);
+
+        // 创建实体
+        T entity = createEntityFromRequest(request);
+        setCreateDefaults(entity);
+
+        int result = insert(entity);
+        if (result <= 0) {
+            throw new BusinessException("创建" + getEntityName() + "失败");
+        }
+
+        log.info("创建{}成功: {}", getEntityName(), entity.getId());
+        return convertToResponse(entity);
     }
 
     /**
@@ -158,24 +154,20 @@ public abstract class BaseService<T extends BaseEntity, R, S> {
      */
     @Transactional
     public void delete(Long id) {
-        String lockKey = DistributedLockUtil.generateLockKey(getEntityName(), "delete", String.valueOf(id));
-        
-        distributedLockUtil.executeWithLock(lockKey, () -> {
-            T entity = selectById(id);
-            if (entity == null) {
-                throw new BusinessException(getEntityName() + "不存在: " + id);
-            }
-            
-            // 检查删除业务规则
-            checkDeleteBusinessRules(id, entity);
-            
-            int result = deleteById(id, LocalDateTime.now());
-            if (result <= 0) {
-                throw new BusinessException("删除" + getEntityName() + "失败");
-            }
-            
-            log.info("删除{}成功: {}", getEntityName(), id);
-        });
+        T entity = selectById(id);
+        if (entity == null) {
+            throw new BusinessException(getEntityName() + "不存在: " + id);
+        }
+
+        // 检查删除业务规则
+        checkDeleteBusinessRules(id, entity);
+
+        int result = deleteById(id, LocalDateTime.now());
+        if (result <= 0) {
+            throw new BusinessException("删除" + getEntityName() + "失败");
+        }
+
+        log.info("删除{}成功: {}", getEntityName(), id);
     }
 
     /**
