@@ -1,0 +1,358 @@
+// 工具页面通用样式
+// 统一的设计规范和复用样式
+
+// 颜色变量
+$primary-color: #007AFF;
+$success-color: #28a745;
+$warning-color: #ffc107;
+$danger-color: #dc3545;
+$info-color: #17a2b8;
+
+$text-primary: #333;
+$text-secondary: #666;
+$text-muted: #999;
+
+$border-color: #ddd;
+$border-light: #e9ecef;
+$border-lighter: #f0f0f0;
+
+$bg-primary: #fff;
+$bg-secondary: #f8f9fa;
+$bg-light: #f5f5f5;
+
+// 间距变量
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+
+// 圆角变量
+$radius-sm: 8rpx;
+$radius-md: 12rpx;
+$radius-lg: 16rpx;
+$radius-xl: 20rpx;
+
+// 字体大小
+$font-xs: 20rpx;
+$font-sm: 24rpx;
+$font-md: 28rpx;
+$font-lg: 32rpx;
+$font-xl: 36rpx;
+
+// 阴影
+$shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 6rpx 20rpx rgba(0, 0, 0, 0.12);
+
+// 通用输入组件样式
+.input-section {
+  margin-bottom: $spacing-lg;
+}
+
+.input-group {
+  margin-bottom: $spacing-lg;
+  
+  .input-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+    font-size: $font-md;
+    color: $text-primary;
+    font-weight: 500;
+    
+    .required {
+      color: $danger-color;
+      margin-left: 5rpx;
+    }
+    
+    .optional {
+      color: $text-muted;
+      font-size: $font-sm;
+      margin-left: 10rpx;
+      font-weight: normal;
+    }
+  }
+  
+  .text-input, .textarea-input {
+    width: 100%;
+    min-height: 120rpx;
+    padding: $spacing-md;
+    border: 2rpx solid $border-color;
+    border-radius: $radius-md;
+    font-size: $font-md;
+    line-height: 1.5;
+    background: $bg-primary;
+    transition: border-color 0.3s ease;
+    
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
+    }
+    
+    &.large {
+      min-height: 200rpx;
+    }
+  }
+  
+  .input-hint {
+    margin-top: 10rpx;
+    text-align: right;
+    
+    .char-count {
+      font-size: $font-sm;
+      color: $text-muted;
+    }
+  }
+}
+
+// 通用设置区域样式
+.settings-section {
+  margin-bottom: $spacing-lg;
+  padding: $spacing-lg;
+  background: $bg-secondary;
+  border-radius: $radius-lg;
+  border: 2rpx solid $border-lighter;
+  
+  .section-title {
+    font-size: $font-xl;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-sm;
+    border-bottom: 2rpx solid $border-lighter;
+  }
+}
+
+.setting-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .setting-label {
+    font-size: $font-md;
+    color: $text-primary;
+    font-weight: 500;
+    min-width: 140rpx;
+  }
+}
+
+// 通用选择器样式
+.picker-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-md;
+  background: $bg-primary;
+  border: 2rpx solid $border-light;
+  border-radius: $radius-md;
+  font-size: $font-md;
+  color: $text-primary;
+  min-width: 200rpx;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    background: $bg-primary;
+  }
+}
+
+// 通用按钮样式
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-md;
+  font-size: $font-md;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &.btn-primary {
+    background: $primary-color;
+    color: white;
+    
+    &:hover {
+      background: darken($primary-color, 10%);
+    }
+    
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+  
+  &.btn-secondary {
+    background: $bg-secondary;
+    color: $text-secondary;
+    border: 2rpx solid $border-light;
+    
+    &:hover {
+      background: $border-light;
+    }
+  }
+  
+  &.btn-success {
+    background: $success-color;
+    color: white;
+    
+    &:hover {
+      background: darken($success-color, 10%);
+    }
+  }
+  
+  &.btn-danger {
+    background: $danger-color;
+    color: white;
+    
+    &:hover {
+      background: darken($danger-color, 10%);
+    }
+  }
+  
+  &.btn-sm {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-sm;
+  }
+  
+  &.btn-lg {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-lg;
+  }
+}
+
+// 通用操作区域
+.action-section {
+  display: flex;
+  gap: $spacing-md;
+  margin: $spacing-lg 0;
+  
+  .action-btn {
+    flex: 1;
+    @extend .btn;
+    @extend .btn-primary;
+    
+    &.secondary {
+      @extend .btn-secondary;
+    }
+  }
+}
+
+// 通用选项组样式
+.option-group {
+  margin-bottom: $spacing-lg;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  border: 2rpx solid $border-lighter;
+  box-shadow: $shadow-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .option-label {
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 2rpx solid $border-lighter;
+  }
+}
+
+// 通用选项卡样式
+.option-tabs {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  
+  .tab-item {
+    padding: $spacing-sm $spacing-md;
+    background: $bg-secondary;
+    border: 2rpx solid $border-light;
+    border-radius: $radius-md;
+    font-size: $font-md;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &.active {
+      background: $primary-color;
+      color: white;
+      border-color: $primary-color;
+    }
+    
+    &:hover:not(.active) {
+      border-color: $primary-color;
+      background: lighten($primary-color, 45%);
+    }
+  }
+}
+
+// 通用预设按钮样式
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  
+  .preset-btn {
+    padding: $spacing-sm $spacing-md;
+    background: $bg-secondary;
+    border: 2rpx solid $border-light;
+    border-radius: $radius-xl;
+    font-size: $font-sm;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: $primary-color;
+      background: lighten($primary-color, 45%);
+      color: $primary-color;
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    &.active {
+      background: $primary-color;
+      color: white;
+      border-color: $primary-color;
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 750rpx) {
+  .setting-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+
+    .picker-display {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+
+  .action-section {
+    flex-direction: column;
+  }
+  
+  .preset-buttons {
+    .preset-btn {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+    }
+  }
+}

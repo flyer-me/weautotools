@@ -1723,17 +1723,17 @@ const formatFileSize = (size) => {
   border: 2rpx solid #f0f0f0;
 }
 
-/* 无损压缩设置样式 */
+// 无损压缩设置样式保留，因为这是特定的功能样式
 .compress-lossless-section {
   .lossless-info {
     display: flex;
     align-items: flex-start;
-    gap: 16rpx;
-    padding: 20rpx;
+    gap: $spacing-sm;
+    padding: $spacing-md;
     background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
-    border-radius: 12rpx;
+    border-radius: $radius-md;
     border: 2rpx solid rgba(0, 122, 255, 0.1);
-    margin-bottom: 24rpx;
+    margin-bottom: $spacing-md;
 
     .info-icon {
       display: flex;
@@ -1742,7 +1742,7 @@ const formatFileSize = (size) => {
       width: 48rpx;
       height: 48rpx;
       background: rgba(0, 122, 255, 0.1);
-      border-radius: 12rpx;
+      border-radius: $radius-md;
       flex-shrink: 0;
     }
 
@@ -1751,16 +1751,16 @@ const formatFileSize = (size) => {
 
       .info-title {
         display: block;
-        font-size: 28rpx;
+        font-size: $font-md;
         font-weight: 600;
-        color: #007AFF;
-        margin-bottom: 8rpx;
+        color: $primary-color;
+        margin-bottom: $spacing-xs;
       }
 
       .info-desc {
         display: block;
-        font-size: 24rpx;
-        color: #666;
+        font-size: $font-sm;
+        color: $text-secondary;
         line-height: 1.4;
       }
     }
@@ -1769,21 +1769,21 @@ const formatFileSize = (size) => {
   .lossless-features {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16rpx;
-    margin-bottom: 24rpx;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
 
     .feature-item {
       display: flex;
       align-items: center;
-      gap: 8rpx;
-      padding: 12rpx 16rpx;
+      gap: $spacing-xs;
+      padding: $spacing-sm $spacing-md;
       background: rgba(40, 167, 69, 0.05);
-      border-radius: 8rpx;
+      border-radius: $radius-sm;
       border: 1rpx solid rgba(40, 167, 69, 0.1);
 
       .feature-text {
-        font-size: 22rpx;
-        color: #333;
+        font-size: $font-xs;
+        color: $text-primary;
         font-weight: 500;
       }
     }
@@ -1792,572 +1792,23 @@ const formatFileSize = (size) => {
   .lossless-note {
     display: flex;
     align-items: flex-start;
-    gap: 8rpx;
-    padding: 16rpx;
+    gap: $spacing-xs;
+    padding: $spacing-sm;
     background: rgba(255, 193, 7, 0.05);
-    border-radius: 12rpx;
+    border-radius: $radius-md;
     border: 1rpx solid rgba(255, 193, 7, 0.1);
 
     .note-text {
-      font-size: 22rpx;
-      color: #666;
+      font-size: $font-xs;
+      color: $text-secondary;
       line-height: 1.4;
     }
   }
 }
 
-/* 尺寸限制设置样式 */
-.dimension-limit-container {
-  .dimension-inputs {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20rpx;
-    margin-bottom: 24rpx;
+// 尺寸限制设置样式已移至通用样式
 
-    .dimension-input {
-      display: flex;
-      align-items: center;
-      gap: 12rpx;
-      padding: 20rpx;
-      background: #f8f9fa;
-      border-radius: 12rpx;
-      border: 2rpx solid #e9ecef;
-      transition: all 0.3s ease;
+// 质量预设、滑块、大小预设等样式已移至通用样式
 
-      &:focus-within {
-        border-color: #007AFF;
-        background: #fff;
-        box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
-      }
-
-      .dimension-label {
-        font-size: 24rpx;
-        color: #666;
-        font-weight: 500;
-        white-space: nowrap;
-      }
-
-      .number-input {
-        flex: 1;
-        padding: 12rpx 16rpx;
-        background: #fff;
-        border: 2rpx solid #dee2e6;
-        border-radius: 8rpx;
-        font-size: 26rpx;
-        color: #333;
-        text-align: center;
-
-        &:focus {
-          border-color: #007AFF;
-          box-shadow: 0 0 0 2rpx rgba(0, 122, 255, 0.1);
-        }
-      }
-
-      .unit {
-        font-size: 22rpx;
-        color: #666;
-        font-weight: 500;
-      }
-    }
-  }
-
-  .dimension-presets {
-    margin-bottom: 24rpx;
-
-    .preset-label {
-      display: block;
-      font-size: 26rpx;
-      font-weight: 500;
-      color: #333;
-      margin-bottom: 16rpx;
-    }
-
-    .preset-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12rpx;
-
-      .dimension-preset {
-        padding: 12rpx 20rpx;
-        background: #f8f9fa;
-        border: 2rpx solid #e9ecef;
-        border-radius: 20rpx;
-        font-size: 24rpx;
-        color: #666;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover {
-          border-color: #007AFF;
-          background: #f0f8ff;
-          color: #007AFF;
-        }
-
-        &:active {
-          transform: scale(0.95);
-        }
-      }
-    }
-  }
-
-  .dimension-note {
-    display: flex;
-    align-items: flex-start;
-    gap: 8rpx;
-    padding: 16rpx;
-    background: rgba(0, 122, 255, 0.05);
-    border-radius: 12rpx;
-    border: 1rpx solid rgba(0, 122, 255, 0.1);
-
-    .note-text {
-      font-size: 22rpx;
-      color: #666;
-      line-height: 1.4;
-    }
-  }
-}
-
-.quality-presets-container {
-  margin-bottom: 32rpx;
-
-  .preset-label {
-    display: block;
-    font-size: 28rpx;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 16rpx;
-  }
-
-  .quality-presets {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12rpx;
-  }
-
-  .preset-btn {
-    padding: 16rpx 12rpx;
-    background: #f8f9fa;
-    border-radius: 12rpx;
-    border: 2rpx solid #e9ecef;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-
-    &.active {
-      background: #007AFF;
-      border-color: #007AFF;
-      color: white;
-    }
-
-    .preset-name {
-      display: block;
-      font-size: 26rpx;
-      font-weight: 500;
-      margin-bottom: 4rpx;
-    }
-
-    .preset-desc {
-      display: block;
-      font-size: 20rpx;
-      opacity: 0.8;
-    }
-  }
-}
-
-.quality-slider-container {
-  .slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16rpx;
-
-    .slider-label {
-      font-size: 28rpx;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .slider-value {
-      font-size: 28rpx;
-      color: #007AFF;
-      font-weight: 600;
-      background: rgba(0, 122, 255, 0.1);
-      padding: 6rpx 16rpx;
-      border-radius: 16rpx;
-    }
-  }
-
-  .slider-wrapper {
-    padding: 16rpx 0;
-  }
-}
-
-.size-presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-  margin-top: 16rpx;
-
-  .preset-btn {
-    padding: 12rpx 24rpx;
-    background: #f5f5f5;
-    border-radius: 20rpx;
-    font-size: 24rpx;
-    color: #666;
-    border: 2rpx solid transparent;
-    transition: all 0.3s ease;
-    min-width: 120rpx;
-    text-align: center;
-
-    &.active {
-      background: #007AFF;
-      color: white;
-      border-color: #007AFF;
-    }
-  }
-}
-
-.slider-container {
-  margin: 16rpx 0;
-
-  .slider-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 8rpx;
-
-    .slider-label {
-      font-size: 22rpx;
-      color: #999;
-    }
-  }
-}
-
-.quality-description {
-  font-size: 22rpx;
-  color: #666;
-  margin-top: 8rpx;
-  text-align: center;
-}
-
-.target-size-input {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  flex: 1;
-
-  .number-input {
-    flex: 1;
-  }
-
-  .unit-picker {
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-    padding: 12rpx 16rpx;
-    background: #f5f5f5;
-    border-radius: 8rpx;
-    font-size: 24rpx;
-    color: #333;
-    min-width: 80rpx;
-    justify-content: center;
-  }
-}
-
-.dimension-inputs {
-  display: flex;
-  gap: 20rpx;
-  flex: 1;
-
-  .dimension-input {
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-    flex: 1;
-
-    .dimension-label {
-      font-size: 22rpx;
-      color: #666;
-      white-space: nowrap;
-    }
-
-    .number-input.small {
-      min-width: 100rpx;
-    }
-  }
-}
-
-.compress-preview {
-  margin-top: 32rpx;
-  padding: 24rpx;
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  border: 2rpx solid #e9ecef;
-
-  .preview-title {
-    font-size: 28rpx;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 20rpx;
-  }
-
-  .preview-stats {
-    display: flex;
-    justify-content: space-between;
-    gap: 20rpx;
-
-    .stat-item {
-      text-align: center;
-      flex: 1;
-
-      .stat-label {
-        display: block;
-        font-size: 22rpx;
-        color: #666;
-        margin-bottom: 8rpx;
-      }
-
-      .stat-value {
-        display: block;
-        font-size: 26rpx;
-        font-weight: 500;
-        color: #333;
-
-        &.compression-ratio {
-          color: #28a745;
-        }
-      }
-    }
-  }
-}
-
-/* 预览区域样式 */
-.preview-section {
-  margin: 32rpx 0;
-  background: #fff;
-  border-radius: 16rpx;
-  overflow: hidden;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
-  border: 2rpx solid #f0f0f0;
-}
-
-@media (max-width: 750rpx) {
-  .quality-presets,
-  .size-presets {
-    gap: 12rpx;
-  }
-
-  .preset-btn {
-    padding: 10rpx 20rpx;
-    font-size: 22rpx;
-  }
-
-  .dimension-limit-container {
-    .dimension-inputs {
-      grid-template-columns: 1fr;
-      gap: 16rpx;
-
-      .dimension-input {
-        padding: 16rpx;
-
-        .dimension-label {
-          font-size: 22rpx;
-        }
-
-        .number-input {
-          padding: 10rpx 12rpx;
-          font-size: 24rpx;
-        }
-      }
-    }
-
-    .dimension-presets {
-      .preset-buttons {
-        gap: 10rpx;
-
-        .dimension-preset {
-          padding: 10rpx 16rpx;
-          font-size: 22rpx;
-        }
-      }
-    }
-
-    .dimension-note {
-      padding: 12rpx;
-
-      .note-text {
-        font-size: 20rpx;
-      }
-    }
-  }
-
-  .target-size-input {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12rpx;
-  }
-
-  .preview-stats {
-    flex-direction: column;
-    gap: 16rpx;
-  }
-
-  .preview-section {
-    margin: 24rpx 0;
-    border-radius: 12rpx;
-  }
-}
-
-/* 统计信息样式 */
-.statistics-section {
-  margin: 32rpx 0;
-  padding: 32rpx;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 20rpx;
-  border: 2rpx solid #dee2e6;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
-
-  .statistics-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24rpx;
-    padding-bottom: 16rpx;
-    border-bottom: 2rpx solid #dee2e6;
-
-    .statistics-title {
-      font-size: 32rpx;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .statistics-summary {
-      display: flex;
-      gap: 16rpx;
-      align-items: center;
-
-      .summary-text {
-        font-size: 24rpx;
-        color: #666;
-      }
-
-      .summary-success {
-        font-size: 22rpx;
-        color: #28a745;
-        background: rgba(40, 167, 69, 0.1);
-        padding: 4rpx 12rpx;
-        border-radius: 12rpx;
-        font-weight: 500;
-      }
-
-      .summary-failed {
-        font-size: 22rpx;
-        color: #dc3545;
-        background: rgba(220, 53, 69, 0.1);
-        padding: 4rpx 12rpx;
-        border-radius: 12rpx;
-        font-weight: 500;
-      }
-    }
-  }
-
-  .statistics-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200rpx, 1fr));
-    gap: 20rpx;
-  }
-
-  .stat-card {
-    display: flex;
-    align-items: center;
-    gap: 16rpx;
-    padding: 20rpx;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 16rpx;
-    border: 2rpx solid rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10rpx);
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateY(-2rpx);
-      box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48rpx;
-      height: 48rpx;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 12rpx;
-      box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-content {
-      flex: 1;
-
-      .stat-label {
-        display: block;
-        font-size: 22rpx;
-        color: #666;
-        margin-bottom: 4rpx;
-      }
-
-      .stat-value {
-        display: block;
-        font-size: 28rpx;
-        font-weight: 600;
-        color: #333;
-
-        &.compression-ratio {
-          color: #17a2b8;
-        }
-
-        &.success-rate {
-          color: #ffc107;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 750rpx) {
-  .statistics-section {
-    margin: 24rpx 0;
-    padding: 24rpx;
-
-    .statistics-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12rpx;
-
-      .statistics-summary {
-        flex-wrap: wrap;
-        gap: 12rpx;
-      }
-    }
-
-    .statistics-details {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16rpx;
-    }
-
-    .stat-card {
-      padding: 16rpx;
-      gap: 12rpx;
-
-      .stat-icon {
-        width: 40rpx;
-        height: 40rpx;
-      }
-
-      .stat-content {
-        .stat-value {
-          font-size: 24rpx;
-        }
-      }
-    }
-  }
-}
+// 所有重复样式已移至通用样式文件
 </style>

@@ -884,9 +884,9 @@ export class ImageProcessor extends BatchProcessor {
    */
   getQualityPresets() {
     return [
-      { name: '高质量', value: 0.9, description: '质量优先' },
-      { name: '标准', value: 0.8, description: '平衡模式' },
-      { name: '压缩', value: 0.6, description: '大小优先' }
+      { index: 0, name: '高质量', value: 0.9, description: '质量优先' },
+      { index: 1, name: '标准', value: 0.8, description: '平衡模式' },
+      { index: 2, name: '压缩', value: 0.6, description: '大小优先' }
     ]
   }
 
@@ -897,18 +897,21 @@ export class ImageProcessor extends BatchProcessor {
   getCompressionModes() {
     return [
       {
+        index: 0,
         value: 'size',
         label: '大小优先',
         description: '设置目标文件大小',
         icon: 'resize'
       },
       {
+        index: 1,
         value: 'quality',
         label: '质量优先',
         description: '调整质量参数',
         icon: 'tune'
       },
       {
+        index: 2,
         value: 'lossless',
         label: '无损压缩',
         description: '保持原始质量',
