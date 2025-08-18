@@ -57,13 +57,17 @@
             :class="{ active: selectedTypes.includes(type.value) }"
             @click="handleTypeToggle(type.value)"
           >
-            <checkbox
-              :value="type.value"
-              :checked="selectedTypes.includes(type.value)"
-              @click.stop
-            />
-            <text class="type-name">{{ type.name }}</text>
-            <text class="type-desc">{{ type.description }}</text>
+            <view class="type-icon">
+              <uni-icons
+                :type="selectedTypes.includes(type.value) ? 'checkmarkempty' : 'circle'"
+                :size="20"
+                :color="selectedTypes.includes(type.value) ? '#007AFF' : '#ccc'"
+              />
+            </view>
+            <view class="type-content">
+              <text class="type-name">{{ type.name }}</text>
+              <text class="type-desc">{{ type.description }}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -175,6 +179,43 @@
           </view>
         </view>
 
+        <!-- 无损压缩模式 -->
+        <view v-if="compressOptions.mode === 'lossless'" class="compress-lossless-section">
+          <view class="lossless-info">
+            <view class="info-icon">
+              <uni-icons type="star" size="24" color="#007AFF" />
+            </view>
+            <view class="info-content">
+              <text class="info-title">无损压缩模式</text>
+              <text class="info-desc">保持原始图片质量，仅通过优化编码和尺寸调整来减小文件大小</text>
+            </view>
+          </view>
+
+          <view class="lossless-features">
+            <view class="feature-item">
+              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
+              <text class="feature-text">保持100%图片质量</text>
+            </view>
+            <view class="feature-item">
+              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
+              <text class="feature-text">优化文件编码结构</text>
+            </view>
+            <view class="feature-item">
+              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
+              <text class="feature-text">智能格式选择</text>
+            </view>
+            <view class="feature-item">
+              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
+              <text class="feature-text">支持尺寸限制</text>
+            </view>
+          </view>
+
+          <view class="lossless-note">
+            <uni-icons type="info" size="16" color="#666" />
+            <text class="note-text">无损压缩的效果取决于原始图片的格式和内容，通常可以减小5%-30%的文件大小</text>
+          </view>
+        </view>
+
 
 
         <!-- 压缩预览信息 -->
@@ -197,111 +238,84 @@
         </view>
       </view>
 
-      <!-- 尺寸限制设置 -->
-      <view v-if="selectedTypes.includes('compress')" class="option-group">
-        <view class="option-label">尺寸限制</view>
 
-        <view class="dimension-limit-container">
-          <view class="dimension-inputs">
-            <view class="dimension-input">
-              <text class="dimension-label">最大宽度</text>
-              <input
-                v-model.number="compressOptions.maxWidth"
-                type="number"
-                class="number-input"
-                placeholder="1920"
-              />
-              <text class="unit">px</text>
-            </view>
-            <view class="dimension-input">
-              <text class="dimension-label">最大高度</text>
-              <input
-                v-model.number="compressOptions.maxHeight"
-                type="number"
-                class="number-input"
-                placeholder="1080"
-              />
-              <text class="unit">px</text>
-            </view>
-          </view>
-
-          <view class="dimension-presets">
-            <text class="preset-label">常用尺寸</text>
-            <view class="preset-buttons">
-              <view
-                v-for="preset in dimensionPresets"
-                :key="preset.name"
-                class="preset-btn dimension-preset"
-                @click="handleDimensionPresetClick(preset)"
-              >
-                {{ preset.name }}
-              </view>
-            </view>
-          </view>
-
-          <view class="dimension-note">
-            <uni-icons type="info" size="16" color="#666" />
-            <text class="note-text">设置最大尺寸可以进一步减小文件大小，超出尺寸的图片将被等比缩放</text>
-          </view>
-        </view>
-      </view>
 
 
 
       <!-- 尺寸调整设置 -->
       <view v-if="selectedTypes.includes('resize')" class="option-group">
         <view class="option-label">尺寸调整</view>
-        
-        <view class="setting-item">
-          <text class="setting-label">预设尺寸</text>
-          <picker
-            :range="presetSizes"
-            range-key="name"
-            :value="selectedSizeIndex"
-            @change="handleSizeChange"
-          >
-            <view class="picker-display">
-              {{ presetSizes[selectedSizeIndex].name }}
-              <uni-icons type="arrowdown" size="14" color="#666" />
+
+        <!-- 尺寸限制设置 -->
+        <view class="resize-limit-section">
+          <view class="dimension-limit-container">
+            <!-- 尺寸输入 -->
+            <view class="dimension-inputs">
+              <view class="dimension-input">
+                <text class="dimension-label">最大宽度</text>
+                <input
+                  v-model.number="resizeOptions.maxWidth"
+                  type="number"
+                  class="number-input"
+                  placeholder="留空表示不限制"
+                />
+                <text class="unit">px</text>
+              </view>
+              <view class="dimension-input">
+                <text class="dimension-label">最大高度</text>
+                <input
+                  v-model.number="resizeOptions.maxHeight"
+                  type="number"
+                  class="number-input"
+                  placeholder="留空表示不限制"
+                />
+                <text class="unit">px</text>
+              </view>
             </view>
-          </picker>
-        </view>
-        
-        <view v-if="selectedSizeIndex > 0" class="setting-item">
-          <text class="setting-label">缩放模式</text>
-          <picker
-            :range="resizeModes"
-            range-key="label"
-            :value="selectedResizeModeIndex"
-            @change="handleResizeModeChange"
-          >
-            <view class="picker-display">
-              {{ resizeModes[selectedResizeModeIndex].label }}
-              <uni-icons type="arrowdown" size="14" color="#666" />
+
+            <!-- 缩放模式选择 -->
+            <view class="setting-item">
+              <text class="setting-label">缩放方式</text>
+              <picker
+                :range="resizeModes"
+                range-key="label"
+                :value="selectedResizeModeIndex"
+                @change="handleResizeModeChange"
+              >
+                <view class="picker-display">
+                  {{ resizeModes[selectedResizeModeIndex].label }}
+                  <uni-icons type="arrowdown" size="14" color="#666" />
+                </view>
+              </picker>
             </view>
-          </picker>
-        </view>
-        
-        <view v-if="selectedSizeIndex === 0" class="custom-size">
-          <view class="size-inputs">
-            <view class="size-input-group">
-              <text class="size-label">宽度</text>
-              <input
-                v-model.number="customSize.width"
-                type="number"
-                class="size-input"
-                placeholder="宽度"
-              />
+
+            <!-- 常用尺寸预设 -->
+            <view class="dimension-presets">
+              <text class="preset-label">常用尺寸</text>
+              <view class="preset-buttons">
+                <view
+                  class="preset-btn dimension-preset"
+                  :class="{ active: !resizeOptions.maxWidth && !resizeOptions.maxHeight }"
+                  @click="handleDimensionPresetClick({ name: '原始尺寸', width: null, height: null })"
+                >
+                  原始尺寸
+                </view>
+                <view
+                  v-for="preset in dimensionPresets.slice(0, -1)"
+                  :key="preset.name"
+                  class="preset-btn dimension-preset"
+                  :class="{ active: resizeOptions.maxWidth === preset.width && resizeOptions.maxHeight === preset.height }"
+                  @click="handleDimensionPresetClick(preset)"
+                >
+                  {{ preset.name }}
+                </view>
+              </view>
             </view>
-            <text class="size-separator">×</text>
-            <view class="size-input-group">
-              <text class="size-label">高度</text>
-              <input
-                v-model.number="customSize.height"
-                type="number"
-                class="size-input"
-                placeholder="高度"
-              />
+
+            <!-- 说明信息 -->
+            <view class="dimension-note">
+              <uni-icons type="info" size="16" color="#666" />
+              <text class="note-text">设置图片的最大尺寸限制。超出限制的图片会根据所选缩放方式进行调整，留空表示该方向不限制</text>
             </view>
           </view>
         </view>
@@ -470,18 +484,15 @@ const selectedFiles = ref([])
 
 const selectedTypes = ref(['compress'])
 const selectedQualityIndex = ref(1) // 标准质量
-const selectedSizeIndex = ref(0) // 原始尺寸
-const selectedResizeModeIndex = ref(1) // contain
+const selectedResizeModeIndex = ref(0) // 保持比例缩放
 const selectedWatermarkTypeIndex = ref(0) // 文字
 const selectedWatermarkPositionIndex = ref(3) // 右下角
 const selectedCompressionModeIndex = ref(0) // 大小优先
 const selectedSizeUnitIndex = ref(1) // KB
 
 const compressOptions = ref({
-  mode: 'size', // 'quality' | 'size'
+  mode: 'size', // 'quality' | 'size' | 'lossless'
   quality: 80, // 0-100
-  maxWidth: 1920,
-  maxHeight: 1080,
   targetSize: 500, // 目标文件大小数值
   targetSizeBytes: 500 * 1024 // 目标文件大小字节数
 })
@@ -489,6 +500,11 @@ const compressOptions = ref({
 const customSize = ref({
   width: null,
   height: null
+})
+
+const resizeOptions = ref({
+  maxWidth: null, // 最大宽度，null表示不限制
+  maxHeight: null // 最大高度，null表示不限制
 })
 
 const watermarkOptions = ref({
@@ -537,7 +553,6 @@ const processTypes = [
 ]
 
 const qualityPresets = imageProcessor.getQualityPresets()
-const presetSizes = imageProcessor.getPresetSizes()
 const compressionModes = imageProcessor.getCompressionModes()
 
 // 文件大小单位
@@ -556,19 +571,24 @@ const sizePresets = [
   { label: '5MB', value: 5, unit: 'MB' }
 ]
 
-// 常用尺寸预设
+// 常用尺寸预设（中国常用尺寸）
 const dimensionPresets = [
-  { name: '4K', width: 3840, height: 2160 },
-  { name: '2K', width: 2560, height: 1440 },
-  { name: '1080P', width: 1920, height: 1080 },
+  { name: '1寸证件照', width: 295, height: 413 },
+  { name: '2寸证件照', width: 413, height: 579 },
+  { name: '小2寸证件照', width: 413, height: 531 },
+  { name: '微信头像', width: 640, height: 640 },
+  { name: '朋友圈封面', width: 1080, height: 608 },
   { name: '720P', width: 1280, height: 720 },
+  { name: '1080P', width: 1920, height: 1080 },
+  { name: '淘宝主图', width: 800, height: 800 },
+  { name: '公众号封面', width: 900, height: 500 },
   { name: '无限制', width: null, height: null }
 ]
 
 const resizeModes = [
-  { value: 'exact', label: '精确尺寸', description: '强制调整到指定尺寸' },
-  { value: 'contain', label: '等比缩放(包含)', description: '保持比例，完整显示' },
-  { value: 'cover', label: '等比缩放(覆盖)', description: '保持比例，填满尺寸' }
+  { value: 'contain', label: '保持比例缩放', description: '等比例缩放，不会变形，可能有留白' },
+  { value: 'cover', label: '填满尺寸缩放', description: '等比例缩放填满，不会变形，可能会裁剪' },
+  { value: 'exact', label: '强制拉伸', description: '强制调整到指定尺寸，可能会变形' }
 ]
 
 const watermarkTypes = [
@@ -601,12 +621,18 @@ const estimatedCompressedSize = computed(() => {
   let estimatedSize
 
   if (compressOptions.value.mode === 'quality') {
-    // 基于质量估算
+    // 基于质量估算 - 使用改进的预估算法
     const compressionRatio = compressOptions.value.quality / 100
-    estimatedSize = totalOriginalSize * compressionRatio
-  } else {
+    // 考虑质量参数的非线性特性
+    const adjustedRatio = Math.pow(compressionRatio, 0.8) * 0.9 + 0.1
+    estimatedSize = totalOriginalSize * adjustedRatio
+  } else if (compressOptions.value.mode === 'size') {
     // 基于目标大小
     estimatedSize = compressOptions.value.targetSizeBytes * selectedFiles.value.length
+  } else if (compressOptions.value.mode === 'lossless') {
+    // 无损压缩估算 - 通常可以减小10%-25%
+    const losslessRatio = 0.8 // 平均80%的大小
+    estimatedSize = totalOriginalSize * losslessRatio
   }
 
   return imageProcessor.formatFileSize(estimatedSize)
@@ -623,9 +649,12 @@ const estimatedCompressionRatio = computed(() => {
 
   if (compressOptions.value.mode === 'quality') {
     const compressionRatio = compressOptions.value.quality / 100
-    estimatedCompressedSize = totalOriginalSize * compressionRatio
-  } else {
+    const adjustedRatio = Math.pow(compressionRatio, 0.8) * 0.9 + 0.1
+    estimatedCompressedSize = totalOriginalSize * adjustedRatio
+  } else if (compressOptions.value.mode === 'size') {
     estimatedCompressedSize = compressOptions.value.targetSizeBytes * selectedFiles.value.length
+  } else if (compressOptions.value.mode === 'lossless') {
+    estimatedCompressedSize = totalOriginalSize * 0.8
   }
 
   return imageProcessor.calculateCompressionRatio(totalOriginalSize, estimatedCompressedSize)
@@ -683,6 +712,13 @@ watch(() => compressOptions.value.targetSizeBytes, () => {
 watch(() => compressOptions.value.mode, () => {
   if (selectedFiles.value.length > 0) {
     generateProcessedPreview(selectedFiles.value[0])
+  }
+})
+
+// 监听尺寸调整参数变化
+watch(() => [resizeOptions.value.maxWidth, resizeOptions.value.maxHeight], () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('resize')) {
+    debouncedPreviewUpdate()
   }
 })
 
@@ -796,9 +832,11 @@ const handleSizePresetClick = (preset) => {
 
 // 尺寸预设点击
 const handleDimensionPresetClick = (preset) => {
-  compressOptions.value.maxWidth = preset.width
-  compressOptions.value.maxHeight = preset.height
+  resizeOptions.value.maxWidth = preset.width
+  resizeOptions.value.maxHeight = preset.height
 }
+
+
 
 
 
@@ -860,19 +898,17 @@ const generateProcessedPreview = async (file) => {
     // 应用压缩设置
     if (compressOptions.value.mode === 'quality') {
       processedFile = await imageProcessor.compressImage(processedFile, {
-        quality: compressOptions.value.quality / 100,
-        maxWidth: compressOptions.value.maxWidth,
-        maxHeight: compressOptions.value.maxHeight
+        quality: compressOptions.value.quality / 100
       })
-    } else {
+    } else if (compressOptions.value.mode === 'size') {
       processedFile = await imageProcessor.compressToTargetSize(
         processedFile,
-        compressOptions.value.targetSizeBytes,
-        {
-          maxWidth: compressOptions.value.maxWidth,
-          maxHeight: compressOptions.value.maxHeight
-        }
+        compressOptions.value.targetSizeBytes
       )
+    } else if (compressOptions.value.mode === 'lossless') {
+      processedFile = await imageProcessor.compressImage(processedFile, {
+        lossless: true
+      })
     }
 
     // 设置处理后的图片
@@ -907,9 +943,7 @@ const clearPreview = () => {
 
 
 
-const handleSizeChange = (e) => {
-  selectedSizeIndex.value = e.detail.value
-}
+
 
 const handleResizeModeChange = (e) => {
   selectedResizeModeIndex.value = e.detail.value
@@ -1012,52 +1046,73 @@ const handleProcess = async () => {
 const processImage = async (file) => {
   let processedFile = file
   
-  // 按顺序执行各种处理
-  for (const type of selectedTypes.value) {
-    switch (type) {
-      case 'compress':
-        if (compressOptions.value.mode === 'quality') {
-          // 质量优先模式
-          processedFile = await imageProcessor.compressImage(processedFile, {
-            quality: compressOptions.value.quality / 100,
-            maxWidth: compressOptions.value.maxWidth,
-            maxHeight: compressOptions.value.maxHeight
-          })
-        } else {
-          // 大小优先模式
-          processedFile = await imageProcessor.compressToTargetSize(
-            processedFile,
-            compressOptions.value.targetSizeBytes,
-            {
-              maxWidth: compressOptions.value.maxWidth,
-              maxHeight: compressOptions.value.maxHeight
-            }
-          )
-        }
-        break
+  // 按优化顺序执行各种处理：尺寸调整 → 水印 → 压缩
 
-      case 'resize':
-        if (selectedSizeIndex.value > 0) {
-          const size = presetSizes[selectedSizeIndex.value]
-          const mode = resizeModes[selectedResizeModeIndex.value].value
-          processedFile = await imageProcessor.resizeImage(processedFile, {
-            width: size.width,
-            height: size.height,
-            mode
-          })
-        } else if (customSize.value.width && customSize.value.height) {
-          const mode = resizeModes[selectedResizeModeIndex.value].value
-          processedFile = await imageProcessor.resizeImage(processedFile, {
-            width: customSize.value.width,
-            height: customSize.value.height,
-            mode
-          })
-        }
-        break
+  // 1. 先执行尺寸调整（无损质量）
+  if (selectedTypes.value.includes('resize')) {
+    await processResize()
+  }
 
-      case 'watermark':
-        processedFile = await imageProcessor.addWatermark(processedFile, watermarkOptions.value)
-        break
+  // 2. 再执行水印添加
+  if (selectedTypes.value.includes('watermark')) {
+    await processWatermark()
+  }
+
+  // 3. 最后执行压缩（确保在最终尺寸上压缩）
+  if (selectedTypes.value.includes('compress')) {
+    await processCompress()
+  }
+
+  // 处理函数封装
+  async function processResize() {
+    // 尺寸限制模式 - 根据设置的最大尺寸进行调整
+    if (resizeOptions.value.maxWidth || resizeOptions.value.maxHeight) {
+      const imageInfo = await imageProcessor.getImageInfo(processedFile)
+      const maxWidth = resizeOptions.value.maxWidth || imageInfo.width
+      const maxHeight = resizeOptions.value.maxHeight || imageInfo.height
+      const mode = resizeModes[selectedResizeModeIndex.value].value
+
+      // 检查是否需要调整
+      const needResize = (resizeOptions.value.maxWidth && imageInfo.width > resizeOptions.value.maxWidth) ||
+                       (resizeOptions.value.maxHeight && imageInfo.height > resizeOptions.value.maxHeight)
+
+      if (needResize) {
+        // 判断是否后续需要压缩，如果需要压缩则不使用无损质量
+        const willCompress = selectedTypes.value.includes('compress')
+
+        processedFile = await imageProcessor.resizeImage(processedFile, {
+          width: maxWidth,
+          height: maxHeight,
+          mode: mode
+        }, {
+          preserveQuality: !willCompress, // 如果后续要压缩，则不保持无损质量
+          keepOriginalFormat: false // 允许格式转换以优化后续压缩
+        })
+      }
+    }
+  }
+
+  async function processWatermark() {
+    processedFile = await imageProcessor.addWatermark(processedFile, watermarkOptions.value)
+  }
+
+  async function processCompress() {
+    if (compressOptions.value.mode === 'quality') {
+      // 质量优先模式
+      processedFile = await imageProcessor.compressImage(processedFile, {
+        quality: compressOptions.value.quality / 100
+      })
+    } else if (compressOptions.value.mode === 'size') {
+      // 大小优先模式
+      processedFile = await imageProcessor.compressToTargetSize(
+        processedFile,
+        compressOptions.value.targetSizeBytes
+      )
+    } else if (compressOptions.value.mode === 'lossless') {
+      // 无损压缩模式
+      processedFile = await imageProcessor.compressImage(processedFile, {
+        lossless: true
+      })
     }
   }
   
@@ -1139,16 +1194,14 @@ const handleClear = () => {
 const handleReset = () => {
   selectedTypes.value = ['compress']
   selectedQualityIndex.value = 1
-  selectedSizeIndex.value = 0
-  selectedResizeModeIndex.value = 1
+  selectedResizeModeIndex.value = 0 // 保持比例缩放
   selectedWatermarkTypeIndex.value = 0
   selectedWatermarkPositionIndex.value = 3
+  selectedCompressionModeIndex.value = 0 // 大小优先
 
   compressOptions.value = {
     mode: 'size',
     quality: 80,
-    maxWidth: 1920,
-    maxHeight: 1080,
     targetSize: 500,
     targetSizeBytes: 500 * 1024
   }
@@ -1156,6 +1209,11 @@ const handleReset = () => {
   customSize.value = {
     width: null,
     height: null
+  }
+
+  resizeOptions.value = {
+    maxWidth: null,
+    maxHeight: null
   }
 
   watermarkOptions.value = {
@@ -1231,41 +1289,90 @@ const formatFileSize = (size) => {
   .type-option {
     display: flex;
     align-items: center;
-    padding: 20rpx;
+    padding: 24rpx;
     background: white;
-    border: 2rpx solid #e9ecef;
+    border: 3rpx solid #e9ecef;
     border-radius: 16rpx;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4rpx;
+      background: transparent;
+      transition: all 0.3s ease;
+    }
 
     &.active {
       border-color: #007aff;
       background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
-      box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.15);
-    }
-
-    &:hover {
-      border-color: #007aff;
+      box-shadow: 0 6rpx 20rpx rgba(0, 122, 255, 0.2);
       transform: translateY(-2rpx);
-      box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
+
+      &::before {
+        background: linear-gradient(90deg, #007AFF 0%, #00d4ff 100%);
+      }
+
+      .type-icon {
+        background: rgba(0, 122, 255, 0.1);
+        transform: scale(1.1);
+      }
+
+      .type-name {
+        color: #007AFF;
+      }
     }
 
-    checkbox {
+    &:hover:not(.active) {
+      border-color: #007aff;
+      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+      transform: translateY(-1rpx);
+      box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.1);
+
+      .type-icon {
+        transform: scale(1.05);
+      }
+    }
+
+    .type-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48rpx;
+      height: 48rpx;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 12rpx;
       margin-right: 16rpx;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .type-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4rpx;
     }
 
     .type-name {
       font-size: 28rpx;
       color: #333;
       font-weight: 600;
-      margin-right: 12rpx;
+      line-height: 1.2;
+      transition: color 0.3s ease;
     }
 
     .type-desc {
       font-size: 22rpx;
       color: #666;
-      flex: 1;
+      line-height: 1.3;
     }
   }
 }
@@ -1429,12 +1536,35 @@ const formatFileSize = (size) => {
   .process-options {
     padding: 20rpx;
   }
-  
+
+  .process-types {
+    grid-template-columns: 1fr;
+    gap: 12rpx;
+
+    .type-option {
+      padding: 20rpx;
+
+      .type-icon {
+        width: 40rpx;
+        height: 40rpx;
+        margin-right: 12rpx;
+      }
+
+      .type-name {
+        font-size: 26rpx;
+      }
+
+      .type-desc {
+        font-size: 20rpx;
+      }
+    }
+  }
+
   .setting-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 15rpx;
-    
+
     .picker-display,
     .number-input,
     .text-input {
@@ -1442,20 +1572,37 @@ const formatFileSize = (size) => {
       min-width: auto;
     }
   }
-  
+
   .size-inputs {
     flex-direction: column;
-    
+
     .size-separator {
       margin: 0;
       transform: rotate(90deg);
+    }
+  }
+
+
+
+  .dimension-presets {
+    .preset-buttons {
+      gap: 8rpx;
+
+      .dimension-preset {
+        padding: 8rpx 16rpx;
+        font-size: 20rpx;
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+      }
     }
   }
 }
 
 /* 压缩设置样式 */
 .compress-quality-section,
-.compress-size-section {
+.compress-size-section,
+.compress-lossless-section {
   margin-top: 24rpx;
   padding: 24rpx;
   background: #fff;
@@ -1563,6 +1710,98 @@ const formatFileSize = (size) => {
       opacity: 0.8;
       line-height: 1.4;
       font-weight: 400;
+    }
+  }
+}
+
+/* 尺寸调整设置样式 */
+.resize-limit-section {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  border: 2rpx solid #f0f0f0;
+}
+
+/* 无损压缩设置样式 */
+.compress-lossless-section {
+  .lossless-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 16rpx;
+    padding: 20rpx;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-radius: 12rpx;
+    border: 2rpx solid rgba(0, 122, 255, 0.1);
+    margin-bottom: 24rpx;
+
+    .info-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48rpx;
+      height: 48rpx;
+      background: rgba(0, 122, 255, 0.1);
+      border-radius: 12rpx;
+      flex-shrink: 0;
+    }
+
+    .info-content {
+      flex: 1;
+
+      .info-title {
+        display: block;
+        font-size: 28rpx;
+        font-weight: 600;
+        color: #007AFF;
+        margin-bottom: 8rpx;
+      }
+
+      .info-desc {
+        display: block;
+        font-size: 24rpx;
+        color: #666;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .lossless-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16rpx;
+    margin-bottom: 24rpx;
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8rpx;
+      padding: 12rpx 16rpx;
+      background: rgba(40, 167, 69, 0.05);
+      border-radius: 8rpx;
+      border: 1rpx solid rgba(40, 167, 69, 0.1);
+
+      .feature-text {
+        font-size: 22rpx;
+        color: #333;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .lossless-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8rpx;
+    padding: 16rpx;
+    background: rgba(255, 193, 7, 0.05);
+    border-radius: 12rpx;
+    border: 1rpx solid rgba(255, 193, 7, 0.1);
+
+    .note-text {
+      font-size: 22rpx;
+      color: #666;
+      line-height: 1.4;
     }
   }
 }
