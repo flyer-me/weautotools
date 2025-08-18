@@ -1,6 +1,6 @@
 package com.flyerme.weautotools.service.impl;
 
-import com.flyerme.weautotools.annotation.DistributedLock;
+import com.flyerme.weautotools.annotation.Lock;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.entity.ClickCounter;
@@ -155,7 +155,7 @@ public class ClickCounterServiceImpl extends BaseService<ClickCounter, ClickCoun
 
     @Override
     @Transactional
-    @DistributedLock(key = "'counter:click:' + #id", failMessage = "计数器正在被其他用户操作，请稍后重试")
+    @Lock(key = "'counter:click:' + #id", failMessage = "计数器正在被其他用户操作，请稍后重试")
     public ClickCounterResponse clickCounter(Long id) {
         LocalDateTime now = LocalDateTime.now();
         int result = clickCounterMapper.incrementClickCount(id, now, now);
@@ -170,7 +170,7 @@ public class ClickCounterServiceImpl extends BaseService<ClickCounter, ClickCoun
 
     @Override
     @Transactional
-    @DistributedLock(key = "'counter:click:' + #counterName", failMessage = "计数器正在被其他用户操作，请稍后重试")
+    @Lock(key = "'counter:click:' + #counterName", failMessage = "计数器正在被其他用户操作，请稍后重试")
     public ClickCounterResponse clickCounterByName(String counterName) {
         LocalDateTime now = LocalDateTime.now();
         int result = clickCounterMapper.incrementClickCountByName(counterName, now, now);

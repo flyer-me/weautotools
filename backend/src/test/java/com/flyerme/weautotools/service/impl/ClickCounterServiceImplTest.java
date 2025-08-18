@@ -5,6 +5,7 @@ import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.entity.ClickCounter;
 import com.flyerme.weautotools.exception.BusinessException;
 import com.flyerme.weautotools.mapper.ClickCounterMapper;
+import com.flyerme.weautotools.service.BaseService;
 import com.flyerme.weautotools.service.ClickCounterService.ClickCounterStatistics;
 import com.flyerme.weautotools.util.DistributedLockUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -47,6 +50,15 @@ class ClickCounterServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        // 使用反射注入Mock到BaseService
+        try {
+            Field field = BaseService.class.getDeclaredField("distributedLockUtil");
+            field.setAccessible(true);
+            field.set(clickCounterService, distributedLockUtil);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to inject mock", e);
+        }
+
         // 设置测试数据
         testCounter = new ClickCounter();
         testCounter.setId(1L);
@@ -64,12 +76,18 @@ class ClickCounterServiceImplTest {
         testRequest.setDescription("Test Counter");
         testRequest.setEnabled(true);
 
-        // Mock分布式锁工具
-        when(distributedLockUtil.executeWithLock(anyString(), any(Supplier.class)))
+        // Mock分布式锁工具 (使用lenient模式避免不必要的存根警告)
+        lenient().when(distributedLockUtil.executeWithLock(anyString(), any(Supplier.class)))
                 .thenAnswer(invocation -> {
                     Supplier<?> supplier = invocation.getArgument(1);
                     return supplier.get();
                 });
+
+        lenient().doAnswer(invocation -> {
+            Runnable runnable = invocation.getArgument(1);
+            runnable.run();
+            return null;
+        }).when(distributedLockUtil).executeWithLock(anyString(), any(Runnable.class));
     }
 
     @Test
