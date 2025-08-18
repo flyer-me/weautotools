@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
  * @since 2025-08-17
  */
 @Service
-class ExampleLockService {
+open class ExampleLockService {
 
     companion object {
         private val logger = LoggerFactory.getLogger(ExampleLockService::class.java)
@@ -25,7 +25,7 @@ class ExampleLockService {
      * 示例1: 简单的用户操作锁
      */
     @Lock(key = "'user:operation:' + #userId")
-    fun userOperation(userId: Long): String {
+    open fun userOperation(userId: Long): String {
         logger.info("执行用户操作: {}", userId)
         Thread.sleep(1000) // 模拟业务处理
         return "用户操作完成: $userId"
@@ -41,7 +41,7 @@ class ExampleLockService {
         timeUnit = TimeUnit.SECONDS,
         failMessage = "订单正在支付中，请稍后重试"
     )
-    fun processPayment(orderId: String, amount: Double): String {
+    open fun processPayment(orderId: String, amount: Double): String {
         logger.info("处理订单支付: {} - {}", orderId, amount)
         Thread.sleep(2000) // 模拟支付处理
         return "支付成功: $orderId"
@@ -51,7 +51,7 @@ class ExampleLockService {
      * 示例3: 批量操作锁，使用数组参数
      */
     @Lock(key = "'batch:process:' + #ids")
-    fun batchProcess(ids: Array<String>): String {
+    open fun batchProcess(ids: Array<String>): String {
         logger.info("批量处理: {}", ids.contentToString())
         Thread.sleep(1500) // 模拟批量处理
         return "批量处理完成: ${ids.size} 条记录"
@@ -61,7 +61,7 @@ class ExampleLockService {
      * 示例4: 使用对象属性作为锁key
      */
     @Lock(key = "'user:profile:' + #request.userId")
-    fun updateUserProfile(request: UserProfileRequest): String {
+    open fun updateUserProfile(request: UserProfileRequest): String {
         logger.info("更新用户资料: {}", request.userId)
         Thread.sleep(800) // 模拟更新处理
         return "用户资料更新完成: ${request.userId}"
@@ -71,7 +71,7 @@ class ExampleLockService {
      * 示例5: 使用执行路径作为锁key
      */
     @Lock(key = "#executionPath + ':' + #resourceId")
-    fun exclusiveResourceOperation(resourceId: String): String {
+    open fun exclusiveResourceOperation(resourceId: String): String {
         logger.info("独占资源操作: {}", resourceId)
         Thread.sleep(1200) // 模拟资源操作
         return "资源操作完成: $resourceId"
@@ -85,7 +85,7 @@ class ExampleLockService {
         autoRelease = false,
         failMessage = "任务正在执行中"
     )
-    fun manualLockTask(taskId: String): String {
+    open fun manualLockTask(taskId: String): String {
         logger.info("手动锁任务: {}", taskId)
         // 注意：autoRelease = false 时需要手动释放锁
         // 这里只是示例，实际使用时需要通过其他方式释放锁
@@ -108,7 +108,7 @@ class ExampleLockService {
      * 示例8: 复杂的SpEL表达式
      */
     @Lock(key = "'complex:' + #request.type + ':' + #request.id + ':' + #userId")
-    fun complexOperation(request: ComplexRequest, userId: Long): String {
+    open fun complexOperation(request: ComplexRequest, userId: Long): String {
         logger.info("复杂操作: {} - {} - {}", request.type, request.id, userId)
         Thread.sleep(1000)
         return "复杂操作完成"
@@ -121,7 +121,7 @@ class ExampleLockService {
         key = "'conditional:' + #data.id",
         failMessage = "数据正在处理中，请稍后重试"
     )
-    fun conditionalLockOperation(data: DataRequest): String {
+    open fun conditionalLockOperation(data: DataRequest): String {
         // 在实际业务中，可以在方法内部添加条件判断
         if (data.needsLock) {
             logger.info("需要锁的操作: {}", data.id)
@@ -137,7 +137,7 @@ class ExampleLockService {
      * 示例10: 使用列表参数
      */
     @Lock(key = "'list:operation:' + #items")
-    fun listOperation(items: List<String>): String {
+    open fun listOperation(items: List<String>): String {
         logger.info("列表操作: {}", items)
         Thread.sleep(800)
         return "列表操作完成: ${items.size} 项"

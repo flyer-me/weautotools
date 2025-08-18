@@ -64,8 +64,8 @@ public class ClickCounterServiceImpl extends BaseService<ClickCounter, ClickCoun
     }
 
     @Override
-    protected int update(ClickCounter entity) {
-        return clickCounterMapper.update(entity);
+    protected int updateById(ClickCounter entity) {
+        return clickCounterMapper.updateById(entity);
     }
 
     @Override
@@ -135,8 +135,9 @@ public class ClickCounterServiceImpl extends BaseService<ClickCounter, ClickCoun
 
     @Override
     public List<ClickCounterResponse> getEnabledCounters() {
-        List<ClickCounter> counters = clickCounterMapper.selectEnabled();
+        List<ClickCounter> counters = clickCounterMapper.selectAll();
         return counters.stream()
+                .filter(counter -> counter.getEnabled() != null && counter.getEnabled())
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
@@ -185,59 +186,72 @@ public class ClickCounterServiceImpl extends BaseService<ClickCounter, ClickCoun
 
     @Override
     public ClickCounterStatistics getStatistics() {
-        long totalCounters = clickCounterMapper.count();
-        long enabledCounters = clickCounterMapper.countEnabled();
-        long totalClicks = clickCounterMapper.sumTotalClicks();
+        List<ClickCounter> allCounters = clickCounterMapper.selectAll();
+        long totalCounters = allCounters.size();
+        long enabledCounters = allCounters.stream()
+                .filter(counter -> counter.getEnabled() != null && counter.getEnabled())
+                .count();
+        long totalClicks = allCounters.stream()
+                .mapToLong(counter -> counter.getClickCount() != null ? counter.getClickCount() : 0L)
+                .sum();
 
         return new ClickCounterStatistics(totalCounters, enabledCounters, totalClicks);
     }
 
     @Override
     public List<ClickCounterResponse> getCountersByPage(int page, int size) {
-        long offset = (long) (page - 1) * size;
-        List<ClickCounter> counters = clickCounterMapper.selectByPage(offset, size);
-        return counters.stream()
+        List<ClickCounter> allCounters = clickCounterMapper.selectAll();
+        return allCounters.stream()
+                .skip((long) (page - 1) * size)
+                .limit(size)
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ClickCounterResponse> getCountersByCondition(Boolean enabled, String counterName) {
-        List<ClickCounter> counters = clickCounterMapper.selectByCondition(enabled, counterName);
-        return counters.stream()
+        List<ClickCounter> allCounters = clickCounterMapper.selectAll();
+        return allCounters.stream()
+                .filter(counter -> enabled == null || counter.getEnabled().equals(enabled))
+                .filter(counter -> counterName == null || counterName.isEmpty() ||
+                        (counter.getCounterName() != null && counter.getCounterName().contains(counterName)))
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ClickCounterResponse> getTopCountersByClicks(int limit) {
-        List<ClickCounter> counters = clickCounterMapper.selectTopByClicks(limit);
-        return counters.stream()
+        List<ClickCounter> allCounters = clickCounterMapper.selectAll();
+        return allCounters.stream()
+                .sorted((c1, c2) -> Long.compare(
+                        c2.getClickCount() != null ? c2.getClickCount() : 0L,
+                        c1.getClickCount() != null ? c1.getClickCount() : 0L))
+                .limit(limit)
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
+    @Lock(key = "'counter:reset:' + #id")
     public ClickCounterResponse resetCounter(Long id) {
-        String lockKey = DistributedLockUtil.generateLockKey("counter", "reset", String.valueOf(id));
+        ClickCounter counter = clickCounterMapper.selectById(id);
+        if (counter == null) {
+            throw new BusinessException("计数器不存在: " + id);
+        }
 
-        return executeWithLock(lockKey, () -> {
-            ClickCounter counter = clickCounterMapper.selectById(id);
-            if (counter == null) {
-                throw new BusinessException("计数器不存在: " + id);
-            }
+        // 直接更新实体并保存
+        counter.setClickCount(0L);
+        counter.setLastClickTime(null);
+        counter.setUpdatedAt(LocalDateTime.now());
 
-            int result = clickCounterMapper.resetClickCount(id, LocalDateTime.now());
-            if (result <= 0) {
-                throw new BusinessException("重置计数器失败");
-            }
+        int result = clickCounterMapper.updateById(counter);
+        if (result <= 0) {
+            throw new BusinessException("重置计数器失败");
+        }
 
-            // 重新查询更新后的数据
-            counter = clickCounterMapper.selectById(id);
-            log.info("重置计数器成功: {}", counter.getCounterName());
-            return convertToResponse(counter);
-        });
+        log.info("重置计数器成功: {}", counter.getCounterName());
+        return convertToResponse(counter);
     }
 
 }

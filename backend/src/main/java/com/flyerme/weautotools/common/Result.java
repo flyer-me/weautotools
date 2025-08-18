@@ -3,6 +3,7 @@ package com.flyerme.weautotools.common;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result<T> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -107,6 +109,20 @@ public class Result<T> implements Serializable {
      */
     public static <T> Result<T> error(ResultCode resultCode) {
         return new Result<>(resultCode.getCode(), resultCode.getMessage());
+    }
+
+    /**
+     * 根据ResultCode创建响应（便捷方法）
+     */
+    public static <T> Result<T> of(ResultCode resultCode) {
+        return new Result<>(resultCode.getCode(), resultCode.getMessage());
+    }
+
+    /**
+     * 根据ResultCode和数据创建响应（便捷方法）
+     */
+    public static <T> Result<T> of(ResultCode resultCode, T data) {
+        return new Result<>(resultCode.getCode(), resultCode.getMessage(), data);
     }
 
     /**

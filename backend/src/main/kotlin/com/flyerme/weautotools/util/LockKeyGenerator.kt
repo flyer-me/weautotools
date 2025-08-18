@@ -23,7 +23,7 @@ import java.security.MessageDigest
  * @since 2025-08-17
  */
 @Component
-class LockKeyGenerator {
+open class LockKeyGenerator {
 
     private val parser: ExpressionParser = SpelExpressionParser()
     private val nameDiscoverer = DefaultParameterNameDiscoverer()

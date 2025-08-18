@@ -19,7 +19,7 @@ import java.util.function.Supplier
  * @since 2025-08-18
  */
 @Component
-class DistributedLockUtil {
+open class DistributedLockUtil {
 
     @Autowired
     private lateinit var redissonClient: RedissonClient

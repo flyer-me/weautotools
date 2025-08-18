@@ -55,9 +55,9 @@ public abstract class BaseService<T extends BaseEntity, R, S> {
     protected abstract int insert(T entity);
 
     /**
-     * 更新实体
+     * 根据ID更新实体
      */
-    protected abstract int update(T entity);
+    protected abstract int updateById(T entity);
 
     /**
      * 删除实体（逻辑删除）
@@ -141,7 +141,7 @@ public abstract class BaseService<T extends BaseEntity, R, S> {
             updateEntityFromRequest(entity, request);
             setUpdateDefaults(entity);
             
-            int result = update(entity);
+            int result = updateById(entity);
             if (result <= 0) {
                 throw new BusinessException("更新" + getEntityName() + "失败");
             }

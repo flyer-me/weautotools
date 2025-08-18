@@ -22,13 +22,13 @@ import org.springframework.stereotype.Component
  */
 @Aspect
 @Component
-class LockAspect {
+open class LockAspect {
 
     @Autowired
-    private lateinit var redissonClient: RedissonClient
+    internal lateinit var redissonClient: RedissonClient
 
     @Autowired
-    private lateinit var lockKeyGenerator: LockKeyGenerator
+    internal lateinit var lockKeyGenerator: LockKeyGenerator
 
     companion object {
         private val logger = LoggerFactory.getLogger(LockAspect::class.java)
