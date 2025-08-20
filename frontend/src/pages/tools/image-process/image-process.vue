@@ -30,6 +30,10 @@
 
     <!-- 图片预览区域 -->
     <view v-if="selectedFiles.length > 0 && previewData.originalImage" class="preview-section">
+      <view class="preview-hint">
+        <uni-icons type="info" size="16" color="#666" />
+        <text class="hint-text">{{ previewHint }}</text>
+      </view>
       <ImagePreviewCompare
         :originalImage="previewData.originalImage"
         :processedImage="previewData.processedImage"
@@ -167,13 +171,15 @@
           <view class="setting-item">
             <text class="setting-label">常用大小</text>
             <view class="size-presets">
-              <view
-                v-for="preset in sizePresets"
-                :key="preset.value"
-                class="preset-btn size-preset"
-                @click="handleSizePresetClick(preset)"
-              >
-                {{ preset.label }}
+              <view class="preset-buttons">
+                <view
+                  v-for="preset in sizePresets"
+                  :key="preset.value"
+                  class="preset-btn size-preset"
+                  @click="handleSizePresetClick(preset)"
+                >
+                  {{ preset.label }}
+                </view>
               </view>
             </view>
           </view>
@@ -218,24 +224,7 @@
 
 
 
-        <!-- 压缩预览信息 -->
-        <view v-if="selectedFiles.length > 0" class="compress-preview">
-          <view class="preview-title">压缩预览</view>
-          <view class="preview-stats">
-            <view class="stat-item">
-              <text class="stat-label">原始大小</text>
-              <text class="stat-value">{{ formatTotalSize(selectedFiles) }}</text>
-            </view>
-            <view class="stat-item">
-              <text class="stat-label">预估压缩后</text>
-              <text class="stat-value">{{ estimatedCompressedSize }}</text>
-            </view>
-            <view class="stat-item">
-              <text class="stat-label">压缩比例</text>
-              <text class="stat-value compression-ratio">{{ estimatedCompressionRatio }}%</text>
-            </view>
-          </view>
-        </view>
+        <!-- 压缩预览信息已移除，避免误导 -->
       </view>
 
 
@@ -253,23 +242,27 @@
             <view class="dimension-inputs">
               <view class="dimension-input">
                 <text class="dimension-label">最大宽度</text>
-                <input
-                  v-model.number="resizeOptions.maxWidth"
-                  type="number"
-                  class="number-input"
-                  placeholder="留空表示不限制"
-                />
-                <text class="unit">px</text>
+                <view class="dimension-inline">
+                  <input
+                    v-model.number="resizeOptions.maxWidth"
+                    type="number"
+                    class="number-input"
+                    placeholder="留空表示不限制"
+                  />
+                  <text class="unit">px</text>
+                </view>
               </view>
               <view class="dimension-input">
                 <text class="dimension-label">最大高度</text>
-                <input
-                  v-model.number="resizeOptions.maxHeight"
-                  type="number"
-                  class="number-input"
-                  placeholder="留空表示不限制"
-                />
-                <text class="unit">px</text>
+                <view class="dimension-inline">
+                  <input
+                    v-model.number="resizeOptions.maxHeight"
+                    type="number"
+                    class="number-input"
+                    placeholder="留空表示不限制"
+                  />
+                  <text class="unit">px</text>
+                </view>
               </view>
             </view>
 
@@ -534,6 +527,16 @@ const previewSettings = ref({
   autoPreview: true // 是否自动生成预览
 })
 
+// 预览提示文本：仅展示 压缩/水印，不展示 尺寸调整
+const previewHint = computed(() => {
+  const shown = []
+  if (selectedTypes.value.includes('compress')) shown.push('压缩')
+  if (selectedTypes.value.includes('watermark')) shown.push('水印')
+  const shownText = shown.length ? shown.join('、') : '无'
+  const hideResize = selectedTypes.value.includes('resize') ? '；不展示：尺寸调整' : ''
+  return `预览仅展示：${shownText}${hideResize}`
+})
+
 const isProcessing = ref(false)
 const progress = ref(0)
 const progressStatus = ref('normal')
@@ -611,54 +614,10 @@ const canProcess = computed(() => {
 
 
 
-// 估算压缩后的总大小
-const estimatedCompressedSize = computed(() => {
-  if (!selectedFiles.value.length || !selectedTypes.value.includes('compress')) {
-    return '0 B'
-  }
-
-  const totalOriginalSize = selectedFiles.value.reduce((sum, file) => sum + file.size, 0)
-  let estimatedSize
-
-  if (compressOptions.value.mode === 'quality') {
-    // 基于质量估算 - 使用改进的预估算法
-    const compressionRatio = compressOptions.value.quality / 100
-    // 考虑质量参数的非线性特性
-    const adjustedRatio = Math.pow(compressionRatio, 0.8) * 0.9 + 0.1
-    estimatedSize = totalOriginalSize * adjustedRatio
-  } else if (compressOptions.value.mode === 'size') {
-    // 基于目标大小
-    estimatedSize = compressOptions.value.targetSizeBytes * selectedFiles.value.length
-  } else if (compressOptions.value.mode === 'lossless') {
-    // 无损压缩估算 - 通常可以减小10%-25%
-    const losslessRatio = 0.8 // 平均80%的大小
-    estimatedSize = totalOriginalSize * losslessRatio
-  }
-
-  return imageProcessor.formatFileSize(estimatedSize)
-})
+// 压缩预估已移除
 
 // 估算压缩比例
-const estimatedCompressionRatio = computed(() => {
-  if (!selectedFiles.value.length || !selectedTypes.value.includes('compress')) {
-    return 0
-  }
-
-  const totalOriginalSize = selectedFiles.value.reduce((sum, file) => sum + file.size, 0)
-  let estimatedCompressedSize
-
-  if (compressOptions.value.mode === 'quality') {
-    const compressionRatio = compressOptions.value.quality / 100
-    const adjustedRatio = Math.pow(compressionRatio, 0.8) * 0.9 + 0.1
-    estimatedCompressedSize = totalOriginalSize * adjustedRatio
-  } else if (compressOptions.value.mode === 'size') {
-    estimatedCompressedSize = compressOptions.value.targetSizeBytes * selectedFiles.value.length
-  } else if (compressOptions.value.mode === 'lossless') {
-    estimatedCompressedSize = totalOriginalSize * 0.8
-  }
-
-  return imageProcessor.calculateCompressionRatio(totalOriginalSize, estimatedCompressedSize)
-})
+// 移除压缩预估以避免误导
 
 // 监听变化
 watch(selectedQualityIndex, (newIndex) => {
@@ -712,6 +671,25 @@ watch(() => compressOptions.value.targetSizeBytes, () => {
 watch(() => compressOptions.value.mode, () => {
   if (selectedFiles.value.length > 0) {
     generateProcessedPreview(selectedFiles.value[0])
+  }
+})
+
+// 监听水印相关变化，实时更新预览（不触发尺寸调整）
+watch(selectedWatermarkTypeIndex, () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    debouncedPreviewUpdate()
+  }
+})
+
+watch(selectedWatermarkPositionIndex, () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    debouncedPreviewUpdate()
+  }
+})
+
+watch(() => [watermarkOptions.value.text, watermarkOptions.value.fontSize, watermarkOptions.value.position], () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    debouncedPreviewUpdate()
   }
 })
 
@@ -883,38 +861,38 @@ const generatePreview = async (file) => {
   }
 }
 
-// 生成处理后的预览
+// 生成处理后的预览（仅应用 压缩/水印，不应用 尺寸调整）
 const generateProcessedPreview = async (file) => {
-  if (!selectedTypes.value.includes('compress')) {
-    // 如果不包含压缩，直接使用原图
-    previewData.value.processedImage = previewData.value.originalImage
-    previewData.value.processedInfo = previewData.value.originalInfo
-    return
-  }
-
   try {
-    let processedFile = file
+    let previewFile = file
 
-    // 应用压缩设置
-    if (compressOptions.value.mode === 'quality') {
-      processedFile = await imageProcessor.compressImage(processedFile, {
-        quality: compressOptions.value.quality / 100
-      })
-    } else if (compressOptions.value.mode === 'size') {
-      processedFile = await imageProcessor.compressToTargetSize(
-        processedFile,
-        compressOptions.value.targetSizeBytes
-      )
-    } else if (compressOptions.value.mode === 'lossless') {
-      processedFile = await imageProcessor.compressImage(processedFile, {
-        lossless: true
-      })
+    // 先应用水印（如启用）
+    if (selectedTypes.value.includes('watermark')) {
+      previewFile = await imageProcessor.addWatermark(previewFile, watermarkOptions.value)
     }
 
-    // 设置处理后的图片
-    const processedUrl = URL.createObjectURL(processedFile)
+    // 再应用压缩（如启用）
+    if (selectedTypes.value.includes('compress')) {
+      if (compressOptions.value.mode === 'quality') {
+        previewFile = await imageProcessor.compressImage(previewFile, {
+          quality: compressOptions.value.quality / 100
+        })
+      } else if (compressOptions.value.mode === 'size') {
+        previewFile = await imageProcessor.compressToTargetSize(
+          previewFile,
+          compressOptions.value.targetSizeBytes
+        )
+      } else if (compressOptions.value.mode === 'lossless') {
+        previewFile = await imageProcessor.compressImage(previewFile, {
+          lossless: true
+        })
+      }
+    }
+
+    // 若都未启用，则展示原图
+    const processedUrl = URL.createObjectURL(previewFile)
     previewData.value.processedImage = processedUrl
-    previewData.value.processedInfo = await imageProcessor.getImageInfo(processedFile)
+    previewData.value.processedInfo = await imageProcessor.getImageInfo(previewFile)
 
   } catch (error) {
     console.error('处理预览生成失败:', error)
@@ -1000,7 +978,17 @@ const handleProcess = async () => {
         extension = 'jpg' // 默认扩展名
       }
 
-      const processedName = `${originalName}_done.${extension}`
+      // 根据实际结果 MIME 决定最终扩展名
+      const mime = result.success ? (result.result?.type || originalFile?.type) : (originalFile?.type || '')
+      const mimeToExt = {
+        'image/jpeg': 'jpg',
+        'image/jpg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif'
+      }
+      const finalExt = mimeToExt[mime] || extension
+      const processedName = `${originalName}_done.${finalExt}`
 
       let thumbnail = null
       if (result.success && result.result) {
@@ -1100,13 +1088,15 @@ const processImage = async (file) => {
     if (compressOptions.value.mode === 'quality') {
       // 质量优先模式
       processedFile = await imageProcessor.compressImage(processedFile, {
+        mimeType: 'image/jpeg',
         quality: compressOptions.value.quality / 100
       })
     } else if (compressOptions.value.mode === 'size') {
       // 大小优先模式
       processedFile = await imageProcessor.compressToTargetSize(
         processedFile,
-        compressOptions.value.targetSizeBytes
+        compressOptions.value.targetSizeBytes,
+        { mimeType: 'image/jpeg' }
       )
     } else if (compressOptions.value.mode === 'lossless') {
       // 无损压缩模式
@@ -1247,6 +1237,7 @@ const formatFileSize = (size) => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/tools-common.scss';
 .process-options {
   margin: 32rpx 0;
 
@@ -1256,6 +1247,26 @@ const formatFileSize = (size) => {
     color: #333;
     margin-bottom: 24rpx;
     padding: 0 8rpx;
+  }
+}
+
+.preview-section {
+  margin-bottom: 24rpx;
+
+  .preview-hint {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    padding: 12rpx 16rpx;
+    background: #f8f9fa;
+    border: 2rpx solid #e9ecef;
+    border-radius: 12rpx;
+    color: #666;
+    margin-bottom: 12rpx;
+
+    .hint-text {
+      font-size: 24rpx;
+    }
   }
 }
 
@@ -1438,6 +1449,43 @@ const formatFileSize = (size) => {
     margin-left: 12rpx;
     font-weight: 500;
   }
+}
+
+/* 页面统一输入框样式，确保非 .setting-item 内的输入也有边框 */
+.number-input,
+.text-input {
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: #333;
+  min-width: 150rpx;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #007aff;
+    background: #fff;
+    box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
+  }
+}
+
+.target-size-input {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.unit-picker {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  color: #333;
 }
 
 .custom-size {
@@ -1721,6 +1769,28 @@ const formatFileSize = (size) => {
   background: #fff;
   border-radius: 12rpx;
   border: 2rpx solid #f0f0f0;
+}
+
+.dimension-inputs {
+  display: flex;
+  gap: 24rpx;
+}
+
+.dimension-input {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.dimension-label {
+  font-size: 26rpx;
+  color: #333;
+  min-width: 140rpx;
+}
+
+.dimension-inline {
+  display: flex;
+  align-items: center;
 }
 
 // 无损压缩设置样式保留，因为这是特定的功能样式
