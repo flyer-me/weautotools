@@ -73,22 +73,6 @@
 				"navigationBarBackgroundColor": "#007aff",
 				"navigationBarTextStyle": "white"
 			}
-		},
-		{
-			"path": "pages/test/test",
-			"style": {
-				"navigationBarTitleText": "功能测试",
-				"navigationBarBackgroundColor": "#28a745",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/qr-debug/qr-debug",
-			"style": {
-				"navigationBarTitleText": "二维码调试",
-				"navigationBarBackgroundColor": "#ff6b35",
-				"navigationBarTextStyle": "white"
-			}
 		}
 	],
 	"globalStyle": {
