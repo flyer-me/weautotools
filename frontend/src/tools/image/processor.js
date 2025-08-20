@@ -25,12 +25,20 @@ export class ImageProcessor extends BatchProcessor {
         quality: 0.8,
         maxWidth: 1920,
         maxHeight: 1080,
-        convertSize: 5000000, // 5MB以上转换为JPEG
+        convertSize: 0, // 始终允许根据 mimeType 转换
         success: resolve,
         error: reject
       }
 
       const finalOptions = { ...defaultOptions, ...options }
+
+      // 非无损模式下，确保可压缩格式统一为 JPEG，保证 quality 参数生效（对 PNG/GIF 等）
+      if (!options.lossless) {
+        const isJpeg = (file.type && (file.type.includes('jpeg') || file.type.includes('jpg')))
+        if (!finalOptions.mimeType) {
+          finalOptions.mimeType = isJpeg ? 'image/jpeg' : 'image/jpeg'
+        }
+      }
 
       // 如果是无损压缩模式
       if (options.lossless) {
@@ -138,6 +146,8 @@ export class ImageProcessor extends BatchProcessor {
       try {
         const compressedFile = await this.compressImage(file, {
           ...options,
+          // 在目标大小模式下也强制 JPEG，以确保质量参数对 PNG/GIF 生效
+          mimeType: (options && options.mimeType) ? options.mimeType : 'image/jpeg',
           quality: currentQuality
         })
 
