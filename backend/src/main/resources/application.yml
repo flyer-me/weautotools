@@ -24,11 +24,12 @@ spring:
           min-idle: 5
           max-wait: 3000ms
 
+# JWT 配置
+app:
+  jwt:
+    secret: ThisIsASecretKeyForJwtGenerationWhichIsLongEnough
+    expiration-in-ms: 86400000 # 24 hours
 
-jwt:
-  secret: your-super-strong-and-long-secret-key-that-is-at-least-256-bits
-  expiration: 86400 # 24 hours
-  
 # 服务器配置
 server:
   port: 8080

@@ -4,13 +4,18 @@
 -- 用户表
 CREATE TABLE IF NOT EXISTS users
 (
-    user_id     BIGSERIAL PRIMARY KEY,   -- 内部用户ID
+    user_id         BIGSERIAL PRIMARY KEY,   -- 内部用户ID
     password_hash   VARCHAR(255) NOT NULL DEFAULT '',   -- 密码哈希值
-    mobile      VARCHAR(20) UNIQUE,      -- 手机号，跨平台统一标识
-    nickname    VARCHAR(50),             -- 昵称
-    avatar_url  TEXT,                    -- 头像地址
-    create_time TIMESTAMP DEFAULT NOW(), -- 创建时间
-    update_time TIMESTAMP DEFAULT NOW()  -- 更新时间
+    role            VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER',  -- 或使用 ENUM
+    enabled         BOOLEAN DEFAULT true,    -- 启用/禁用
+    account_non_locked BOOLEAN DEFAULT TRUE,  -- 是否未被锁定
+    credentials_non_expired BOOLEAN DEFAULT TRUE, -- 凭证是否未过期
+    account_non_expired BOOLEAN DEFAULT TRUE, -- 账户是否未过期
+    mobile          VARCHAR(20) UNIQUE,      -- 手机号，跨平台统一标识
+    nickname        VARCHAR(50),             -- 昵称
+    avatar_url      TEXT,                    -- 头像地址
+    create_time     TIMESTAMP DEFAULT NOW(), -- 创建时间
+    update_time     TIMESTAMP DEFAULT NOW()  -- 更新时间
 );
 
 -- 平台账号绑定表
