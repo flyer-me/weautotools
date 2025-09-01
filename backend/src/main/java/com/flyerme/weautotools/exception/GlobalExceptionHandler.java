@@ -2,6 +2,8 @@ package com.flyerme.weautotools.exception;
 
 import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.common.ResultCode;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,8 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -96,6 +97,16 @@ public class GlobalExceptionHandler {
     public Result<Void> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error("数据完整性约束违反", e);
         return Result.error(ResultCode.DATA_INTEGRITY_VIOLATION);
+    }
+
+    /*
+    * 处理资源不存在异常
+     */
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result<Void> handleNotFound(NoSuchElementException e) {
+        log.warn("资源不存在: {}", e.getMessage());
+        return Result.error(ResultCode.NOT_FOUND.getCode(), "资源不存在");
     }
 
     /**

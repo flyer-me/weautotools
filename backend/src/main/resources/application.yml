@@ -25,6 +25,10 @@ spring:
           max-wait: 3000ms
 
 
+jwt:
+  secret: your-super-strong-and-long-secret-key-that-is-at-least-256-bits
+  expiration: 86400 # 24 hours
+  
 # 服务器配置
 server:
   port: 8080

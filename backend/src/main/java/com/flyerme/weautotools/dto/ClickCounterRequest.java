@@ -1,9 +1,8 @@
 package com.flyerme.weautotools.dto;
 
-import lombok.Data;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 /**
  * 点击计数器请求DTO
