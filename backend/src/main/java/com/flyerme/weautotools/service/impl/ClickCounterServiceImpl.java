@@ -4,7 +4,7 @@ import com.flyerme.weautotools.annotation.Lock;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.entity.ClickCounter;
-import com.flyerme.weautotools.exception.BusinessException;
+import com.flyerme.weautotools.common.BusinessException;
 import com.flyerme.weautotools.mapper.ClickCounterMapper;
 import com.flyerme.weautotools.service.BaseService;
 import com.flyerme.weautotools.service.ClickCounterService;

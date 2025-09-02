@@ -1,7 +1,7 @@
 package com.flyerme.weautotools.aspect
 
 import com.flyerme.weautotools.annotation.Lock
-import com.flyerme.weautotools.exception.BusinessException
+import com.flyerme.weautotools.common.BusinessException
 import com.flyerme.weautotools.util.LockKeyGenerator
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around

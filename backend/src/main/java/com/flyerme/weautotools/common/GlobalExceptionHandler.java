@@ -1,7 +1,5 @@
-package com.flyerme.weautotools.exception;
+package com.flyerme.weautotools.common;
 
-import com.flyerme.weautotools.common.Result;
-import com.flyerme.weautotools.common.ResultCode;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.warn("业务异常: {}", e.getMessage());
+        log.error("业务异常: {}", e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
@@ -48,7 +46,7 @@ public class GlobalExceptionHandler {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("参数校验失败: {}", message);
+        log.error("参数校验失败: {}", message);
         return Result.error(ResultCode.VALIDATION_ERROR.getCode(), message);
     }
 
@@ -61,7 +59,7 @@ public class GlobalExceptionHandler {
         String message = e.getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("参数绑定失败: {}", message);
+        log.error("参数绑定失败: {}", message);
         return Result.error(ResultCode.VALIDATION_ERROR.getCode(), message);
     }
 
@@ -74,7 +72,7 @@ public class GlobalExceptionHandler {
         String message = e.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));
-        log.warn("约束校验失败: {}", message);
+        log.error("约束校验失败: {}", message);
         return Result.error(ResultCode.VALIDATION_ERROR.getCode(), message);
     }
 
@@ -85,7 +83,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         String message = String.format("参数类型错误: %s", e.getName());
-        log.warn("参数类型不匹配: {}", message);
+        log.error("参数类型不匹配: {}", message);
         return Result.error(ResultCode.BAD_REQUEST.getCode(), message);
     }
 

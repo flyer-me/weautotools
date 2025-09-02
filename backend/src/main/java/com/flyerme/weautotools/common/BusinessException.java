@@ -1,6 +1,5 @@
-package com.flyerme.weautotools.exception;
+package com.flyerme.weautotools.common;
 
-import com.flyerme.weautotools.common.ResultCode;
 import lombok.Getter;
 
 /**

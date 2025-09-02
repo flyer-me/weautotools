@@ -1,7 +1,7 @@
 package com.flyerme.weautotools.service;
 
 import com.flyerme.weautotools.common.BaseEntity;
-import com.flyerme.weautotools.exception.BusinessException;
+import com.flyerme.weautotools.common.BusinessException;
 import com.flyerme.weautotools.util.BeanCopyUtils;
 import com.flyerme.weautotools.util.DistributedLockUtil;
 import lombok.extern.slf4j.Slf4j;
