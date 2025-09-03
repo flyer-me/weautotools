@@ -7,7 +7,7 @@
 - **Java**: OpenJDK 17 (LTS)
 - **框架**: Spring Boot 3.5.4
 - **数据库**: PostgreSQL
-- **ORM**: MyBatis 3.5.14
+- **ORM**: MyBatis-plus 3.5.13
 - **构建工具**: Maven
 
 ## 项目结构

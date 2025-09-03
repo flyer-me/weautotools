@@ -34,7 +34,7 @@ public class ClickCounterController {
     @PostMapping
     public Result<ClickCounterResponse> createCounter(@Valid @RequestBody ClickCounterRequest request) {
         log.info("创建计数器请求: {}", request.getCounterName());
-        ClickCounterResponse response = clickCounterService.createCounter(request);
+        ClickCounterResponse response = clickCounterService.create(request);
         return Result.success("计数器创建成功", response);
     }
 
@@ -43,7 +43,7 @@ public class ClickCounterController {
      */
     @GetMapping("/{id}")
     public Result<ClickCounterResponse> getCounter(@PathVariable Long id) {
-        ClickCounterResponse response = clickCounterService.getCounterById(id);
+        ClickCounterResponse response = clickCounterService.selectById(id);
         return Result.success(response);
     }
 

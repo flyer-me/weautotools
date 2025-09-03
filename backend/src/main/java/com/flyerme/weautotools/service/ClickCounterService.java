@@ -2,6 +2,9 @@ package com.flyerme.weautotools.service;
 
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
+import com.flyerme.weautotools.entity.ClickCounter;
+import jakarta.validation.Valid;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -12,42 +15,19 @@ import java.util.List;
  * @version 1.0.0
  * @since 2025-08-15
  */
-public interface ClickCounterService {
+public interface ClickCounterService extends BaseService<ClickCounter, ClickCounterRequest, ClickCounterResponse> {
 
-    /**
-     * 创建计数器
-     */
-    ClickCounterResponse createCounter(ClickCounterRequest request);
-
-    /**
-     * 根据ID获取计数器
-     */
-    ClickCounterResponse getCounterById(Long id);
 
     /**
      * 根据名称获取计数器
      */
     ClickCounterResponse getCounterByName(String counterName);
 
-    /**
-     * 获取所有计数器
-     */
-    List<ClickCounterResponse> getAllCounters();
 
     /**
      * 获取所有启用的计数器
      */
     List<ClickCounterResponse> getEnabledCounters();
-
-    /**
-     * 更新计数器
-     */
-    ClickCounterResponse updateCounter(Long id, ClickCounterRequest request);
-
-    /**
-     * 删除计数器
-     */
-    void deleteCounter(Long id);
 
     /**
      * 点击计数（根据ID）
@@ -84,10 +64,22 @@ public interface ClickCounterService {
      */
     ClickCounterResponse resetCounter(Long id);
 
+    List<ClickCounterResponse> getAllCounters();
+
+    ClickCounterResponse create(@Valid ClickCounterRequest request);
+
+    ClickCounterResponse selectById(Long id);
+
+    ClickCounterResponse updateCounter(Long id, @Valid ClickCounterRequest request);
+
+    void deleteCounter(Long id);
+
     /**
      * 计数器统计信息
      */
+    @Getter
     class ClickCounterStatistics {
+        // Getters
         private long totalCounters;
         private long enabledCounters;
         private long totalClicks;
@@ -98,9 +90,5 @@ public interface ClickCounterService {
             this.totalClicks = totalClicks;
         }
 
-        // Getters
-        public long getTotalCounters() { return totalCounters; }
-        public long getEnabledCounters() { return enabledCounters; }
-        public long getTotalClicks() { return totalClicks; }
     }
 }

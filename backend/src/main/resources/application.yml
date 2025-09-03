@@ -8,6 +8,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/weautotools
     username: ${DB_USERNAME:weautotools}
     password: ${DB_PASSWORD:weautotools123}
+    driver-class-name: org.postgresql.Driver
 
   # Redis配置
   data:
@@ -33,13 +34,9 @@ app:
 # 服务器配置
 server:
   port: 8080
-  servlet:
-    context-path: /api
 
 # MyBatis配置
-mybatis:
-  mapper-locations: classpath*:mapper/**/*.xml
-  type-aliases-package: com.flyerme.weautotools.entity
+mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 

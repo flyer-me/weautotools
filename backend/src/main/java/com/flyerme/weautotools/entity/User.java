@@ -1,18 +1,19 @@
 package com.flyerme.weautotools.entity;
 
+import com.flyerme.weautotools.common.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class User implements UserDetails {
-    private Long userId;
+public class User extends BaseEntity implements UserDetails  {
 
     private String passwordHash;
 
@@ -31,10 +32,6 @@ public class User implements UserDetails {
     private String nickname;
 
     private String avatarUrl;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
 
     private List<String> roles;
 

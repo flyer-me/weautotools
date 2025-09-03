@@ -4,7 +4,7 @@
 -- 用户表
 CREATE TABLE IF NOT EXISTS users
 (
-    user_id         BIGSERIAL PRIMARY KEY,   -- 内部用户ID
+    id         BIGSERIAL PRIMARY KEY,   -- 内部用户ID
     password_hash   VARCHAR(255) NOT NULL DEFAULT '',   -- 密码哈希值
     role            VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER',  -- 或使用 ENUM
     enabled         BOOLEAN DEFAULT true,    -- 启用/禁用
@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS users
     mobile          VARCHAR(20) UNIQUE,      -- 手机号，跨平台统一标识
     nickname        VARCHAR(50),             -- 昵称
     avatar_url      TEXT,                    -- 头像地址
-    create_time     TIMESTAMP DEFAULT NOW(), -- 创建时间
-    update_time     TIMESTAMP DEFAULT NOW()  -- 更新时间
+    create_at     TIMESTAMP DEFAULT NOW(), -- 创建时间
+    update_at     TIMESTAMP DEFAULT NOW()  -- 更新时间
 );
 
 -- 平台账号绑定表
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS user_bindings
     provider_user_id TEXT        NOT NULL,   -- 平台唯一ID（如openid、alipay_user_id、app_uuid）
     provider_union_id TEXT,                   -- unionid
     raw_info         JSONB     DEFAULT '{}', -- 第三方返回的原始资料
-    create_time      TIMESTAMP DEFAULT NOW(),
-    update_time      TIMESTAMP DEFAULT NOW(),
+    create_at      TIMESTAMP DEFAULT NOW(),
+    update_at      TIMESTAMP DEFAULT NOW(),
     UNIQUE (provider, provider_user_id)      -- 保证同一平台的ID唯一
 );
 -- 创建点击计数器表

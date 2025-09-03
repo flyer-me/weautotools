@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableTransactionManagement
+//@MapperScan("com.flyerme.weautotools.mapper")
 public class WeAutoToolsApplication {
 
 	public static void main(String[] args) {
