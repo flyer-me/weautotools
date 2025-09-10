@@ -3,8 +3,6 @@ package com.flyerme.weautotools.service;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.entity.ClickCounter;
-import jakarta.validation.Valid;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -64,31 +62,6 @@ public interface ClickCounterService extends BaseService<ClickCounter, ClickCoun
      */
     ClickCounterResponse resetCounter(Long id);
 
-    List<ClickCounterResponse> getAllCounters();
 
-    ClickCounterResponse create(@Valid ClickCounterRequest request);
-
-    ClickCounterResponse selectById(Long id);
-
-    ClickCounterResponse updateCounter(Long id, @Valid ClickCounterRequest request);
-
-    void deleteCounter(Long id);
-
-    /**
-     * 计数器统计信息
-     */
-    @Getter
-    class ClickCounterStatistics {
-        // Getters
-        private long totalCounters;
-        private long enabledCounters;
-        private long totalClicks;
-
-        public ClickCounterStatistics(long totalCounters, long enabledCounters, long totalClicks) {
-            this.totalCounters = totalCounters;
-            this.enabledCounters = enabledCounters;
-            this.totalClicks = totalClicks;
-        }
-
-    }
+    record ClickCounterStatistics(long totalCounters, long enabledCounters, long totalClicks) {}
 }

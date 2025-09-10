@@ -10,8 +10,9 @@ import org.redisson.api.RedissonClient;
 import java.time.Duration;
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class JwtTokenBlacklistTest {
 

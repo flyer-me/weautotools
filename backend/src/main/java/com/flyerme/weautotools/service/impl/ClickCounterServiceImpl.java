@@ -2,12 +2,12 @@ package com.flyerme.weautotools.service.impl;
 
 import com.flyerme.weautotools.annotation.Lock;
 import com.flyerme.weautotools.common.BusinessException;
+import com.flyerme.weautotools.dao.ClickCounterMapper;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.entity.ClickCounter;
-import com.flyerme.weautotools.mapper.ClickCounterMapper;
+import com.flyerme.weautotools.mapper.ClickCounterConverter;
 import com.flyerme.weautotools.service.ClickCounterService;
-import com.flyerme.weautotools.util.BeanCopyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +30,12 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         implements ClickCounterService {
 
     private final ClickCounterMapper clickCounterMapper;
+    private final ClickCounterConverter converter;
 
-    public ClickCounterServiceImpl(ClickCounterMapper clickCounterMapper) {
-        super(ClickCounterResponse.class);
-        this.clickCounterMapper = clickCounterMapper;
+    public ClickCounterServiceImpl(ClickCounterMapper mapper, ClickCounterConverter converter) {
+        super(converter);
+        this.clickCounterMapper = mapper;
+        this.converter = converter;
     }
 
     @Override
@@ -42,43 +44,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         if (counter == null) {
             throw new BusinessException("计数器不存在: " + counterName);
         }
-        return convertToResponse(counter);
-    }
-
-
-    public List<ClickCounterResponse> getAllCounters() {
-        return BeanCopyUtils.copyPropertiesList(list(), ClickCounterResponse.class);
-    }
-
-
-    public ClickCounterResponse create(ClickCounterRequest request) {
-        validateCreateRequest(request);
-        // 创建实体
-        ClickCounter entity = BeanCopyUtils.copyProperties(request, ClickCounter.class);
-        entity.setClickCount(0L);
-        entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
-
-        if (!save(entity)) {
-            throw new BusinessException("创建计数器失败");
-        }
-
-        return convertToResponse(entity);
-    }
-
-    @Override
-    public ClickCounterResponse selectById(Long id) {
-        return null;
-    }
-
-    @Override
-    public ClickCounterResponse updateCounter(Long id, ClickCounterRequest request) {
-        return null;
-    }
-
-    @Override
-    public void deleteCounter(Long id) {
-
+        return converter.toResponse(counter);
     }
 
     @Override
@@ -86,8 +52,8 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         List<ClickCounter> counters = list();
         return counters.stream()
                 .filter(counter -> counter.getEnabled() != null && counter.getEnabled())
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .map(converter::toResponse)
+                .toList();
     }
 
 
@@ -102,7 +68,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         }
 
         ClickCounter counter = this.baseMapper.selectById(id);
-        return convertToResponse(counter);
+        return converter.toResponse(counter);
     }
 
     @Override
@@ -117,7 +83,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
 
         ClickCounter counter = clickCounterMapper.selectByName(counterName);
         log.debug("计数器点击成功: {} -> {}", counterName, counter.getClickCount());
-        return convertToResponse(counter);
+        return converter.toResponse(counter);
     }
 
     @Override
@@ -140,8 +106,8 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         return allCounters.stream()
                 .skip((long) (page - 1) * size)
                 .limit(size)
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .map(converter::toResponse)
+                .toList();
     }
 
     @Override
@@ -151,7 +117,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
                 .filter(counter -> enabled == null || counter.getEnabled().equals(enabled))
                 .filter(counter -> counterName == null || counterName.isEmpty() ||
                         (counter.getCounterName() != null && counter.getCounterName().contains(counterName)))
-                .map(this::convertToResponse)
+                .map(converter::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -163,7 +129,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
                         c2.getClickCount() != null ? c2.getClickCount() : 0L,
                         c1.getClickCount() != null ? c1.getClickCount() : 0L))
                 .limit(limit)
-                .map(this::convertToResponse)
+                .map(converter::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -187,18 +153,11 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         }
 
         log.info("重置计数器成功: {}", counter.getCounterName());
-        return convertToResponse(counter);
-    }
-
-    public ClickCounterResponse convertToResponse(ClickCounter entity) {
-        return BeanCopyUtils.copyProperties(entity, ClickCounterResponse.class);
+        return converter.toResponse(counter);
     }
 
     @Override
     protected void validateCreateRequest(ClickCounterRequest request) {
-        if (request.getCounterName() == null || request.getCounterName().isEmpty()) {
-            throw new BusinessException("计数器名称不能为空");
-        }
         ClickCounter existing = clickCounterMapper.selectByName(request.getCounterName());
         if (existing != null) {
             throw new BusinessException("计数器名称已存在: " + request.getCounterName());

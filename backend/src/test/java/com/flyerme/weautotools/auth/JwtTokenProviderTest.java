@@ -1,8 +1,6 @@
 package com.flyerme.weautotools.auth;
 
 import com.flyerme.weautotools.entity.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

@@ -3,6 +3,8 @@ package com.flyerme.weautotools.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.flyerme.weautotools.common.BaseEntity;
 
+import java.util.List;
+
 /**
  * 基础Service
  * 提供通用的数据库操作和业务逻辑模板，如不需要业务逻辑模板，请直接继承IService以简化设计
@@ -16,5 +18,9 @@ import com.flyerme.weautotools.common.BaseEntity;
  */
 
 public interface BaseService<T extends BaseEntity, R, S> extends IService<T> {
-
+    S update(Long id, R request);
+    List<S> getAll();
+    S create(R request);
+    S getByIdSerializable(Long id);
+    void delete(Long id);
 }

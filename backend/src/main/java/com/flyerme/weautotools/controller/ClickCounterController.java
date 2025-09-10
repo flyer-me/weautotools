@@ -43,7 +43,7 @@ public class ClickCounterController {
      */
     @GetMapping("/{id}")
     public Result<ClickCounterResponse> getCounter(@PathVariable Long id) {
-        ClickCounterResponse response = clickCounterService.selectById(id);
+        ClickCounterResponse response = clickCounterService.getByIdSerializable(id);
         return Result.success(response);
     }
 
@@ -61,7 +61,7 @@ public class ClickCounterController {
      */
     @GetMapping
     public Result<List<ClickCounterResponse>> getAllCounters() {
-        List<ClickCounterResponse> responses = clickCounterService.getAllCounters();
+        List<ClickCounterResponse> responses = clickCounterService.getAll();
         return Result.success(responses);
     }
 
@@ -81,7 +81,7 @@ public class ClickCounterController {
     public Result<ClickCounterResponse> updateCounter(@PathVariable Long id, 
                                                      @Valid @RequestBody ClickCounterRequest request) {
         log.info("更新计数器请求: {} -> {}", id, request.getCounterName());
-        ClickCounterResponse response = clickCounterService.updateCounter(id, request);
+        ClickCounterResponse response = clickCounterService.update(id, request);
         return Result.success("计数器更新成功", response);
     }
 
@@ -91,7 +91,7 @@ public class ClickCounterController {
     @DeleteMapping("/{id}")
     public Result<Void> deleteCounter(@PathVariable Long id) {
         log.info("删除计数器请求: {}", id);
-        clickCounterService.deleteCounter(id);
+        clickCounterService.delete(id);
         return Result.success("计数器删除成功");
     }
 

@@ -1,8 +1,6 @@
 package com.flyerme.weautotools.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,8 +32,8 @@ public class AuthController {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
+                        loginRequest.username(),
+                        loginRequest.password()
                 )
         );
 
@@ -57,23 +55,7 @@ public class AuthController {
     }
 }
 
-@Setter
-@Getter
-class LoginRequest {
-    // getters and setters
-    private String username;
-    private String password;
+record LoginRequest(String username, String password) {}
 
-}
+record JwtAuthenticationResponse(String accessToken) {}
 
-@Setter
-@Getter
-class JwtAuthenticationResponse {
-    private String accessToken;
-    private String tokenType = "Bearer";
-
-    public JwtAuthenticationResponse(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-}

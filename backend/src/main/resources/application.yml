@@ -2,28 +2,27 @@
 spring:
   application:
     name: weautotools-backend
-
-  # 数据源配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   datasource:
     url: jdbc:postgresql://localhost:5432/weautotools
     username: ${DB_USERNAME:weautotools}
     password: ${DB_PASSWORD:weautotools123}
     driver-class-name: org.postgresql.Driver
-
-  # Redis配置
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: ${REDIS_DATABASE:0}
-      timeout: 3000ms
-      lettuce:
-        pool:
-          max-active: 20
-          max-idle: 10
-          min-idle: 5
-          max-wait: 3000ms
+          host: ${REDIS_HOST:localhost}
+          port: ${REDIS_PORT:6379}
+          password: ${REDIS_PASSWORD:}
+          database: ${REDIS_DATABASE:0}
+          timeout: 3000ms
+          lettuce:
+            pool:
+              max-active: 20
+              max-idle: 10
+              min-idle: 5
+              max-wait: 3000ms
 
 # JWT 配置
 app:

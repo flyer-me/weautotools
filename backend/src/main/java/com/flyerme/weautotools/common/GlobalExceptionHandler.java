@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -105,6 +106,13 @@ public class GlobalExceptionHandler {
     public Result<Void> handleNotFound(NoSuchElementException e) {
         log.warn("资源不存在: {}", e.getMessage());
         return Result.error(ResultCode.NOT_FOUND.getCode(), "资源不存在");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public Result<Void> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        log.warn("不支持的请求方法: {}", e.getMessage());
+        return Result.error(ResultCode.METHOD_NOT_ALLOWED.getCode(), "不支持的请求方法");
     }
 
     /**

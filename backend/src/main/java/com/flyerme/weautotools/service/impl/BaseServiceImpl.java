@@ -4,21 +4,22 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.flyerme.weautotools.common.BaseEntity;
 import com.flyerme.weautotools.common.BusinessException;
+import com.flyerme.weautotools.mapper.BaseConverter;
 import com.flyerme.weautotools.service.BaseService;
-import com.flyerme.weautotools.util.BeanCopyUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<BaseMapper<T>, T> implements BaseService<T, R, S> {
-    private final Class<S> responseClass;
+public class BaseServiceImpl<T extends BaseEntity, R, S>
+        extends ServiceImpl<BaseMapper<T>, T>
+        implements BaseService<T, R, S> {
 
-    protected BaseServiceImpl(Class<S> responseClass) {
-        this.responseClass = responseClass;
+    protected final BaseConverter<T, R, S> converter;
+
+    protected BaseServiceImpl(BaseConverter<T, R, S> converter) {
+        this.converter = converter;
     }
 
-    @Transactional
     public S create(R request) {
         // 验证请求参数,业务规则
         validateCreateRequest(request);
@@ -32,7 +33,7 @@ public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<Bas
             throw new BusinessException("通过" + request.getClass() + "创建失败");
         }
 
-        return convertToResponse(entity);
+        return converter.toResponse(entity);
     }
 
     /**
@@ -41,12 +42,12 @@ public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<Bas
      * @param id 实体ID
      * @return 响应DTO
      */
-    public S getByIdOrThrow(Long id) {
+    public S getByIdSerializable(Long id) {
         T entity = getById(id);
         if (entity == null) {
-            throw new BusinessException("getById的实体不存在: " + id);
+            return null;
         }
-        return convertToResponse(entity);
+        return converter.toResponse(entity);
     }
 
     /**
@@ -56,7 +57,6 @@ public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<Bas
      * @param request 请求DTO
      * @return 响应DTO
      */
-    @Transactional
     public S update(Long id, R request) {
         T entity = getById(id);
         if (entity == null) {
@@ -67,14 +67,14 @@ public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<Bas
         checkUpdateBusinessRules(id, request, entity);
 
         // 更新实体属性
-        updateEntityFromRequest(entity, request);
+        converter.updateEntityFromRequest(entity, request);
         setUpdateDefaults(entity);
 
         if (!updateById(entity)) {
             throw new BusinessException("更新" + entity.getClass() + "失败");
         }
 
-        return convertToResponse(entity);
+        return converter.toResponse(entity);
     }
 
     /**
@@ -82,7 +82,6 @@ public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<Bas
      *
      * @param id 实体ID
      */
-    @Transactional
     public void delete(Long id) {
         if (!removeById(id)) {
             throw new BusinessException("删除失败");
@@ -96,28 +95,16 @@ public class BaseServiceImpl<T extends BaseEntity, R, S> extends ServiceImpl<Bas
      * @return 响应DTO列表
      */
     public List<S> getAll() {
-        return BeanCopyUtils.copyPropertiesList(list(), responseClass);
-    }
-
-    /**
-     * 转换为响应DTO
-     */
-    public S convertToResponse(T entity) {
-        return BeanCopyUtils.copyProperties(entity, responseClass);
+        List<T> entities = list();
+        return entities.stream()
+                .map(converter::toResponse).toList();
     }
 
     /**
      * 从请求DTO创建实体
      */
     T createEntityFromRequest(R request) {
-        return BeanCopyUtils.copyProperties(request, getEntityClass());
-    }
-
-    /**
-     * 从请求DTO更新实体
-     */
-    void updateEntityFromRequest(T entity, R request) {
-        BeanCopyUtils.copyProperties(request, entity, "id", "createdAt", "version");
+        return converter.toEntity(request);
     }
 
     /**

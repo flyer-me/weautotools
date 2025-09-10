@@ -1,4 +1,4 @@
-package com.flyerme.weautotools.mapper;
+package com.flyerme.weautotools.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.flyerme.weautotools.entity.User;

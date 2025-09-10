@@ -31,18 +31,9 @@ class AuthControllerTest {
     @MockBean
     private JwtTokenProvider tokenProvider;
 
-    @MockBean
-    private JwtTokenBlacklist tokenBlacklist;
-    
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
-
-
     @Test
     void testAuthenticateUser() throws Exception {
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("testuser");
-        loginRequest.setPassword("password");
+        LoginRequest loginRequest = new LoginRequest("testuser", "password");
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);

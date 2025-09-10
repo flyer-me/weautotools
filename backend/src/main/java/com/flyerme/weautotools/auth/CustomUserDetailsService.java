@@ -1,6 +1,6 @@
 package com.flyerme.weautotools.auth;
 
-import com.flyerme.weautotools.mapper.UserMapper;
+import com.flyerme.weautotools.dao.UserMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
