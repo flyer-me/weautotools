@@ -45,11 +45,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            String jwt = bearerToken.substring(7);
+        String jwt = JwtTokenProvider.extractTokenFromRequest(request);
+        if (jwt != null) {
             Date expiration = tokenProvider.getExpirationDateFromToken(jwt);
-            tokenBlacklist.add(jwt, expiration);
+            if (expiration != null) {
+                tokenBlacklist.add(jwt, expiration);
+            }
         }
         return ResponseEntity.ok("Successfully logged out");
     }
