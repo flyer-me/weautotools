@@ -246,6 +246,7 @@ import ToolContainer from '@/components/tools/ToolContainer.vue'
 import FileUploader from '@/components/tools/FileUploader.vue'
 import { DataConverter } from '@/tools/data/converter.js'
 import { ProgressTracker } from '@/tools/base/ProgressTracker.js'
+import { useUsageLimit } from '@/composables/useUsageLimit'
 
 // 响应式数据
 const fileUploaderRef = ref(null)
@@ -266,6 +267,11 @@ const batchResults = ref([])
 
 // 工具实例
 const dataConverter = new DataConverter()
+
+// 使用限制相关
+const {
+  useFrontendTool
+} = useUsageLimit()
 
 // 配置选项
 const formatOptions = [
@@ -445,6 +451,12 @@ const clearInput = () => {
 const handleConvert = async () => {
   if (!canConvert.value || isConverting.value) return
   
+  // 1. 预检查使用限制
+  const usageResult = await useFrontendTool('data-convert', 1)
+  if (!usageResult.canUse) {
+    return // 已显示限制提示
+  }
+  
   isConverting.value = true
   progressStatus.value = 'running'
   progressMessage.value = '正在转换...'
@@ -480,6 +492,9 @@ const handleConvert = async () => {
 
     progressStatus.value = 'completed'
     progressMessage.value = `转换完成 (${inputContent.value.length} → ${result.length} 字符)`
+    
+    // 3. 成功后报告使用
+    await usageResult.reportUsage(1)
 
     uni.showToast({
       title: `${fromFormat.toUpperCase()} → ${toFormat.toUpperCase()} 转换成功`,
@@ -501,6 +516,7 @@ const handleConvert = async () => {
     }
 
     errorMessage.value = userFriendlyMessage
+    // 失败时不记录使用次数
 
     uni.showToast({
       title: userFriendlyMessage,
@@ -591,6 +607,12 @@ const handleFileError = (error) => {
 const convertFiles = async (files) => {
   if (isConverting.value) return
   
+  // 1. 预检查使用限制
+  const usageResult = await useFrontendTool('data-convert', files.length)
+  if (!usageResult.canUse) {
+    return // 已显示限制提示
+  }
+  
   isConverting.value = true
   progress.value = 0
   progressStatus.value = 'running'
@@ -636,10 +658,15 @@ const convertFiles = async (files) => {
     
     tracker.complete()
     
+    // 3. 成功后报告使用
+    const successfulCount = batchStats.value.successful
+    await usageResult.reportUsage(successfulCount)
+    
   } catch (error) {
     progressStatus.value = 'error'
     progressMessage.value = '批量转换失败'
     errorMessage.value = error.message
+    // 失败时不记录使用次数
   } finally {
     isConverting.value = false
   }

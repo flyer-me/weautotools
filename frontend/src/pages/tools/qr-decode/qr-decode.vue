@@ -138,6 +138,7 @@ import ToolContainer from '@/components/tools/ToolContainer.vue'
 import FileUploader from '@/components/tools/FileUploader.vue'
 import { QRDecoder } from '@/tools/qrcode/decoder.js'
 import { ProgressTracker } from '@/tools/base/ProgressTracker.js'
+import { useUsageLimit } from '@/composables/useUsageLimit'
 
 // 响应式数据
 const fileUploaderRef = ref(null)
@@ -157,6 +158,11 @@ const cameraStream = ref(null)
 
 // 工具实例
 const qrDecoder = new QRDecoder()
+
+// 使用限制相关
+const {
+  useFrontendTool
+} = useUsageLimit()
 
 // 方法
 const validateImageFormat = (file) => {
@@ -185,6 +191,12 @@ const handleFileError = (error) => {
 
 const decodeFiles = async (files) => {
   if (isDecoding.value) return
+
+  // 1. 预检查使用限制
+  const usageResult = await useFrontendTool('qr-decode', files.length)
+  if (!usageResult.canUse) {
+    return // 已显示限制提示
+  }
 
   isDecoding.value = true
   progress.value = 0
@@ -249,12 +261,17 @@ const decodeFiles = async (files) => {
     if (firstSuccess) {
       selectedResult.value = firstSuccess
     }
+    
+    // 3. 成功后报告使用
+    const successfulCount = results.value.filter(r => r.success).length
+    await usageResult.reportUsage(successfulCount)
 
   } catch (error) {
     console.error('批量识别失败:', error)
     progressStatus.value = 'error'
     progressMessage.value = '识别失败'
     errorMessage.value = error.message
+    // 失败时不记录使用次数
   } finally {
     isDecoding.value = false
   }
@@ -303,7 +320,13 @@ const stopCamera = () => {
   isCameraActive.value = false
 }
 
-const handleCameraResult = (data, result) => {
+const handleCameraResult = async (data, result) => {
+  // 1. 检查使用限制
+  const usageResult = await useFrontendTool('qr-decode', 1)
+  if (!usageResult.canUse) {
+    return // 已显示限制提示
+  }
+  
   const cameraResult = {
     success: true,
     file: { name: 'camera_scan.jpg', type: 'image/jpeg' },
@@ -319,6 +342,9 @@ const handleCameraResult = (data, result) => {
   
   // 自动显示详情
   selectedResult.value = cameraResult
+  
+  // 2. 成功后报告使用
+  await usageResult.reportUsage(1)
   
   uni.showToast({
     title: '识别成功',

@@ -104,6 +104,60 @@
       </view>
     </view>
 
+    <!-- 使用限制配置管理 -->
+    <view class="section-card" v-if="isAuthenticated">
+      <view class="section-title">使用限制配置管理</view>
+      
+      <view class="limit-config-controls">
+        <button 
+          class="btn-refresh" 
+          @click="refreshLimitConfigs"
+          :disabled="limitLoading"
+        >
+          {{ limitLoading ? '加载中...' : '刷新配置' }}
+        </button>
+        <button 
+          class="btn-save" 
+          @click="saveLimitConfigs"
+          :disabled="limitLoading"
+        >
+          保存配置
+        </button>
+      </view>
+      
+      <view class="limit-config-list" v-if="limitConfigs.length > 0">
+        <view 
+          v-for="(config, index) in limitConfigs" 
+          :key="config.id"
+          class="config-item"
+        >
+          <view class="config-info">
+            <text class="tool-name">{{ config.toolName }}</text>
+            <text class="user-type">{{ getUserTypeText(config.userType) }}</text>
+            <text class="limit-type">{{ getLimitTypeText(config.limitType) }}</text>
+          </view>
+          <view class="config-controls">
+            <input 
+              v-model.number="config.limitCount" 
+              type="number" 
+              class="limit-input"
+              placeholder="限制次数"
+            />
+            <switch
+              :checked="config.enabled"
+              @change="handleConfigEnabledChange(index, $event)"
+              color="#007aff"
+              style="transform: scale(0.8);"
+            />
+          </view>
+        </view>
+      </view>
+      
+      <view v-else-if="!limitLoading" class="empty-config">
+        <text>暂无限制配置数据</text>
+      </view>
+    </view>
+
     <!-- 重置按钮 -->
     <view class="actions" v-if="isAuthenticated">
       <button class="btn-reset" @click="handleReset">重置为生产模式</button>
@@ -128,11 +182,15 @@ import {
   isDevModeValid,
   disableDevMode
 } from '@/config/features'
+import { useUsageLimitAdmin } from '@/composables/useUsageLimit'
 
 // 开发模式状态
 const devModeEnabled = ref(DEV_MODE.enabled)
 const showPasswordModal = ref(false)
 const currentTime = ref(Date.now())
+
+// 使用限制配置管理
+const { configs: limitConfigs, loading: limitLoading, fetchConfigs, batchUpdateConfigs } = useUsageLimitAdmin()
 
 // 功能开关
 const featureFlags = computed(() => FEATURE_FLAGS)
@@ -177,6 +235,54 @@ const featureNameMap = {
 // 获取功能名称
 const getFeatureName = (key) => {
   return featureNameMap[key] || key
+}
+
+// 获取用户类型文本
+const getUserTypeText = (userType) => {
+  return userType === 'ANONYMOUS' ? '匿名用户' : '登录用户'
+}
+
+// 获取限制类型文本
+const getLimitTypeText = (limitType) => {
+  const typeMap = {
+    'DAILY': '每日',
+    'HOURLY': '每小时',
+    'TOTAL': '总计'
+  }
+  return typeMap[limitType] || limitType
+}
+
+// 处理配置启用状态变化
+const handleConfigEnabledChange = (index, e) => {
+  limitConfigs.value[index].enabled = e.detail.value
+}
+
+// 刷新限制配置
+const refreshLimitConfigs = async () => {
+  try {
+    await fetchConfigs()
+    uni.showToast({
+      title: '刷新成功',
+      icon: 'success'
+    })
+  } catch (error) {
+    console.error('刷新配置失败:', error)
+  }
+}
+
+// 保存限制配置
+const saveLimitConfigs = async () => {
+  try {
+    const success = await batchUpdateConfigs(limitConfigs.value)
+    if (success) {
+      uni.showToast({
+        title: '保存成功',
+        icon: 'success'
+      })
+    }
+  } catch (error) {
+    console.error('保存配置失败:', error)
+  }
 }
 
 // 处理开发模式切换
@@ -242,6 +348,11 @@ onMounted(() => {
   timeInterval = setInterval(() => {
     currentTime.value = Date.now()
   }, 60000)
+  
+  // 在开发者模式下初始化限制配置
+  if (isAuthenticated.value) {
+    fetchConfigs()
+  }
 })
 
 onUnmounted(() => {
@@ -459,5 +570,99 @@ onUnmounted(() => {
     padding: 24rpx 48rpx;
     font-size: 28rpx;
   }
+}
+
+// 使用限制配置样式
+.limit-config-controls {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+  
+  .btn-refresh,
+  .btn-save {
+    flex: 1;
+    height: 64rpx;
+    border-radius: 8rpx;
+    font-size: 26rpx;
+    border: none;
+    
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+  
+  .btn-refresh {
+    background: #f0f0f0;
+    color: #333;
+    
+    &:active:not(:disabled) {
+      background: #e0e0e0;
+    }
+  }
+  
+  .btn-save {
+    background: #007aff;
+    color: #fff;
+    
+    &:active:not(:disabled) {
+      background: #0056cc;
+    }
+  }
+}
+
+.limit-config-list {
+  .config-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20rpx 0;
+    border-bottom: 1rpx solid #f0f0f0;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .config-info {
+      flex: 1;
+      
+      .tool-name {
+        display: block;
+        font-size: 28rpx;
+        color: #333;
+        font-weight: 500;
+        margin-bottom: 8rpx;
+      }
+      
+      .user-type,
+      .limit-type {
+        font-size: 24rpx;
+        color: #666;
+        margin-right: 16rpx;
+      }
+    }
+    
+    .config-controls {
+      display: flex;
+      align-items: center;
+      gap: 16rpx;
+      
+      .limit-input {
+        width: 120rpx;
+        height: 56rpx;
+        padding: 8rpx 12rpx;
+        border: 1rpx solid #ddd;
+        border-radius: 6rpx;
+        font-size: 24rpx;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.empty-config {
+  text-align: center;
+  padding: 48rpx 0;
+  color: #999;
+  font-size: 26rpx;
 }
 </style>

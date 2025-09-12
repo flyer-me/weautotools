@@ -470,6 +470,7 @@ import FileUploader from '@/components/tools/FileUploader.vue'
 import ImagePreviewCompare from '@/components/tools/ImagePreviewCompare.vue'
 import { ImageProcessor } from '@/tools/image/processor.js'
 import { ProgressTracker } from '@/tools/base/ProgressTracker.js'
+import { useUsageLimit } from '@/composables/useUsageLimit'
 
 // 响应式数据
 const fileUploaderRef = ref(null)
@@ -548,6 +549,11 @@ const errorMessage = ref('')
 // 工具实例
 const imageProcessor = new ImageProcessor()
 
+// 使用限制相关
+const {
+  useFrontendTool
+} = useUsageLimit()
+
 // 配置选项
 const processTypes = [
   { value: 'compress', name: '压缩', description: '减小文件大小' },
@@ -611,13 +617,6 @@ const watermarkPositions = [
 const canProcess = computed(() => {
   return selectedFiles.value.length > 0 && selectedTypes.value.length > 0
 })
-
-
-
-// 压缩预估已移除
-
-// 估算压缩比例
-// 移除压缩预估以避免误导
 
 // 监听变化
 watch(selectedQualityIndex, (newIndex) => {
@@ -815,9 +814,6 @@ const handleDimensionPresetClick = (preset) => {
 }
 
 
-
-
-
 // 格式化总文件大小
 const formatTotalSize = (files) => {
   const totalSize = files.reduce((sum, file) => sum + file.size, 0)
@@ -920,9 +916,6 @@ const clearPreview = () => {
 }
 
 
-
-
-
 const handleResizeModeChange = (e) => {
   selectedResizeModeIndex.value = e.detail.value
 }
@@ -937,6 +930,12 @@ const handleWatermarkPositionChange = (e) => {
 
 const handleProcess = async () => {
   if (!canProcess.value || isProcessing.value) return
+  
+  // 1. 预检查使用限制
+  const usageResult = await useFrontendTool('image-process', selectedFiles.value.length)
+  if (!usageResult.canUse) {
+    return // 已显示限制提示
+  }
   
   isProcessing.value = true
   progress.value = 0
@@ -1022,10 +1021,15 @@ const handleProcess = async () => {
     
     tracker.complete()
     
+    // 3. 成功后报告使用
+    const successfulCount = results.value.filter(r => r.success).length
+    await usageResult.reportUsage(successfulCount)
+    
   } catch (error) {
     progressStatus.value = 'error'
     progressMessage.value = '处理失败'
     errorMessage.value = error.message
+    // 失败时不记录使用次数
   } finally {
     isProcessing.value = false
   }
@@ -1036,12 +1040,10 @@ const processImage = async (file) => {
   
   // 按优化顺序执行各种处理：尺寸调整 → 水印 → 压缩
 
-  // 1. 先执行尺寸调整（无损质量）
   if (selectedTypes.value.includes('resize')) {
     await processResize()
   }
 
-  // 2. 再执行水印添加
   if (selectedTypes.value.includes('watermark')) {
     await processWatermark()
   }

@@ -15,6 +15,13 @@
     @clear="handleClear"
     @preview="handlePreview"
   >
+    <!-- 使用限制提示 -->
+    <view v-if="showUsageHint" :class="['usage-hint', usageHintClass]">
+      <uni-icons type="info" size="16" :color="usageHintClass === 'usage-hint-danger' ? '#ff4757' : '#3742fa'" />
+      <text class="hint-text">{{ usageHintText }}</text>
+      <text v-if="showLoginHint" class="login-hint" @click="handleLoginHint">登录获取更多</text>
+    </view>
+
     <!-- 输入区域 -->
     <view class="input-section">
       <!-- 文本输入 -->
@@ -167,6 +174,7 @@ import { ref, computed, watch } from 'vue'
 import ToolContainer from '@/components/tools/ToolContainer.vue'
 import { QRGenerator } from '@/tools/qrcode/generator.js'
 import { ProgressTracker } from '@/tools/base/ProgressTracker.js'
+import { useUsageLimit } from '@/composables/useUsageLimit'
 
 // 响应式数据
 const inputText = ref('')
@@ -185,6 +193,19 @@ const results = ref([])
 const statistics = ref({})
 const errorMessage = ref('')
 const previewResult = ref(null)
+
+// 使用限制相关
+const {
+  remainingUsage,
+  isLimited,
+  userType,
+  loading,
+  showUsageHint,
+  usageHintText,
+  usageHintClass,
+  showLoginHint,
+  useFrontendTool
+} = useUsageLimit()
 
 // 工具实例
 const qrGenerator = new QRGenerator()
@@ -262,6 +283,13 @@ const getGenerateOptions = () => {
 const handleGenerate = async () => {
   if (!canGenerate.value || isGenerating.value) return
 
+  // 1. 预检查使用限制
+  const batchSize = isBatchMode.value ? batchLines.value.length : 1
+  const usageResult = await useFrontendTool('qr-generate', batchSize)
+  if (!usageResult.canUse) {
+    return // 已显示限制提示
+  }
+
   isGenerating.value = true
   progress.value = 0
   progressStatus.value = 'running'
@@ -285,10 +313,15 @@ const handleGenerate = async () => {
     // 计算统计信息
     updateStatistics()
     
+    // 3. 成功后报告使用
+    await usageResult.reportUsage(batchSize)
+    
   } catch (error) {
     progressStatus.value = 'error'
     progressMessage.value = '生成失败'
     errorMessage.value = error.message
+    // 失败时不记录使用次数
+    console.error('二维码生成失败:', error)
   } finally {
     isGenerating.value = false
   }
@@ -414,10 +447,24 @@ const formatFileSize = (size) => {
   return `${(size / (1024 * 1024)).toFixed(1)}MB`
 }
 
+// 处理登录提示点击
+const handleLoginHint = () => {
+  uni.navigateTo({
+    url: '/pages/auth/login',
+    fail: () => {
+      uni.showToast({
+        title: '请通过登录获取更多使用次数',
+        icon: 'none',
+        duration: 3000
+      })
+    }
+  })
+}
+
 // 页面加载时生成预览
 import { onMounted } from 'vue'
 
-onMounted(() => {
+onMounted(async () => {
   // 设置默认文本用于演示
   inputText.value = 'https://weautotools.com'
 })
@@ -641,6 +688,47 @@ onMounted(() => {
         font-size: 24rpx;
         color: #666;
       }
+    }
+  }
+}
+
+// 使用限制提示样式
+.usage-hint {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  
+  &.usage-hint-info {
+    background: #e6f7ff;
+    border: 1rpx solid #91d5ff;
+  }
+  
+  &.usage-hint-warning {
+    background: #fff7e6;
+    border: 1rpx solid #ffd591;
+  }
+  
+  &.usage-hint-danger {
+    background: #fff2f0;
+    border: 1rpx solid #ffccc7;
+  }
+  
+  .hint-text {
+    flex: 1;
+    color: #333;
+  }
+  
+  .login-hint {
+    color: #007aff;
+    text-decoration: underline;
+    cursor: pointer;
+    
+    &:active {
+      opacity: 0.7;
     }
   }
 }
