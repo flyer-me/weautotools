@@ -103,3 +103,4 @@ application-*.yml
 !application.yml
 !application-*.yml.example
 qodana.yaml
+.qoder/

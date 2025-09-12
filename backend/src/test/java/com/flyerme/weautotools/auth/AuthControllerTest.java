@@ -35,7 +35,7 @@ class AuthControllerTest {
     void testAuthenticateUser() throws Exception {
         LoginRequest loginRequest = new LoginRequest("testuser", "password");
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(tokenProvider.generateToken(any(Authentication.class))).thenReturn("test-jwt-token");
 

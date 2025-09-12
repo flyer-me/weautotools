@@ -30,6 +30,7 @@ class JwtTokenProviderTest {
 
     private Authentication createTestAuthentication() {
         User user = new User();
+        user.setId(123L);
         user.setMobile("1234567890");
         user.setRoles(List.of("ROLE_USER", "ROLE_ADMIN"));
         return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
@@ -51,6 +52,23 @@ class JwtTokenProviderTest {
         String username = jwtTokenProvider.getUsernameFromJWT(token);
 
         assertEquals("1234567890", username);
+    }
+
+    @Test
+    void testGetUserIdFromJWT() {
+        Authentication authentication = createTestAuthentication();
+        String token = jwtTokenProvider.generateToken(authentication);
+        Long userId = jwtTokenProvider.getUserIdFromJWT(token);
+
+        assertEquals(123L, userId);
+    }
+
+    @Test
+    void testGetUserIdFromJWT_InvalidToken() {
+        String invalidToken = "invalid-token";
+        Long userId = jwtTokenProvider.getUserIdFromJWT(invalidToken);
+        
+        assertNull(userId);
     }
 
     @Test
