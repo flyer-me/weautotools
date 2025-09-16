@@ -1,0 +1,1525 @@
+openapi: "3.0.1"
+info:
+  title: "API Documentation"
+  version: "1.0"
+paths:
+  /health:
+    get:
+      summary: "健康检查接口"
+      description: "健康检查接口"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      status:
+                        type: "string"
+                      timestamp:
+                        type: "object"
+                      application:
+                        type: "string"
+                      version:
+                        type: "string"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+                  success:
+                    type: "boolean"
+                    description: "判断是否成功"
+  /health/hello:
+    get:
+      summary: "简单的Hello World接口"
+      description: "简单的Hello World接口"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "string"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /api/usage-limits/check:
+    get:
+      summary: "检查工具使用限制"
+      description: "检查工具使用限制"
+      parameters:
+      - name: "toolName"
+        in: "query"
+        description: ""
+        required: true
+        schema:
+          type: "string"
+          nullable: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      isExceeded:
+                        type: "boolean"
+                        description: "是否超出限制"
+                      remaining:
+                        type: "integer"
+                        description: "剩余使用次数"
+                      message:
+                        type: "string"
+                        description: "限制信息"
+                      toolName:
+                        type: "string"
+                        description: "工具名称"
+                      userType:
+                        type: "string"
+                        description: "用户类型"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /api/usage-limits/configs:
+    get:
+      summary: "获取所有限制配置"
+      description: "获取所有限制配置"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "array"
+                    description: "响应数据"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: "配置ID"
+                          format: "int64"
+                        toolType:
+                          type: "string"
+                          description: "工具类型"
+                        toolName:
+                          type: "string"
+                          description: "工具名称"
+                        userType:
+                          type: "string"
+                          description: "用户类型 (ANONYMOUS/LOGIN)"
+                        limitType:
+                          type: "string"
+                          description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                        limitCount:
+                          type: "integer"
+                          description: "限制次数"
+                        enabled:
+                          type: "boolean"
+                          description: "是否启用"
+                        createdAt:
+                          type: "string"
+                          description: "创建时间"
+                        updatedAt:
+                          type: "string"
+                          description: "更新时间"
+                      description: "工具使用限制配置响应DTO"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+    post:
+      summary: "创建限制配置"
+      description: "创建限制配置"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "limitCount"
+              - "limitType"
+              - "toolName"
+              - "toolType"
+              - "userType"
+              type: "object"
+              properties:
+                id:
+                  type: "integer"
+                  description: "配置ID（更新时使用）"
+                  format: "int64"
+                toolType:
+                  type: "string"
+                  description: "工具类型"
+                toolName:
+                  type: "string"
+                  description: "工具名称"
+                userType:
+                  type: "string"
+                  description: "用户类型 (ANONYMOUS/LOGIN)"
+                limitType:
+                  type: "string"
+                  description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                limitCount:
+                  type: "integer"
+                  description: "限制次数"
+                enabled:
+                  type: "boolean"
+                  description: "是否启用"
+                  default: "true"
+              description: ""
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: "配置ID"
+                        format: "int64"
+                      toolType:
+                        type: "string"
+                        description: "工具类型"
+                      toolName:
+                        type: "string"
+                        description: "工具名称"
+                      userType:
+                        type: "string"
+                        description: "用户类型 (ANONYMOUS/LOGIN)"
+                      limitType:
+                        type: "string"
+                        description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                      limitCount:
+                        type: "integer"
+                        description: "限制次数"
+                      enabled:
+                        type: "boolean"
+                        description: "是否启用"
+                      createdAt:
+                        type: "string"
+                        description: "创建时间"
+                      updatedAt:
+                        type: "string"
+                        description: "更新时间"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /api/usage-limits/configs/{id}:
+    get:
+      summary: "根据ID获取限制配置"
+      description: "根据ID获取限制配置"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: "配置ID"
+                        format: "int64"
+                      toolType:
+                        type: "string"
+                        description: "工具类型"
+                      toolName:
+                        type: "string"
+                        description: "工具名称"
+                      userType:
+                        type: "string"
+                        description: "用户类型 (ANONYMOUS/LOGIN)"
+                      limitType:
+                        type: "string"
+                        description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                      limitCount:
+                        type: "integer"
+                        description: "限制次数"
+                      enabled:
+                        type: "boolean"
+                        description: "是否启用"
+                      createdAt:
+                        type: "string"
+                        description: "创建时间"
+                      updatedAt:
+                        type: "string"
+                        description: "更新时间"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+    put:
+      summary: "更新限制配置"
+      description: "更新限制配置"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "limitCount"
+              - "limitType"
+              - "toolName"
+              - "toolType"
+              - "userType"
+              type: "object"
+              properties:
+                id:
+                  type: "integer"
+                  description: "配置ID（更新时使用）"
+                  format: "int64"
+                toolType:
+                  type: "string"
+                  description: "工具类型"
+                toolName:
+                  type: "string"
+                  description: "工具名称"
+                userType:
+                  type: "string"
+                  description: "用户类型 (ANONYMOUS/LOGIN)"
+                limitType:
+                  type: "string"
+                  description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                limitCount:
+                  type: "integer"
+                  description: "限制次数"
+                enabled:
+                  type: "boolean"
+                  description: "是否启用"
+                  default: "true"
+              description: ""
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: "配置ID"
+                        format: "int64"
+                      toolType:
+                        type: "string"
+                        description: "工具类型"
+                      toolName:
+                        type: "string"
+                        description: "工具名称"
+                      userType:
+                        type: "string"
+                        description: "用户类型 (ANONYMOUS/LOGIN)"
+                      limitType:
+                        type: "string"
+                        description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                      limitCount:
+                        type: "integer"
+                        description: "限制次数"
+                      enabled:
+                        type: "boolean"
+                        description: "是否启用"
+                      createdAt:
+                        type: "string"
+                        description: "创建时间"
+                      updatedAt:
+                        type: "string"
+                        description: "更新时间"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+    delete:
+      summary: "删除限制配置"
+      description: "删除限制配置"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "string"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /api/usage-limits/configs/batch:
+    put:
+      summary: "批量更新配置"
+      description: "批量更新配置"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "array"
+              description: ""
+              items:
+                required:
+                - "limitCount"
+                - "limitType"
+                - "toolName"
+                - "toolType"
+                - "userType"
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "配置ID（更新时使用）"
+                    format: "int64"
+                  toolType:
+                    type: "string"
+                    description: "工具类型"
+                  toolName:
+                    type: "string"
+                    description: "工具名称"
+                  userType:
+                    type: "string"
+                    description: "用户类型 (ANONYMOUS/LOGIN)"
+                  limitType:
+                    type: "string"
+                    description: "限制类型 (DAILY/HOURLY/TOTAL)"
+                  limitCount:
+                    type: "integer"
+                    description: "限制次数"
+                  enabled:
+                    type: "boolean"
+                    description: "是否启用"
+                    default: "true"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "string"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /api/usage-limits/reset:
+    post:
+      summary: "重置用户使用次数"
+      description: "重置用户使用次数"
+      parameters:
+      - name: "userIdentifier"
+        in: "query"
+        description: ""
+        required: true
+        schema:
+          type: "string"
+          nullable: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "string"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter:
+    get:
+      summary: "获取所有计数器"
+      description: "获取所有计数器"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "array"
+                    description: "响应数据"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        counterName:
+                          type: "string"
+                          description: ""
+                        description:
+                          type: "string"
+                          description: ""
+                        clickCount:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        enabled:
+                          type: "boolean"
+                          description: ""
+                        lastClickTime:
+                          type: "string"
+                          description: ""
+                        createdAt:
+                          type: "string"
+                          description: ""
+                        updatedAt:
+                          type: "string"
+                          description: ""
+                      description: "点击计数器响应DTO"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+    post:
+      summary: "创建计数器"
+      description: "创建计数器"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "counterName"
+              type: "object"
+              properties:
+                counterName:
+                  maxLength: 100
+                  type: "string"
+                  description: "计数器名称"
+                description:
+                  maxLength: 500
+                  type: "string"
+                  description: "计数器描述"
+                enabled:
+                  type: "boolean"
+                  description: "是否启用"
+                  default: "true"
+              description: ""
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/{id}:
+    get:
+      summary: "根据ID获取计数器"
+      description: "根据ID获取计数器"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+    put:
+      summary: "更新计数器"
+      description: "更新计数器"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - "counterName"
+              type: "object"
+              properties:
+                counterName:
+                  maxLength: 100
+                  type: "string"
+                  description: "计数器名称"
+                description:
+                  maxLength: 500
+                  type: "string"
+                  description: "计数器描述"
+                enabled:
+                  type: "boolean"
+                  description: "是否启用"
+                  default: "true"
+              description: ""
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+    delete:
+      summary: "删除计数器"
+      description: "删除计数器"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "string"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/name/{counterName}:
+    get:
+      summary: "根据名称获取计数器"
+      description: "根据名称获取计数器"
+      parameters:
+      - name: "counterName"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/enabled:
+    get:
+      summary: "获取所有启用的计数器"
+      description: "获取所有启用的计数器"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "array"
+                    description: "响应数据"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        counterName:
+                          type: "string"
+                          description: ""
+                        description:
+                          type: "string"
+                          description: ""
+                        clickCount:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        enabled:
+                          type: "boolean"
+                          description: ""
+                        lastClickTime:
+                          type: "string"
+                          description: ""
+                        createdAt:
+                          type: "string"
+                          description: ""
+                        updatedAt:
+                          type: "string"
+                          description: ""
+                      description: "点击计数器响应DTO"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/{id}/click:
+    post:
+      summary: "点击计数（根据ID）"
+      description: "点击计数（根据ID）"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/name/{counterName}/click:
+    post:
+      summary: "点击计数（根据名称）"
+      description: "点击计数（根据名称）"
+      parameters:
+      - name: "counterName"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/statistics:
+    get:
+      summary: "获取统计信息"
+      description: "获取统计信息"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      totalCounters:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabledCounters:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      totalClicks:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/page:
+    get:
+      summary: "分页查询计数器"
+      description: "分页查询计数器"
+      parameters:
+      - name: "page"
+        in: "query"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+          nullable: false
+          default: "1"
+      - name: "size"
+        in: "query"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+          nullable: false
+          default: "10"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "array"
+                    description: "响应数据"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        counterName:
+                          type: "string"
+                          description: ""
+                        description:
+                          type: "string"
+                          description: ""
+                        clickCount:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        enabled:
+                          type: "boolean"
+                          description: ""
+                        lastClickTime:
+                          type: "string"
+                          description: ""
+                        createdAt:
+                          type: "string"
+                          description: ""
+                        updatedAt:
+                          type: "string"
+                          description: ""
+                      description: "点击计数器响应DTO"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/search:
+    get:
+      summary: "根据条件查询计数器"
+      description: "根据条件查询计数器"
+      parameters:
+      - name: "enabled"
+        in: "query"
+        description: ""
+        required: false
+        schema:
+          type: "boolean"
+          nullable: false
+      - name: "counterName"
+        in: "query"
+        description: ""
+        required: false
+        schema:
+          type: "string"
+          nullable: false
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "array"
+                    description: "响应数据"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        counterName:
+                          type: "string"
+                          description: ""
+                        description:
+                          type: "string"
+                          description: ""
+                        clickCount:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        enabled:
+                          type: "boolean"
+                          description: ""
+                        lastClickTime:
+                          type: "string"
+                          description: ""
+                        createdAt:
+                          type: "string"
+                          description: ""
+                        updatedAt:
+                          type: "string"
+                          description: ""
+                      description: "点击计数器响应DTO"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/top:
+    get:
+      summary: "获取点击数最多的计数器"
+      description: "获取点击数最多的计数器"
+      parameters:
+      - name: "limit"
+        in: "query"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+          nullable: false
+          default: "10"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "array"
+                    description: "响应数据"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        counterName:
+                          type: "string"
+                          description: ""
+                        description:
+                          type: "string"
+                          description: ""
+                        clickCount:
+                          type: "integer"
+                          description: ""
+                          format: "int64"
+                        enabled:
+                          type: "boolean"
+                          description: ""
+                        lastClickTime:
+                          type: "string"
+                          description: ""
+                        createdAt:
+                          type: "string"
+                          description: ""
+                        updatedAt:
+                          type: "string"
+                          description: ""
+                      description: "点击计数器响应DTO"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /click-counter/{id}/reset:
+    post:
+      summary: "重置计数器点击数"
+      description: "重置计数器点击数"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: ""
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  code:
+                    type: "integer"
+                    description: "响应码"
+                  message:
+                    type: "string"
+                    description: "响应消息"
+                  data:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      counterName:
+                        type: "string"
+                        description: ""
+                      description:
+                        type: "string"
+                        description: ""
+                      clickCount:
+                        type: "integer"
+                        description: ""
+                        format: "int64"
+                      enabled:
+                        type: "boolean"
+                        description: ""
+                      lastClickTime:
+                        type: "string"
+                        description: ""
+                      createdAt:
+                        type: "string"
+                        description: ""
+                      updatedAt:
+                        type: "string"
+                        description: ""
+                    description: "响应数据"
+                  timestamp:
+                    type: "integer"
+                    description: "时间戳"
+                    format: "int64"
+  /auth/login:
+    post:
+      summary: "authenticateUser"
+      description: "authenticateUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                username:
+                  type: "string"
+                  description: ""
+                password:
+                  type: "string"
+                  description: ""
+              description: ""
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties: {}
+  /auth/logout:
+    post:
+      summary: "logoutUser"
+      description: "logoutUser"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties: {}
+components:
+  schemas:
+    java.lang.Object:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+        timestamp:
+          type: "object"
+        application:
+          type: "string"
+        version:
+          type: "string"
+      description: "响应数据"
+    使用限制检查响应DTO:
+      type: "object"
+      properties:
+        isExceeded:
+          type: "boolean"
+          description: "是否超出限制"
+        remaining:
+          type: "integer"
+          description: "剩余使用次数"
+        message:
+          type: "string"
+          description: "限制信息"
+        toolName:
+          type: "string"
+          description: "工具名称"
+        userType:
+          type: "string"
+          description: "用户类型"
+      description: "响应数据"
+    工具使用限制配置响应DTO:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: "配置ID"
+          format: "int64"
+        toolType:
+          type: "string"
+          description: "工具类型"
+        toolName:
+          type: "string"
+          description: "工具名称"
+        userType:
+          type: "string"
+          description: "用户类型 (ANONYMOUS/LOGIN)"
+        limitType:
+          type: "string"
+          description: "限制类型 (DAILY/HOURLY/TOTAL)"
+        limitCount:
+          type: "integer"
+          description: "限制次数"
+        enabled:
+          type: "boolean"
+          description: "是否启用"
+        createdAt:
+          type: "string"
+          description: "创建时间"
+        updatedAt:
+          type: "string"
+          description: "更新时间"
+      description: "响应数据"
+    点击计数器响应DTO:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: ""
+          format: "int64"
+        counterName:
+          type: "string"
+          description: ""
+        description:
+          type: "string"
+          description: ""
+        clickCount:
+          type: "integer"
+          description: ""
+          format: "int64"
+        enabled:
+          type: "boolean"
+          description: ""
+        lastClickTime:
+          type: "string"
+          description: ""
+        createdAt:
+          type: "string"
+          description: ""
+        updatedAt:
+          type: "string"
+          description: ""
+      description: "响应数据"
+    com.flyerme.weautotools.dto.ClickCounterStatistics:
+      type: "object"
+      properties:
+        totalCounters:
+          type: "integer"
+          description: ""
+          format: "int64"
+        enabledCounters:
+          type: "integer"
+          description: ""
+          format: "int64"
+        totalClicks:
+          type: "integer"
+          description: ""
+          format: "int64"
+      description: "响应数据"

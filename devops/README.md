@@ -11,12 +11,11 @@ scripts/
 │   ├── init/                   # 数据库初始化脚本
 │   ├── migration/              # 数据库迁移脚本
 │   └── seed/                   # 测试数据脚本
-├── environment/                # 环境配置文件
+├── env/                # 环境配置文件
 │   ├── .env.example           # 环境变量示例文件
 │   ├── .env.dev               # 开发环境配置
-│   ├── .env.prod              # 生产环境配置
-│   └── database.properties    # 数据库配置
-├── deployment/                 # 部署相关脚本
+│   └── .env.prod              # 生产环境配置
+├── deploy/                 # 部署相关脚本
 │   └── docker/                # Docker相关文件
 │       ├── docker-compose.yml # Docker Compose配置文件
 │       └── postgres/          # PostgreSQL初始化脚本

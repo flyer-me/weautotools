@@ -3,6 +3,7 @@ package com.flyerme.weautotools.controller;
 import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
+import com.flyerme.weautotools.dto.ClickCounterStatistics;
 import com.flyerme.weautotools.service.ClickCounterService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -117,8 +118,8 @@ public class ClickCounterController {
      * 获取统计信息
      */
     @GetMapping("/statistics")
-    public Result<ClickCounterService.ClickCounterStatistics> getStatistics() {
-        ClickCounterService.ClickCounterStatistics statistics = clickCounterService.getStatistics();
+    public Result<ClickCounterStatistics> getStatistics() {
+        ClickCounterStatistics statistics = clickCounterService.getStatistics();
         return Result.success(statistics);
     }
 

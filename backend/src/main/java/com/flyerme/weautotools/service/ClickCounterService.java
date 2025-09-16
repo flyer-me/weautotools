@@ -2,6 +2,7 @@ package com.flyerme.weautotools.service;
 
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
+import com.flyerme.weautotools.dto.ClickCounterStatistics;
 import com.flyerme.weautotools.entity.ClickCounter;
 
 import java.util.List;
@@ -62,6 +63,4 @@ public interface ClickCounterService extends BaseService<ClickCounter, ClickCoun
      */
     ClickCounterResponse resetCounter(Long id);
 
-
-    record ClickCounterStatistics(long totalCounters, long enabledCounters, long totalClicks) {}
 }
