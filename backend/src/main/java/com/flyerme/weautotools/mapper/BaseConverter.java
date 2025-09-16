@@ -11,8 +11,6 @@ public interface BaseConverter<T extends BaseEntity, R, S> {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    // @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
-    // 注：updatedAt 会在BaseServiceImpl中设置
+    // @Mapping(target = "updatedAt", expression = "java(java.time.Instant.now())")
     void updateEntityFromRequest(@MappingTarget T entity, R request);
 }

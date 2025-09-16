@@ -22,13 +22,7 @@ public @interface UsageLimit {
      * @return 工具名称
      */
     String toolName();
-    
-    /**
-     * 工具类型
-     * @return 工具类型，默认为DEFAULT
-     */
-    String toolType() default "DEFAULT";
-    
+
     /**
      * 是否需要认证
      * @return 是否需要认证，默认false

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 使用限制管理控制器
+ * 使用限制
  *
  * @author WeAutoTools Team
  * @version 1.0.2

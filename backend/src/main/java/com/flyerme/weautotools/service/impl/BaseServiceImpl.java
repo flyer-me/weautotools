@@ -7,6 +7,7 @@ import com.flyerme.weautotools.common.BusinessException;
 import com.flyerme.weautotools.mapper.BaseConverter;
 import com.flyerme.weautotools.service.BaseService;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -111,7 +112,7 @@ public class BaseServiceImpl<T extends BaseEntity, R, S>
      * 设置创建时的默认值
      */
     void setCreateDefaults(T entity) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
         entity.setDeleted(0);
@@ -122,7 +123,7 @@ public class BaseServiceImpl<T extends BaseEntity, R, S>
      * 设置更新时的默认值
      */
     void setUpdateDefaults(T entity) {
-        entity.setUpdatedAt(LocalDateTime.now());
+        entity.setUpdatedAt(Instant.now());
     }
 
     protected void validateCreateRequest(R request) {}

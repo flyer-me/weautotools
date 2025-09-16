@@ -5,7 +5,7 @@
 -- 工具使用限制配置表
 CREATE TABLE IF NOT EXISTS tool_usage_limits (
     id BIGSERIAL PRIMARY KEY,
-    tool_type VARCHAR(50) NOT NULL,          -- 工具类型 (QR_CODE, IMAGE_PROCESS, DATA_CONVERT等)
+    tool_type VARCHAR(50) NOT NULL,          -- 工具类型
     tool_name VARCHAR(100) NOT NULL,         -- 工具名称
     user_type VARCHAR(20) NOT NULL,          -- 用户类型 (ANONYMOUS, LOGIN)
     limit_type VARCHAR(20) NOT NULL,         -- 限制类型 (DAILY, HOURLY, TOTAL)

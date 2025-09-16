@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 点击计数器控制器
+ * 点击计数
  *
  * @author WeAutoTools Team
  * @version 1.0.0

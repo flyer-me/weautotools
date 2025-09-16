@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.error("业务异常: {}", e.getMessage());
+        log.error("错误: {}", e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
@@ -101,9 +101,9 @@ public class GlobalExceptionHandler {
     /*
     * 处理资源不存在异常
      */
-    @ExceptionHandler(NoSuchElementException.class)
+    @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Result<Void> handleNotFound(NoSuchElementException e) {
+    public Result<Void> handleNotFound(NoResourceFoundException e) {
         log.warn("资源不存在: {}", e.getMessage());
         return Result.error(ResultCode.NOT_FOUND.getCode(), "资源不存在");
     }

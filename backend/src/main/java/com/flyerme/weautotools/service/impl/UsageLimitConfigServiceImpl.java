@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,8 +64,8 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
 
         // 创建新配置
         ToolUsageLimit config = convertFromRequest(request);
-        config.setCreatedAt(LocalDateTime.now());
-        config.setUpdatedAt(LocalDateTime.now());
+        config.setCreatedAt(Instant.now());
+        config.setUpdatedAt(Instant.now());
         
         toolUsageLimitMapper.insert(config);
         
@@ -100,7 +101,7 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
         existingConfig.setLimitType(request.getLimitType());
         existingConfig.setLimitCount(request.getLimitCount());
         existingConfig.setEnabled(request.getEnabled());
-        existingConfig.setUpdatedAt(LocalDateTime.now());
+        existingConfig.setUpdatedAt(Instant.now());
         
         toolUsageLimitMapper.updateById(existingConfig);
         
@@ -118,7 +119,7 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
 
         // 逻辑删除
         config.setDeleted(1);
-        config.setUpdatedAt(LocalDateTime.now());
+        config.setUpdatedAt(Instant.now());
         toolUsageLimitMapper.updateById(config);
         
         log.info("删除使用限制配置: {}", id);

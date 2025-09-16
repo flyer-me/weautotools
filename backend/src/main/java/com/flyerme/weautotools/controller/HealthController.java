@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 健康检查控制器
+ * 健康检查
  *
  * @author WeAutoTools Team
  * @version 1.0.0
@@ -21,7 +21,7 @@ import java.util.Map;
 public class HealthController {
 
     /**
-     * 健康检查接口
+     * 健康检查
      */
     @GetMapping
     public Result<Map<String, Object>> health() {
@@ -34,11 +34,4 @@ public class HealthController {
         return Result.success("服务运行正常", data);
     }
 
-    /**
-     * 简单的Hello World接口
-     */
-    @GetMapping("/hello")
-    public Result<String> hello() {
-        return Result.success("Hello, WeAutoTools!");
-    }
 }

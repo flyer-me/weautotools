@@ -220,10 +220,7 @@ class UsageLimitAspectTest {
         return new UsageLimit() {
             @Override
             public String toolName() { return toolName; }
-            
-            @Override
-            public String toolType() { return toolType; }
-            
+
             @Override
             public boolean requireAuth() { return requireAuth; }
             

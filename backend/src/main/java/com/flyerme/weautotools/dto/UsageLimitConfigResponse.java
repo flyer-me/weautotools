@@ -2,6 +2,7 @@ package com.flyerme.weautotools.dto;
 
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 /**
@@ -52,10 +53,10 @@ public class UsageLimitConfigResponse {
     /**
      * 创建时间
      */
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     /**
      * 更新时间
      */
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }

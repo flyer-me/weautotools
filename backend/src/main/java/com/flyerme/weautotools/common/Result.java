@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * 统一响应结果封装类
@@ -38,10 +39,10 @@ public class Result<T> implements Serializable {
     /**
      * 时间戳
      */
-    private Long timestamp;
+    private Instant timestamp;
 
     public Result() {
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = Instant.now();
     }
 
     public Result(Integer code, String message) {

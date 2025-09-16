@@ -67,7 +67,7 @@ public class UsageLimitServiceImpl implements UsageLimitService {
             incrementRedisCounter(userIdentifier, toolName, "hourly");
 
             // 异步记录到数据库
-            recordToDatabase(userIdentifier, toolName, userType, userId, ipAddress, userAgent);
+            recordToDatabase(userIdentifier, toolName, userId, ipAddress, userAgent);
             
             log.debug("记录用户 {} 使用工具 {}", userIdentifier, toolName);
         } catch (Exception e) {
@@ -127,18 +127,16 @@ public class UsageLimitServiceImpl implements UsageLimitService {
 
         // 2. 查找工具类型的默认限制
         String toolType = extractToolType(toolName);
-        if (toolType != null) {
-            List<ToolUsageLimit> typeLimits = toolUsageLimitMapper.selectByToolTypeAndUserType(
-                toolType, userType.name());
-            
-            ToolUsageLimit typeLimit = typeLimits.stream()
-                .filter(limit -> limitType.name().equals(limit.getLimitType()))
-                .findFirst()
-                .orElse(null);
-            
-            if (typeLimit != null) {
-                return typeLimit;
-            }
+        List<ToolUsageLimit> typeLimits = toolUsageLimitMapper.selectByToolTypeAndUserType(
+            toolType, userType.name());
+
+        ToolUsageLimit typeLimit = typeLimits.stream()
+            .filter(limit -> limitType.name().equals(limit.getLimitType()))
+            .findFirst()
+            .orElse(null);
+
+        if (typeLimit != null) {
+            return typeLimit;
         }
 
         // 3. 使用系统默认限制
@@ -153,14 +151,8 @@ public class UsageLimitServiceImpl implements UsageLimitService {
      * 从工具名称提取工具类型
      */
     private String extractToolType(String toolName) {
-        if (toolName.startsWith("qr-")) {
-            return "QR_CODE";
-        } else if (toolName.startsWith("image-")) {
-            return "IMAGE_PROCESS";
-        } else if (toolName.startsWith("data-")) {
-            return "DATA_CONVERT";
-        }
-        return null;
+        //TODO: 业务扩展后添加不同的工具类型
+        return "DEFAULT";
     }
 
     /**
@@ -207,7 +199,7 @@ public class UsageLimitServiceImpl implements UsageLimitService {
         Long newCount = redisTemplate.opsForValue().increment(key);
         
         // 设置过期时间
-        if (newCount == 1) {
+        if (newCount != null && newCount == 1) {
             if ("daily".equals(timeType)) {
                 // 每日计数器，设置为第二天零点过期
                 long secondsUntilMidnight = ChronoUnit.SECONDS.between(
@@ -234,50 +226,10 @@ public class UsageLimitServiceImpl implements UsageLimitService {
     }
 
     /**
-     * 前端工具使用后批量记录
-     * @param userIdentifier 用户标识
-     * @param toolName 工具名称
-     * @param userType 用户类型
-     * @param usageCount 使用次数
-     */
-    public void recordFrontendToolUsage(String userIdentifier, String toolName, 
-                                       ToolUsageLimit.UserType userType, 
-                                       int usageCount) {
-        try {
-            // 批量记录使用次数
-            for (int i = 0; i < usageCount; i++) {
-                recordUsage(userIdentifier, toolName, userType, null, null, null);
-            }
-            log.debug("批量记录前端工具使用: {} - {} - {}次", userIdentifier, toolName, usageCount);
-        } catch (Exception e) {
-            log.error("批量记录前端工具使用异常", e);
-        }
-    }
-
-    /**
-     * 获取前端工具的剩余使用次数（考虑批量需求）
-     * @param userIdentifier 用户标识
-     * @param toolName 工具名称
-     * @param userType 用户类型
-     * @param requiredCount 需要的使用次数
-     * @return 是否有足够的剩余次数
-     */
-    public boolean hasSufficientUsage(String userIdentifier, String toolName, 
-                                     ToolUsageLimit.UserType userType, int requiredCount) {
-        try {
-            int remaining = getRemainingUsage(userIdentifier, toolName, userType);
-            return remaining >= requiredCount;
-        } catch (Exception e) {
-            log.error("检查前端工具剩余次数异常", e);
-            return true; // 异常时允许使用
-        }
-    }
-
-    /**
      * 记录到数据库
      */
-    private void recordToDatabase(String userIdentifier, String toolName, ToolUsageLimit.UserType userType,
-                                 Long userId, String ipAddress, String userAgent) {
+    private void recordToDatabase(String userIdentifier, String toolName,
+                                  Long userId, String ipAddress, String userAgent) {
         ToolUsageRecord record = new ToolUsageRecord();
         record.setUserId(userId);
         record.setUserIdentifier(userIdentifier);

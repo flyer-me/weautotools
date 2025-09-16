@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,8 +60,6 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
 
 
     @Override
-    @Transactional
-    @Lock(key = "'counter:click:' + #id", failMessage = "计数器正在被其他用户操作，请稍后重试")
     public ClickCounterResponse clickCounter(Long id) {
         LocalDateTime now = LocalDateTime.now();
         int result = clickCounterMapper.incrementClickCount(id, now, now);
@@ -73,8 +72,6 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
     }
 
     @Override
-    @Transactional
-    @Lock(key = "'counter:click:' + #counterName", failMessage = "计数器正在被其他用户操作，请稍后重试")
     public ClickCounterResponse clickCounterByName(String counterName) {
         LocalDateTime now = LocalDateTime.now();
         int result = clickCounterMapper.incrementClickCountByName(counterName, now, now);
@@ -146,7 +143,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
         // 直接更新实体并保存
         counter.setClickCount(0L);
         counter.setLastClickTime(null);
-        counter.setUpdatedAt(LocalDateTime.now());
+        counter.setUpdatedAt(Instant.now());
 
         int result = this.baseMapper.updateById(counter);
         if (result <= 0) {

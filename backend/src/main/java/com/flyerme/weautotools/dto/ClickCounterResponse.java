@@ -1,6 +1,6 @@
 package com.flyerme.weautotools.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 点击计数器响应DTO
@@ -11,5 +11,5 @@ import java.time.LocalDateTime;
  */
 public record ClickCounterResponse
         (Long id, String counterName, String description,
-         Long clickCount, Boolean enabled, LocalDateTime lastClickTime,
-         LocalDateTime createdAt, LocalDateTime updatedAt) {}
+         Long clickCount, Boolean enabled, Instant lastClickTime,
+         Instant createdAt, Instant updatedAt) {}

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.Instant;
+
 /**
  * 点击计数器实体类
  *
@@ -42,5 +44,5 @@ public class ClickCounter extends BaseEntity {
     /**
      * 最后点击时间
      */
-    private java.time.LocalDateTime lastClickTime;
+    private Instant lastClickTime;
 }
