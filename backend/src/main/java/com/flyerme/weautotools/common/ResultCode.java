@@ -31,6 +31,19 @@ public enum ResultCode {
     BAD_GATEWAY(502, "网关错误"),
     SERVICE_UNAVAILABLE(503, "服务不可用"),
 
+    // 认证授权错误
+    AUTH_FAILED(4001, "认证失败"),
+    AUTH_BAD_CREDENTIALS(4002, "用户名或密码错误"),
+    AUTH_USER_NOT_FOUND(4003, "用户不存在"),
+    AUTH_USER_DISABLED(4004, "用户已被禁用"),
+    AUTH_USER_LOCKED(4005, "用户已被锁定"),
+    AUTH_ACCESS_DENIED(4006, "访问被拒绝，权限不足"),
+    AUTH_TOKEN_EXPIRED(4007, "访问令牌已过期"),
+    AUTH_TOKEN_MALFORMED(4008, "令牌格式不正确"),
+    AUTH_TOKEN_SIGNATURE_INVALID(4009, "令牌签名无效"),
+    AUTH_TOKEN_INVALID(4010, "令牌无效"),
+    AUTH_SECURITY_ERROR(4011, "安全验证失败"),
+
     // 业务错误
     BUSINESS_ERROR(1000, "业务处理失败"),
     DATA_NOT_FOUND(1001, "数据不存在"),
@@ -46,13 +59,6 @@ public enum ResultCode {
     NETWORK_ERROR(3001, "网络连接错误"),
     TIMEOUT_ERROR(3002, "请求超时");
 
-    /**
-     * 状态码
-     */
     private final Integer code;
-
-    /**
-     * 状态消息
-     */
     private final String message;
 }

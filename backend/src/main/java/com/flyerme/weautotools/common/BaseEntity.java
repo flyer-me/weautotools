@@ -25,16 +25,7 @@ public abstract class BaseEntity implements Serializable {
     @TableId
     private Long id;
 
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Instant createdAt;
-
-    /**
-     * 更新时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Instant  updatedAt;
 
     /**
@@ -43,8 +34,5 @@ public abstract class BaseEntity implements Serializable {
      */
     private Integer deleted = 0;
 
-    /**
-     * 版本号（乐观锁）
-     */
     private Integer version = 0;
 }

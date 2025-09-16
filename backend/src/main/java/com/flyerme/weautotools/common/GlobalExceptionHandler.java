@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.error("错误: {}", e.getMessage());
+        log.error("业务异常: {}", e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
@@ -94,24 +94,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public Result<Void> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-        log.error("数据完整性约束违反", e);
+        log.error("数据完整性约束违反: {}", e.getMessage());
         return Result.error(ResultCode.DATA_INTEGRITY_VIOLATION);
     }
 
-    /*
-    * 处理资源不存在异常
+    /**
+     * 处理资源不存在异常
      */
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Result<Void> handleNotFound(NoResourceFoundException e) {
-        log.warn("资源不存在: {}", e.getMessage());
+        log.warn("资源不存在: {}", e.getResourcePath());
         return Result.error(ResultCode.NOT_FOUND.getCode(), "资源不存在");
     }
 
+    /**
+     * 处理不支持的请求方法异常
+     */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public Result<Void> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        log.warn("不支持的请求方法: {}", e.getMessage());
+        log.warn("不支持的请求方法: {} 支持的方法: {}", e.getMethod(), e.getSupportedMethods());
         return Result.error(ResultCode.METHOD_NOT_ALLOWED.getCode(), "不支持的请求方法");
     }
 
