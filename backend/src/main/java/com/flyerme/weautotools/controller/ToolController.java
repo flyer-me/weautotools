@@ -3,8 +3,8 @@ package com.flyerme.weautotools.controller;
 import com.flyerme.weautotools.entity.Tool;
 import com.flyerme.weautotools.service.ToolService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.flyerme.weautotools.common.Result;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -25,82 +25,94 @@ public class ToolController {
     private final ToolService toolService;
 
     @GetMapping
-    public ResponseEntity<List<Tool>> getActiveTools() {
-        return ResponseEntity.ok(toolService.getActiveTools());
+    public Result<List<Tool>> getActiveTools() {
+        List<Tool> tools = toolService.getActiveTools();
+        return Result.success(tools);
     }
 
     @GetMapping("/type/{toolType}")
-    public ResponseEntity<List<Tool>> getToolsByType(@PathVariable String toolType) {
-        return ResponseEntity.ok(toolService.getByToolType(toolType));
+    public Result<List<Tool>> getToolsByType(@PathVariable String toolType) {
+        List<Tool> tools = toolService.getByToolType(toolType);
+        return Result.success(tools);
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<Tool>> getToolsByCategory(@PathVariable String category) {
-        return ResponseEntity.ok(toolService.getByCategory(category));
+    public Result<List<Tool>> getToolsByCategory(@PathVariable String category) {
+        List<Tool> tools = toolService.getByCategory(category);
+        return Result.success(tools);
     }
 
     @GetMapping("/frontend")
-    public ResponseEntity<List<Tool>> getFrontendTools() {
-        return ResponseEntity.ok(toolService.getFrontendTools());
+    public Result<List<Tool>> getFrontendTools() {
+        List<Tool> tools = toolService.getFrontendTools();
+        return Result.success(tools);
     }
 
     @GetMapping("/backend")
-    public ResponseEntity<List<Tool>> getBackendTools() {
-        return ResponseEntity.ok(toolService.getBackendTools());
+    public Result<List<Tool>> getBackendTools() {
+        List<Tool> tools = toolService.getBackendTools();
+        return Result.success(tools);
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Tool>> getToolsByStatus(@PathVariable String status) {
-        return ResponseEntity.ok(toolService.getByStatus(status));
+    public Result<List<Tool>> getToolsByStatus(@PathVariable String status) {
+        List<Tool> tools = toolService.getByStatus(status);
+        return Result.success(tools);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Tool>> searchTools(@RequestParam String keyword) {
-        return ResponseEntity.ok(toolService.searchByKeyword(keyword));
+    public Result<List<Tool>> searchTools(@RequestParam String keyword) {
+        List<Tool> tools = toolService.searchByKeyword(keyword);
+        return Result.success(tools);
     }
 
     @GetMapping("/{toolCode}")
-    public ResponseEntity<Tool> getToolByCode(@PathVariable String toolCode) {
+    public Result<Tool> getToolByCode(@PathVariable String toolCode) {
         return toolService.getByToolCode(toolCode)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(Result::success)
+                .orElse(Result.error("工具不存在"));
     }
 
     @PostMapping
-    public ResponseEntity<Tool> createTool(@Valid @RequestBody Tool tool) {
-        return ResponseEntity.ok(toolService.createTool(tool));
+    public Result<Tool> createTool(@Valid @RequestBody Tool tool) {
+        Tool createdTool = toolService.createTool(tool);
+        return Result.success("工具创建成功", createdTool);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Tool> updateTool(@PathVariable Long id, @Valid @RequestBody Tool tool) {
+    public Result<Tool> updateTool(@PathVariable Long id, @Valid @RequestBody Tool tool) {
         tool.setId(id);
-        return ResponseEntity.ok(toolService.updateTool(tool));
+        Tool updatedTool = toolService.updateTool(tool);
+        return Result.success("工具更新成功", updatedTool);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTool(@PathVariable Long id) {
+    public Result<Void> deleteTool(@PathVariable Long id) {
         boolean deleted = toolService.deleteTool(id);
-        return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        return deleted ? Result.success("工具删除成功") : Result.error("工具不存在");
     }
 
     @GetMapping("/exists/{toolCode}")
-    public ResponseEntity<Boolean> existsByToolCode(@PathVariable String toolCode) {
-        return ResponseEntity.ok(toolService.existsByToolCode(toolCode));
+    public Result<Boolean> existsByToolCode(@PathVariable String toolCode) {
+        Boolean exists = toolService.existsByToolCode(toolCode);
+        return Result.success(exists);
     }
 
     @GetMapping("/stats/status")
-    public ResponseEntity<Map<String, Integer>> countByStatus() {
-        return ResponseEntity.ok(toolService.countByStatus());
+    public Result<Map<String, Integer>> countByStatus() {
+        Map<String, Integer> stats = toolService.countByStatus();
+        return Result.success(stats);
     }
 
     @GetMapping("/stats/category")
-    public ResponseEntity<Map<String, Integer>> countByCategory() {
-        return ResponseEntity.ok(toolService.countByCategory());
+    public Result<Map<String, Integer>> countByCategory() {
+        Map<String, Integer> stats = toolService.countByCategory();
+        return Result.success(stats);
     }
 
     @GetMapping("/{toolCode}/id")
-    public ResponseEntity<Long> getToolIdByCode(@PathVariable String toolCode) {
+    public Result<Long> getToolIdByCode(@PathVariable String toolCode) {
         Long toolId = toolService.getToolIdByCode(toolCode);
-        return toolId != null ? ResponseEntity.ok(toolId) : ResponseEntity.notFound().build();
+        return toolId != null ? Result.success(toolId) : Result.error("工具不存在");
     }
 }

@@ -1,5 +1,6 @@
 package com.flyerme.weautotools.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.flyerme.weautotools.common.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ import java.time.Instant;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@TableName("click_counters")
 public class ClickCounter extends BaseEntity {
 
     /**

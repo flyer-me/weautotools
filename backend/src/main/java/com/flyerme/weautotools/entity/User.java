@@ -1,5 +1,7 @@
 package com.flyerme.weautotools.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.flyerme.weautotools.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@TableName("users")
 public class User extends BaseEntity implements UserDetails  {
 
     private String passwordHash;
@@ -33,6 +36,7 @@ public class User extends BaseEntity implements UserDetails  {
 
     private String avatarUrl;
 
+    @TableField(exist = false)
     private List<String> roles;
 
     @Override

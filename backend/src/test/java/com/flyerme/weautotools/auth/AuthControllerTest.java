@@ -38,7 +38,7 @@ class AuthControllerTest {
 
     @Test
     void testAuthenticateUser() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("testuser", "password");
+        LoginRequest loginRequest = new LoginRequest("testuser", "passwordHash");
         
         // 创建测试用户
         User testUser = new User();
@@ -46,7 +46,7 @@ class AuthControllerTest {
         testUser.setMobile("testuser");
         testUser.setRoles(List.of("USER"));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(testUser, "password");
+        Authentication authentication = new UsernamePasswordAuthenticationToken(testUser, "passwordHash");
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         
         // 创建预期Token响应

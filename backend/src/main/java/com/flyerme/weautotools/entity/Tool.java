@@ -1,7 +1,6 @@
 package com.flyerme.weautotools.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.flyerme.weautotools.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,46 +23,39 @@ public class Tool extends BaseEntity {
      * 工具代码（唯一标识）
      */
     @NotBlank(message = "工具代码不能为空")
-    @TableField("tool_code")
     private String toolCode;
 
     /**
      * 工具名称
      */
     @NotBlank(message = "工具名称不能为空")
-    @TableField("tool_name")
     private String toolName;
 
     /**
      * 工具类型
      */
     @NotBlank(message = "工具类型不能为空")
-    @TableField("tool_type")
     private String toolType;
 
     /**
      * 工具描述
      */
-    @TableField("description")
     private String description;
 
     /**
      * 工具分类
      */
-    @TableField("category")
     private String category;
 
     /**
      * 工具状态
      */
     @NotNull(message = "工具状态不能为空")
-    @TableField("status")
     private String status = ToolStatus.ACTIVE.name();
 
     /**
      * 是否为前端工具
      */
-    @TableField("is_frontend")
     private Boolean isFrontend = false;
 
     /**

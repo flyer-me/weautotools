@@ -1,6 +1,7 @@
 package com.flyerme.weautotools.controller;
 
 import com.flyerme.weautotools.common.Result;
+import com.flyerme.weautotools.common.PageResult;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.dto.ClickCounterStatistics;
@@ -127,11 +128,11 @@ public class ClickCounterController {
      * 分页查询计数器
      */
     @GetMapping("/page")
-    public Result<List<ClickCounterResponse>> getCountersByPage(
+    public Result<PageResult<ClickCounterResponse>> getCountersByPage(
             @RequestParam(defaultValue = "1") @Min(1) int page,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
-        List<ClickCounterResponse> responses = clickCounterService.getCountersByPage(page, size);
-        return Result.success(responses);
+        PageResult<ClickCounterResponse> pageResult = clickCounterService.getCountersByPageResult(page, size);
+        return Result.success(pageResult);
     }
 
     /**

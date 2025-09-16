@@ -1,5 +1,6 @@
 package com.flyerme.weautotools.service;
 
+import com.flyerme.weautotools.common.PageResult;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.dto.ClickCounterStatistics;
@@ -44,9 +45,9 @@ public interface ClickCounterService extends BaseService<ClickCounter, ClickCoun
     ClickCounterStatistics getStatistics();
 
     /**
-     * 分页查询计数器
+     * 分页查询计数器（返回PageResult）
      */
-    List<ClickCounterResponse> getCountersByPage(int page, int size);
+    PageResult<ClickCounterResponse> getCountersByPageResult(int page, int size);
 
     /**
      * 根据条件查询计数器

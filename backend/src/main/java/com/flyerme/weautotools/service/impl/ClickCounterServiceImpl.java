@@ -2,6 +2,7 @@ package com.flyerme.weautotools.service.impl;
 
 import com.flyerme.weautotools.annotation.Lock;
 import com.flyerme.weautotools.common.BusinessException;
+import com.flyerme.weautotools.common.PageResult;
 import com.flyerme.weautotools.dao.ClickCounterMapper;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
@@ -99,13 +100,17 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
     }
 
     @Override
-    public List<ClickCounterResponse> getCountersByPage(int page, int size) {
+    public PageResult<ClickCounterResponse> getCountersByPageResult(int page, int size) {
         List<ClickCounter> allCounters = list();
-        return allCounters.stream()
+        long total = allCounters.size();
+        
+        List<ClickCounterResponse> records = allCounters.stream()
                 .skip((long) (page - 1) * size)
                 .limit(size)
                 .map(converter::toResponse)
                 .toList();
+        
+        return PageResult.of(records, total, (long) size, (long) page);
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.flyerme.weautotools.auth;
 
+import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.dto.TokenResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
-    private final AuthenticationCenterService authenticationCenterService;
+    private final AuthenticationCenterService authService;
 
     /**
      * 用户登录
@@ -38,24 +38,24 @@ public class AuthController {
      * @return Token响应
      */
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public Result<TokenResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
             log.info("User login attempt: {}", loginRequest.username());
             
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.username(),
-                            loginRequest.password()
+                            loginRequest.passwordHash()
                     )
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // 使用认证中心服务生成Token响应
-            TokenResponse tokenResponse = authenticationCenterService.generateTokenResponse(authentication);
+            TokenResponse tokenResponse = authService.generateTokenResponse(authentication);
             
             log.info("User login successful: {}", loginRequest.username());
-            return ResponseEntity.ok(tokenResponse);
+            return Result.success("登录成功", tokenResponse);
             
         } catch (Exception e) {
             log.error("User login failed: {}", loginRequest.username(), e);
@@ -70,18 +70,18 @@ public class AuthController {
      * @return 登出结果
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+    public Result<Void> logoutUser(HttpServletRequest request) {
         try {
             String jwt = JwtTokenProvider.extractTokenFromRequest(request);
             if (jwt != null) {
                 // 使用认证中心服务使Token失效
-                authenticationCenterService.invalidateToken(jwt);
+                authService.invalidateToken(jwt);
                 log.info("User logout successful");
             }
-            return ResponseEntity.ok("Successfully logged out");
+            return Result.success("登出成功");
         } catch (Exception e) {
             log.error("Error during logout", e);
-            return ResponseEntity.ok("Logout completed");
+            return Result.success("登出完成");
         }
     }
 }
@@ -89,10 +89,4 @@ public class AuthController {
 /**
  * 登录请求记录
  */
-record LoginRequest(String username, String password) {}
-
-/**
- * JWT认证响应记录（保持向后兼容）
- */
-record JwtAuthenticationResponse(String accessToken) {}
-
+record LoginRequest(String username, String passwordHash) {}

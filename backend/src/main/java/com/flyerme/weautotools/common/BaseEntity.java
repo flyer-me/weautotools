@@ -1,6 +1,6 @@
 package com.flyerme.weautotools.common;
 
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -22,17 +22,20 @@ public abstract class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Instant createdAt;
-    private Instant  updatedAt;
+
+    private Instant updatedAt;
 
     /**
      * 逻辑删除标记
      * 0: 未删除, 1: 已删除
      */
+    @TableLogic
     private Integer deleted = 0;
 
+    @Version
     private Integer version = 0;
 }
