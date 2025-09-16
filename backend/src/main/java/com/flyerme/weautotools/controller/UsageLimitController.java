@@ -1,6 +1,5 @@
 package com.flyerme.weautotools.controller;
 
-import com.flyerme.weautotools.auth.JwtTokenProvider;
 import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.dto.UsageLimitCheckResponse;
 import com.flyerme.weautotools.dto.UsageLimitConfigRequest;
@@ -8,7 +7,6 @@ import com.flyerme.weautotools.dto.UsageLimitConfigResponse;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
 import com.flyerme.weautotools.service.UsageLimitService;
 import com.flyerme.weautotools.service.UsageLimitConfigService;
-import com.flyerme.weautotools.util.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 使用限制
+ * 使用限制控制器
+ * 使用新的BaseController和内部网关获取用户信息
  *
  * @author WeAutoTools Team
  * @version 1.0.2
@@ -28,35 +27,26 @@ import java.util.List;
 @RequestMapping("/api/usage-limits")
 @RequiredArgsConstructor
 @Slf4j
-public class UsageLimitController {
+public class UsageLimitController extends BaseController {
 
     private final UsageLimitService usageLimitService;
     private final UsageLimitConfigService usageLimitConfigService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 检查工具使用限制
+     * 使用新的用户信息获取方式
      */
     @GetMapping("/check")
     public Result<UsageLimitCheckResponse> checkUsageLimit(
             @RequestParam String toolName,
             HttpServletRequest request) {
         try {
-            String ipAddress = IpUtils.getClientIpAddress(request);
+            // 使用BaseController的方法获取用户信息
+            String userIdentifier = getUserIdentifier(request);
+            ToolUsageLimit.UserType userType = getUserType(request);
             
-            // 获取用户身份信息
-            String userIdentifier;
-            ToolUsageLimit.UserType userType;
-            
-            String token = JwtTokenProvider.extractTokenFromRequest(request);
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                Long userId = jwtTokenProvider.getUserIdFromJWT(token);
-                userIdentifier = "user:" + userId;
-                userType = ToolUsageLimit.UserType.LOGIN;
-            } else {
-                userIdentifier = "anonymous:" + IpUtils.hashIpAddress(ipAddress);
-                userType = ToolUsageLimit.UserType.ANONYMOUS;
-            }
+            log.debug("Checking usage limit for tool: {}, user: {}, type: {}", 
+                     toolName, userIdentifier, userType);
             
             // 检查限制
             boolean isExceeded = usageLimitService.isExceededLimit(userIdentifier, toolName, userType);

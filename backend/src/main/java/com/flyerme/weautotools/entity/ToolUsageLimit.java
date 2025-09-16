@@ -1,5 +1,7 @@
 package com.flyerme.weautotools.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.flyerme.weautotools.common.BaseEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,23 +12,31 @@ import lombok.EqualsAndHashCode;
  * 工具使用限制配置实体类
  *
  * @author WeAutoTools Team
- * @version 1.0.2
- * @since 2025-09-12
+ * @version 1.0.3
+ * @since 2025-09-16
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@TableName("tool_usage_limits")
 public class ToolUsageLimit extends BaseEntity {
 
     /**
-     * 工具类型
+     * 关联的工具ID
      */
-    @NotBlank(message = "工具类型不能为空")
+    @NotNull(message = "工具ID不能为空")
+    @TableField("tool_id")
+    private Long toolId;
+
+    /**
+     * 工具类型（保留用于兼容性，建议使用toolId）
+     */
+    @TableField("tool_type")
     private String toolType;
 
     /**
-     * 工具名称
+     * 工具名称（保留用于兼容性，建议使用toolId）
      */
-    @NotBlank(message = "工具名称不能为空")
+    @TableField("tool_name")
     private String toolName;
 
     /**

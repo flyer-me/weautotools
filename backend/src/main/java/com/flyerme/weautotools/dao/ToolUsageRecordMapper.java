@@ -13,22 +13,22 @@ import java.util.List;
  * 工具使用记录Mapper接口
  *
  * @author WeAutoTools Team
- * @version 1.0.2
- * @since 2025-09-12
+ * @version 1.0.3
+ * @since 2025-09-16
  */
 @Mapper
 public interface ToolUsageRecordMapper extends BaseMapper<ToolUsageRecord> {
 
     /**
-     * 统计指定时间范围内的使用次数
+     * 统计指定时间范围内的使用次数（基于toolId）
      */
     @Select("SELECT COUNT(*) FROM tool_usage_records WHERE user_identifier = #{userIdentifier} " +
-            "AND tool_name = #{toolName} AND usage_time >= #{startTime} AND usage_time <= #{endTime} " +
+            "AND tool_id = #{toolId} AND usage_time >= #{startTime} AND usage_time <= #{endTime} " +
             "AND deleted = 0")
-    long countUsageInTimeRange(@Param("userIdentifier") String userIdentifier,
-                              @Param("toolName") String toolName,
-                              @Param("startTime") LocalDateTime startTime,
-                              @Param("endTime") LocalDateTime endTime);
+    long countUsageByToolId(@Param("userIdentifier") String userIdentifier,
+                           @Param("toolId") Long toolId,
+                           @Param("startTime") LocalDateTime startTime,
+                           @Param("endTime") LocalDateTime endTime);
 
     /**
      * 查询指定时间范围内的使用记录
