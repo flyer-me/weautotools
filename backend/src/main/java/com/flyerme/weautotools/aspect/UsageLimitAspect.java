@@ -1,8 +1,10 @@
 package com.flyerme.weautotools.aspect;
 
 import com.flyerme.weautotools.annotation.UsageLimit;
-import com.flyerme.weautotools.auth.JwtTokenProvider;
+import com.flyerme.weautotools.auth.AuthConstants;
+import com.flyerme.weautotools.auth.AuthenticationCenterService;
 import com.flyerme.weautotools.common.Result;
+import com.flyerme.weautotools.dto.AuthenticatedUser;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
 import com.flyerme.weautotools.service.UsageLimitService;
 import com.flyerme.weautotools.util.IpUtils;
@@ -20,9 +22,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * 使用限制检查切面
  * 用于拦截带有@UsageLimit注解的方法，进行使用次数限制检查
+ * 使用统一的认证中心服务获取用户信息
  *
  * @author WeAutoTools Team
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025-09-12
  */
 @Aspect
@@ -32,10 +35,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class UsageLimitAspect {
 
     private final UsageLimitService usageLimitService;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthenticationCenterService authenticationCenterService;
 
     /**
      * 环绕通知，检查使用限制
+     * 使用统一认证服务获取用户信息
      */
     @Around("@annotation(usageLimit)")
     public Object checkUsageLimit(ProceedingJoinPoint joinPoint, UsageLimit usageLimit) throws Throwable {
@@ -48,27 +52,19 @@ public class UsageLimitAspect {
             }
             
             HttpServletRequest request = attributes.getRequest();
-            String ipAddress = IpUtils.getClientIpAddress(request);
-            String userAgent = request.getHeader("User-Agent");
             
-            // 获取用户身份信息
-            String userIdentifier;
-            ToolUsageLimit.UserType userType;
-            Long userId = null;
-            
-            // 尝试从JWT Token获取用户信息
-            String token = JwtTokenProvider.extractTokenFromRequest(request);
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                userId = jwtTokenProvider.getUserIdFromJWT(token);
-                userIdentifier = "user:" + userId;
-                userType = ToolUsageLimit.UserType.LOGIN;
-                log.debug("检测到登录用户: {}", userId);
-            } else {
-                // 匿名用户，使用IP地址哈希作为标识
-                userIdentifier = "anonymous:" + IpUtils.hashIpAddress(ipAddress);
-                userType = ToolUsageLimit.UserType.ANONYMOUS;
-                log.debug("检测到匿名用户，IP: {}", ipAddress);
+            // 使用统一认证服务获取用户信息
+            AuthenticatedUser user = authenticationCenterService.getCurrentUser(request);
+            if (user == null) {
+                log.warn("无法获取用户信息，创建匿名用户");
+                user = createFallbackAnonymousUser(request);
             }
+            
+            // 获取用户标识和类型
+            String userIdentifier = user.getUserIdentifier();
+            ToolUsageLimit.UserType userType = convertToUsageLimitUserType(user);
+            
+            log.debug("检测到用户: {}, 类型: {}", userIdentifier, userType);
             
             // 检查使用限制
             boolean isExceeded = usageLimitService.isExceededLimit(
@@ -83,14 +79,7 @@ public class UsageLimitAspect {
             }
             
             // 记录使用行为
-            usageLimitService.recordUsage(
-                userIdentifier, 
-                usageLimit.toolName(), 
-                userType,
-                userId,
-                ipAddress,
-                userAgent
-            );
+            usageLimitService.recordUsage(userIdentifier, usageLimit.toolName());
             
             log.debug("用户 {} 使用工具 {} 检查通过", userIdentifier, usageLimit.toolName());
             
@@ -104,8 +93,34 @@ public class UsageLimitAspect {
         }
     }
     
-
+    /**
+     * 将AuthenticatedUser的用户类型转换为ToolUsageLimit的用户类型
+     */
+    private ToolUsageLimit.UserType convertToUsageLimitUserType(AuthenticatedUser user) {
+        if (user == null || !user.isAuthenticated()) {
+            return ToolUsageLimit.UserType.ANONYMOUS;
+        }
+        
+        // 基于用户类型进行转换
+        String userType = user.getUserType();
+        if (AuthConstants.ROLE_USER.equals(userType) || AuthConstants.ROLE_ADMIN.equals(userType)) {
+            return ToolUsageLimit.UserType.LOGIN;
+        }
+        
+        return ToolUsageLimit.UserType.ANONYMOUS;
+    }
     
+    /**
+     * 创建备用匿名用户（当认证服务返回null时）
+     */
+    private AuthenticatedUser createFallbackAnonymousUser(HttpServletRequest request) {
+        String ipAddress = IpUtils.getClientIpAddress(request);
+        return AuthenticatedUser.builder()
+                .userType(AuthConstants.ROLE_ANONYMOUS)
+                .clientIp(ipAddress)
+                .build();
+    }
+
     /**
      * 创建限制超出的响应
      */

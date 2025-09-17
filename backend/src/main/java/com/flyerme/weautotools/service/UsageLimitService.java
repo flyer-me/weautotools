@@ -26,13 +26,8 @@ public interface UsageLimitService {
      *
      * @param userIdentifier 用户标识
      * @param toolName      工具名称
-     * @param userType      用户类型
-     * @param userId        用户ID (可选)
-     * @param ipAddress     IP地址
-     * @param userAgent     用户代理
      */
-    void recordUsage(String userIdentifier, String toolName, ToolUsageLimit.UserType userType, 
-                    Long userId, String ipAddress, String userAgent);
+    void recordUsage(String userIdentifier, String toolName);
 
     /**
      * 获取剩余使用次数

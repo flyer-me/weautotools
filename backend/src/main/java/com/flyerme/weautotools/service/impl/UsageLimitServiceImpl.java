@@ -1,9 +1,8 @@
 package com.flyerme.weautotools.service.impl;
 
 import com.flyerme.weautotools.dao.ToolUsageLimitMapper;
-import com.flyerme.weautotools.dao.ToolUsageRecordMapper;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
-import com.flyerme.weautotools.entity.ToolUsageRecord;
+import com.flyerme.weautotools.service.ToolService;
 import com.flyerme.weautotools.service.UsageLimitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,23 +27,31 @@ import java.util.concurrent.TimeUnit;
 public class UsageLimitServiceImpl implements UsageLimitService {
 
     private final ToolUsageLimitMapper toolUsageLimitMapper;
-    private final ToolUsageRecordMapper toolUsageRecordMapper;
     private final StringRedisTemplate redisTemplate;
+    private final ToolService toolService;
 
     @Override
     public boolean isExceededLimit(String userIdentifier, String toolName, ToolUsageLimit.UserType userType) {
         try {
-            // 获取限制配置
-            ToolUsageLimit dailyLimit = getUsageLimitByType(toolName, userType, ToolUsageLimit.LimitType.DAILY);
-            ToolUsageLimit hourlyLimit = getUsageLimitByType(toolName, userType, ToolUsageLimit.LimitType.HOURLY);
+            // 1. 获得tool_id
+            Long toolId = toolService.getToolIdByName(toolName);
+            if (toolId == null) {
+                log.warn("工具不存在: {}, 使用默认限制策略", toolName);
+                return isExceededDefaultLimit(userIdentifier, userType);
+            }
 
-            // 检查每日限制
+            // 2. 获取限制配置（优先使用tool_id查询）
+            ToolUsageLimit dailyLimit = getUsageLimitByToolIdAndType(toolId, userType, ToolUsageLimit.LimitType.DAILY);
+
+            // 3. 检查每日限制
             if (dailyLimit != null && isExceededDailyLimit(userIdentifier, toolName, dailyLimit.getLimitCount())) {
                 log.debug("用户 {} 工具 {} 超出每日限制", userIdentifier, toolName);
                 return true;
             }
 
-            // 检查每小时限制
+            ToolUsageLimit hourlyLimit = getUsageLimitByToolIdAndType(toolId, userType, ToolUsageLimit.LimitType.HOURLY);
+
+            // 4. 检查每小时限制
             if (hourlyLimit != null && isExceededHourlyLimit(userIdentifier, toolName, hourlyLimit.getLimitCount())) {
                 log.debug("用户 {} 工具 {} 超出每小时限制", userIdentifier, toolName);
                 return true;
@@ -52,41 +59,53 @@ public class UsageLimitServiceImpl implements UsageLimitService {
 
             return false;
         } catch (Exception e) {
-            log.error("检查使用限制(UsageLimitService)异常", e);
+            log.error("检查使用限制异常，工具: {}, 用户: {}", toolName, userIdentifier, e);
             // 异常情况下允许使用，避免因为限制检查导致业务中断
             return false;
         }
     }
 
     @Override
-    public void recordUsage(String userIdentifier, String toolName, ToolUsageLimit.UserType userType, 
-                           Long userId, String ipAddress, String userAgent) {
+    public void recordUsage(String userIdentifier, String toolName) {
         try {
-            // 更新Redis计数器
+            // 1. 获取工具ID
+            Long toolId = toolService.getToolIdByName(toolName);
+            if (toolId == null) {
+                log.warn("工具不存在: {}, 跳过使用记录", toolName);
+                return;
+            }
+
+            // 2. 更新Redis计数器（保持现有递增逻辑）
             incrementRedisCounter(userIdentifier, toolName, "daily");
             incrementRedisCounter(userIdentifier, toolName, "hourly");
-
-            // 异步记录到数据库
-            recordToDatabase(userIdentifier, toolName, userId, ipAddress, userAgent);
             
-            log.debug("记录用户 {} 使用工具 {}", userIdentifier, toolName);
+            log.debug("记录用户 {} 使用工具 {} (ID: {})", userIdentifier, toolName, toolId);
         } catch (Exception e) {
-            log.error("记录使用行为异常", e);
+            log.error("记录使用行为异常，工具: {}, 用户: {}", toolName, userIdentifier, e);
         }
     }
 
     @Override
     public int getRemainingUsage(String userIdentifier, String toolName, ToolUsageLimit.UserType userType) {
         try {
-            ToolUsageLimit dailyLimit = getUsageLimitByType(toolName, userType, ToolUsageLimit.LimitType.DAILY);
+            // 1. 获取工具ID
+            Long toolId = toolService.getToolIdByName(toolName);
+            if (toolId == null) {
+                log.warn("工具不存在: {}, 返回默认限制", toolName);
+                return getDefaultRemainingUsage(userIdentifier, userType);
+            }
+
+            // 2. 获取每日限制配置
+            ToolUsageLimit dailyLimit = getUsageLimitByToolIdAndType(toolId, userType, ToolUsageLimit.LimitType.DAILY);
             if (dailyLimit == null) {
                 return Integer.MAX_VALUE;
             }
 
+            // 3. 计算剩余使用次数
             int dailyUsed = getDailyUsageCount(userIdentifier, toolName);
             return Math.max(0, dailyLimit.getLimitCount() - dailyUsed);
         } catch (Exception e) {
-            log.error("获取剩余使用次数异常", e);
+            log.error("获取剩余使用次数异常，工具: {}, 用户: {}", toolName, userIdentifier, e);
             return 0;
         }
     }
@@ -104,17 +123,21 @@ public class UsageLimitServiceImpl implements UsageLimitService {
 
     @Override
     public ToolUsageLimit getUsageLimit(String toolName, ToolUsageLimit.UserType userType) {
-        return getUsageLimitByType(toolName, userType, ToolUsageLimit.LimitType.DAILY);
+        Long toolId = toolService.getToolIdByName(toolName);
+        if (toolId == null) {
+            log.warn("工具不存在: {}, 返回默认限制", toolName);
+            return getDefaultUsageLimit(userType);
+        }
+        return getUsageLimitByToolIdAndType(toolId, userType, ToolUsageLimit.LimitType.DAILY);
     }
 
     /**
      * 根据限制类型获取使用限制配置
      */
-    private ToolUsageLimit getUsageLimitByType(String toolName, ToolUsageLimit.UserType userType, 
-                                              ToolUsageLimit.LimitType limitType) {
-        // 1. 先查找具体工具的限制配置
-        List<ToolUsageLimit> limits = toolUsageLimitMapper.selectByToolNameAndUserType(
-            toolName, userType.name());
+    private ToolUsageLimit getUsageLimitByToolIdAndType(Long toolId, ToolUsageLimit.UserType userType, 
+                                                        ToolUsageLimit.LimitType limitType) {
+        // 1. 先查找具体工具的限制配置（优先使用tool_id查询）
+        List<ToolUsageLimit> limits = toolUsageLimitMapper.selectByToolIdAndUserType(toolId, userType.name());
         
         ToolUsageLimit specificLimit = limits.stream()
             .filter(limit -> limitType.name().equals(limit.getLimitType()))
@@ -125,21 +148,13 @@ public class UsageLimitServiceImpl implements UsageLimitService {
             return specificLimit;
         }
 
-        // 2. 查找工具类型的默认限制
-        String toolType = extractToolType(toolName);
-        List<ToolUsageLimit> typeLimits = toolUsageLimitMapper.selectByToolTypeAndUserType(
-            toolType, userType.name());
+        return getDefaultUsageLimitByType(userType, limitType);
+    }
 
-        ToolUsageLimit typeLimit = typeLimits.stream()
-            .filter(limit -> limitType.name().equals(limit.getLimitType()))
-            .findFirst()
-            .orElse(null);
-
-        if (typeLimit != null) {
-            return typeLimit;
-        }
-
-        // 3. 使用系统默认限制
+    /**
+     * 获取默认使用限制（按类型）
+     */
+    private ToolUsageLimit getDefaultUsageLimitByType(ToolUsageLimit.UserType userType, ToolUsageLimit.LimitType limitType) {
         List<ToolUsageLimit> defaultLimits = toolUsageLimitMapper.selectDefaultLimits(userType.name());
         return defaultLimits.stream()
             .filter(limit -> limitType.name().equals(limit.getLimitType()))
@@ -148,11 +163,33 @@ public class UsageLimitServiceImpl implements UsageLimitService {
     }
 
     /**
-     * 从工具名称提取工具类型
+     * 获取默认使用限制（返回每日限制）
      */
-    private String extractToolType(String toolName) {
-        //TODO: 业务扩展后添加不同的工具类型
-        return "DEFAULT";
+    private ToolUsageLimit getDefaultUsageLimit(ToolUsageLimit.UserType userType) {
+        return getDefaultUsageLimitByType(userType, ToolUsageLimit.LimitType.DAILY);
+    }
+
+    /**
+     * 检查是否超出默认限制
+     */
+    private boolean isExceededDefaultLimit(String userIdentifier, ToolUsageLimit.UserType userType) {
+        ToolUsageLimit dailyLimit = getDefaultUsageLimit(userType);
+        if (dailyLimit == null) {
+            return false; // 没有默认限制，不限制使用
+        }
+        return getDailyUsageCount(userIdentifier, "default") >= dailyLimit.getLimitCount();
+    }
+
+    /**
+     * 获取默认剩余使用次数
+     */
+    private int getDefaultRemainingUsage(String userIdentifier, ToolUsageLimit.UserType userType) {
+        ToolUsageLimit dailyLimit = getDefaultUsageLimit(userType);
+        if (dailyLimit == null) {
+            return Integer.MAX_VALUE;
+        }
+        int dailyUsed = getDailyUsageCount(userIdentifier, "default");
+        return Math.max(0, dailyLimit.getLimitCount() - dailyUsed);
     }
 
     /**
@@ -167,7 +204,9 @@ public class UsageLimitServiceImpl implements UsageLimitService {
      * 检查是否超出每小时限制
      */
     private boolean isExceededHourlyLimit(String userIdentifier, String toolName, int hourlyLimit) {
-        int hourlyUsed = getHourlyUsageCount(userIdentifier, toolName);
+        String key = buildRedisKey(userIdentifier, toolName, "hourly");
+        String count = redisTemplate.opsForValue().get(key);
+        int hourlyUsed = count != null ? Integer.parseInt(count) : 0;
         return hourlyUsed >= hourlyLimit;
     }
 
@@ -180,14 +219,6 @@ public class UsageLimitServiceImpl implements UsageLimitService {
         return count != null ? Integer.parseInt(count) : 0;
     }
 
-    /**
-     * 获取每小时使用次数
-     */
-    private int getHourlyUsageCount(String userIdentifier, String toolName) {
-        String key = buildRedisKey(userIdentifier, toolName, "hourly");
-        String count = redisTemplate.opsForValue().get(key);
-        return count != null ? Integer.parseInt(count) : 0;
-    }
 
     /**
      * 增加Redis计数器
@@ -222,23 +253,7 @@ public class UsageLimitServiceImpl implements UsageLimitService {
      * 构建Redis键
      */
     private String buildRedisKey(String userIdentifier, String toolName, String timeType) {
-        return String.format("limit:%s:%s:%s", userIdentifier, toolName, timeType);
+        return String.format("usage-limit:%s:%s:%s", userIdentifier, toolName, timeType);
     }
 
-    /**
-     * 记录到数据库
-     */
-    private void recordToDatabase(String userIdentifier, String toolName,
-                                  Long userId, String ipAddress, String userAgent) {
-        ToolUsageRecord record = new ToolUsageRecord();
-        record.setUserId(userId);
-        record.setUserIdentifier(userIdentifier);
-        record.setToolType(extractToolType(toolName));
-        record.setToolName(toolName);
-        record.setUsageTime(LocalDateTime.now());
-        record.setIpAddress(ipAddress);
-        record.setUserAgent(userAgent);
-        
-        toolUsageRecordMapper.insert(record);
-    }
 }

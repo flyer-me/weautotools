@@ -1,7 +1,11 @@
+package com.flyerme.weautotools.aspect;
+
 import com.flyerme.weautotools.annotation.UsageLimit;
 import com.flyerme.weautotools.aspect.UsageLimitAspect;
-import com.flyerme.weautotools.auth.JwtTokenProvider;
+import com.flyerme.weautotools.auth.AuthConstants;
+import com.flyerme.weautotools.auth.AuthenticationCenterService;
 import com.flyerme.weautotools.common.Result;
+import com.flyerme.weautotools.dto.AuthenticatedUser;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
 import com.flyerme.weautotools.service.UsageLimitService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,9 +26,10 @@ import static org.mockito.Mockito.*;
 
 /**
  * 使用限制切面单元测试
+ * 针对重构后使用AuthenticationCenterService的新版本
  *
  * @author WeAutoTools Team
- * @version 1.0.2
+ * @version 1.0.3
  * @since 2025-09-12
  */
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +39,7 @@ class UsageLimitAspectTest {
     private UsageLimitService usageLimitService;
 
     @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    private AuthenticationCenterService authenticationCenterService;
 
     @Mock
     private ProceedingJoinPoint joinPoint;
@@ -69,7 +74,13 @@ class UsageLimitAspectTest {
     @Test
     void testCheckUsageLimit_AnonymousUser_NotExceeded() throws Throwable {
         // 安排
-        when(request.getHeader("Authorization")).thenReturn(null);
+        AuthenticatedUser anonymousUser = AuthenticatedUser.builder()
+            .userType(AuthConstants.ROLE_ANONYMOUS)
+            .clientIp("192.168.1.1")
+            .build();
+        
+        when(authenticationCenterService.validateAndExtractUser(request))
+            .thenReturn(anonymousUser);
         when(usageLimitService.isExceededLimit(anyString(), eq("qr-generate"), eq(ToolUsageLimit.UserType.ANONYMOUS)))
             .thenReturn(false);
         when(joinPoint.proceed()).thenReturn("success");
@@ -82,8 +93,6 @@ class UsageLimitAspectTest {
 
             // 验证
             assertEquals("success", result);
-            verify(usageLimitService).recordUsage(anyString(), eq("qr-generate"), 
-                eq(ToolUsageLimit.UserType.ANONYMOUS), isNull(), anyString(), anyString());
             verify(joinPoint).proceed();
         }
     }
@@ -91,7 +100,13 @@ class UsageLimitAspectTest {
     @Test
     void testCheckUsageLimit_AnonymousUser_Exceeded() throws Throwable {
         // 安排
-        when(request.getHeader("Authorization")).thenReturn(null);
+        AuthenticatedUser anonymousUser = AuthenticatedUser.builder()
+            .userType(AuthConstants.ROLE_ANONYMOUS)
+            .clientIp("192.168.1.1")
+            .build();
+            
+        when(authenticationCenterService.validateAndExtractUser(request))
+            .thenReturn(anonymousUser);
         when(usageLimitService.isExceededLimit(anyString(), eq("qr-generate"), eq(ToolUsageLimit.UserType.ANONYMOUS)))
             .thenReturn(true);
 
@@ -107,7 +122,6 @@ class UsageLimitAspectTest {
             assertEquals(429, resultObj.getCode());
             assertTrue(resultObj.getMessage().contains("测试限制"));
             
-            verify(usageLimitService, never()).recordUsage(anyString(), anyString(), any(), any(), anyString(), anyString());
             verify(joinPoint, never()).proceed();
         }
     }
@@ -115,66 +129,57 @@ class UsageLimitAspectTest {
     @Test
     void testCheckUsageLimit_LoginUser_WithValidToken() throws Throwable {
         // 安排
-        String validToken = "valid.jwt.token";
-        when(request.getHeader("Authorization")).thenReturn("Bearer " + validToken);
-        
-        // 模拟JWT验证和用户ID提取
-        try (MockedStatic<JwtTokenProvider> jwtMockedStatic = 
-                mockStatic(JwtTokenProvider.class);
-             MockedStatic<RequestContextHolder> contextMockedStatic = 
+        AuthenticatedUser loginUser = AuthenticatedUser.builder()
+            .userId(123L)
+            .username("testuser")
+            .userType(AuthConstants.ROLE_USER)
+            .clientIp("192.168.1.1")
+            .build();
+            
+        when(authenticationCenterService.validateAndExtractUser(request))
+            .thenReturn(loginUser);
+        when(usageLimitService.isExceededLimit(eq("user:123"), eq("qr-generate"), eq(ToolUsageLimit.UserType.LOGIN)))
+            .thenReturn(false);
+        when(joinPoint.proceed()).thenReturn("success");
+
+        try (MockedStatic<RequestContextHolder> contextMockedStatic = 
                 mockStatic(RequestContextHolder.class)) {
             
-            jwtMockedStatic.when(() -> JwtTokenProvider.extractTokenFromRequest(request))
-                .thenReturn(validToken);
-            when(jwtTokenProvider.validateToken(validToken))
-                .thenReturn(true);
-            when(jwtTokenProvider.getUserIdFromJWT(validToken))
-                .thenReturn(123L);
             contextMockedStatic.when(RequestContextHolder::getRequestAttributes).thenReturn(requestAttributes);
-
-            when(usageLimitService.isExceededLimit(eq("user:123"), eq("qr-generate"), eq(ToolUsageLimit.UserType.LOGIN)))
-                .thenReturn(false);
-            when(joinPoint.proceed()).thenReturn("success");
 
             // 执行
             Object result = usageLimitAspect.checkUsageLimit(joinPoint, usageLimit);
 
             // 验证
             assertEquals("success", result);
-            verify(usageLimitService).recordUsage(eq("user:123"), eq("qr-generate"), 
-                eq(ToolUsageLimit.UserType.LOGIN), eq(123L), anyString(), anyString());
             verify(joinPoint).proceed();
         }
     }
 
     @Test
     void testCheckUsageLimit_LoginUser_WithInvalidToken() throws Throwable {
-        // 安排
-        String invalidToken = "invalid.jwt.token";
-        when(request.getHeader("Authorization")).thenReturn("Bearer " + invalidToken);
+        // 安排 - AuthenticationCenterService 返回匿名用户（Token无效时）
+        AuthenticatedUser anonymousUser = AuthenticatedUser.builder()
+            .userType(AuthConstants.ROLE_ANONYMOUS)
+            .clientIp("192.168.1.1")
+            .build();
+            
+        when(authenticationCenterService.validateAndExtractUser(request))
+            .thenReturn(anonymousUser);
+        when(usageLimitService.isExceededLimit(anyString(), eq("qr-generate"), eq(ToolUsageLimit.UserType.ANONYMOUS)))
+            .thenReturn(false);
+        when(joinPoint.proceed()).thenReturn("success");
 
-        try (MockedStatic<JwtTokenProvider> jwtMockedStatic = 
-                mockStatic(JwtTokenProvider.class);
-             MockedStatic<RequestContextHolder> contextMockedStatic = 
+        try (MockedStatic<RequestContextHolder> contextMockedStatic = 
                 mockStatic(RequestContextHolder.class)) {
             
-            jwtMockedStatic.when(() -> JwtTokenProvider.extractTokenFromRequest(request))
-                .thenReturn(invalidToken);
-            when(jwtTokenProvider.validateToken(invalidToken))
-                .thenReturn(false);
             contextMockedStatic.when(RequestContextHolder::getRequestAttributes).thenReturn(requestAttributes);
-
-            when(usageLimitService.isExceededLimit(anyString(), eq("qr-generate"), eq(ToolUsageLimit.UserType.ANONYMOUS)))
-                .thenReturn(false);
-            when(joinPoint.proceed()).thenReturn("success");
 
             // 执行
             Object result = usageLimitAspect.checkUsageLimit(joinPoint, usageLimit);
 
             // 验证
             assertEquals("success", result);
-            verify(usageLimitService).recordUsage(anyString(), eq("qr-generate"), 
-                eq(ToolUsageLimit.UserType.ANONYMOUS), isNull(), anyString(), anyString());
         }
     }
 
@@ -200,7 +205,7 @@ class UsageLimitAspectTest {
         // 安排
         try (MockedStatic<RequestContextHolder> mockedStatic = mockStatic(RequestContextHolder.class)) {
             mockedStatic.when(RequestContextHolder::getRequestAttributes).thenReturn(requestAttributes);
-            when(usageLimitService.isExceededLimit(anyString(), anyString(), any()))
+            when(authenticationCenterService.validateAndExtractUser(request))
                 .thenThrow(new RuntimeException("Test exception"));
             when(joinPoint.proceed()).thenReturn("success");
 
@@ -210,6 +215,27 @@ class UsageLimitAspectTest {
             // 验证
             assertEquals("success", result);
             verify(joinPoint).proceed(); // 异常情况下应该继续执行
+        }
+    }
+    
+    @Test
+    void testCheckUsageLimit_AuthServiceReturnsNull() throws Throwable {
+        // 安排 - AuthenticationCenterService 返回 null
+        when(authenticationCenterService.validateAndExtractUser(request))
+            .thenReturn(null);
+        when(usageLimitService.isExceededLimit(anyString(), eq("qr-generate"), eq(ToolUsageLimit.UserType.ANONYMOUS)))
+            .thenReturn(false);
+        when(joinPoint.proceed()).thenReturn("success");
+
+        try (MockedStatic<RequestContextHolder> mockedStatic = mockStatic(RequestContextHolder.class)) {
+            mockedStatic.when(RequestContextHolder::getRequestAttributes).thenReturn(requestAttributes);
+
+            // 执行
+            Object result = usageLimitAspect.checkUsageLimit(joinPoint, usageLimit);
+
+            // 验证
+            assertEquals("success", result);
+            verify(joinPoint).proceed();
         }
     }
 

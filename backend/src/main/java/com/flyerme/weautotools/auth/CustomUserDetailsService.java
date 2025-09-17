@@ -1,6 +1,7 @@
 package com.flyerme.weautotools.auth;
 
 import com.flyerme.weautotools.dao.UserMapper;
+import com.flyerme.weautotools.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +18,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userMapper.findByUsername(username)
+        User user = userMapper.selectByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPasswordHash())
+                .roles(user.getRole())
+                .build();
     }
 }

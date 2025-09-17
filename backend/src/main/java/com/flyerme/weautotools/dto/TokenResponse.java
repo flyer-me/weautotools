@@ -18,26 +18,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TokenResponse {
-    
-    /**
-     * 访问令牌
-     */
-    private String accessToken;
-    
-    /**
-     * 令牌过期时间（秒）
-     */
+
+    private String token;
+
     private Long expiresIn;
-    
-    /**
-     * 令牌类型，通常为 "Bearer"
-     */
+
     @Builder.Default
     private String tokenType = "Bearer";
-    
-    /**
-     * 认证用户信息
-     */
+
     private AuthenticatedUser user;
     
     /**
@@ -50,7 +38,7 @@ public class TokenResponse {
      */
     public static TokenResponse success(String accessToken, Long expiresIn, AuthenticatedUser user) {
         return TokenResponse.builder()
-                .accessToken(accessToken)
+                .token(accessToken)
                 .expiresIn(expiresIn)
                 .tokenType("Bearer")
                 .user(user)
@@ -62,7 +50,7 @@ public class TokenResponse {
      */
     public static TokenResponse withRefresh(String accessToken, String refreshToken, Long expiresIn, AuthenticatedUser user) {
         return TokenResponse.builder()
-                .accessToken(accessToken)
+                .token(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(expiresIn)
                 .tokenType("Bearer")

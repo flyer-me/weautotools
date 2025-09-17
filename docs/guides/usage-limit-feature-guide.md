@@ -238,7 +238,7 @@ public Result<String> performAction() {
 ### 1. 数据库迁移
 ```bash
 # 执行迁移脚本
-psql -d weautotools -f devops/database/migration/V1_0_2__Create_usage_limit_tables.sql
+
 ```
 
 ### 2. Redis配置

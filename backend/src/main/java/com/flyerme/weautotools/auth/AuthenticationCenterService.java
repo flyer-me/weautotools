@@ -4,17 +4,17 @@ import com.flyerme.weautotools.dto.AuthenticatedUser;
 import com.flyerme.weautotools.dto.TokenResponse;
 import com.flyerme.weautotools.entity.User;
 import com.flyerme.weautotools.util.IpUtils;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 认证中心服务 - 简化版
@@ -31,21 +31,27 @@ public class AuthenticationCenterService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenBlacklist jwtTokenBlacklist;
+    
+    @Value("${app.jwt.expiration-in-ms}")
+    private long jwtExpirationInMs;
 
     /**
      * 验证请求并提取用户信息
      */
+    @Nullable
     public AuthenticatedUser validateAndExtractUser(HttpServletRequest request) {
         try {
             String token = JwtTokenProvider.extractTokenFromRequest(request);
             if (token == null || jwtTokenBlacklist.isBlacklisted(token) || !jwtTokenProvider.validateToken(token)) {
-                return createAnonymousUser(request);
+                // return createAnonymousUser(request);
+                return null;
             }
 
             return extractUserFromToken(token, request);
         } catch (Exception e) {
             log.debug("Token validation failed: {}", e.getMessage());
-            return createAnonymousUser(request);
+            // return createAnonymousUser(request);
+            return null;
         }
     }
 
@@ -56,7 +62,11 @@ public class AuthenticationCenterService {
         String token = jwtTokenProvider.generateToken(authentication);
         User user = (User) authentication.getPrincipal();
         AuthenticatedUser authenticatedUser = convertToAuthenticatedUser(user);
-        return TokenResponse.success(token, 900L, authenticatedUser); // 15分钟
+        
+        // 计算过期时间（秒）- 与JWT实际过期时间保持一致
+        long expiresInSeconds = jwtExpirationInMs / 1000;
+        
+        return TokenResponse.success(token, expiresInSeconds, authenticatedUser);
     }
 
     /**
@@ -80,17 +90,6 @@ public class AuthenticationCenterService {
             return (AuthenticatedUser) userAttr;
         }
         return validateAndExtractUser(request);
-    }
-
-    /**
-     * 将用户信息设置到请求属性
-     */
-    public void setUserToRequest(HttpServletRequest request, AuthenticatedUser user) {
-        if (user != null) {
-            request.setAttribute(AuthConstants.USER_INFO, user);
-            request.setAttribute(AuthConstants.USER_ID, user.getUserId());
-            request.setAttribute(AuthConstants.CLIENT_IP, user.getClientIp());
-        }
     }
 
     // 私有辅助方法
@@ -121,9 +120,7 @@ public class AuthenticationCenterService {
     }
 
     private AuthenticatedUser convertToAuthenticatedUser(User user) {
-        List<String> authorities = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+        List<String> authorities = List.of(user.getRole() != null ? user.getRole() : AuthConstants.ROLE_USER);
 
         return AuthenticatedUser.builder()
                 .userId(user.getId())

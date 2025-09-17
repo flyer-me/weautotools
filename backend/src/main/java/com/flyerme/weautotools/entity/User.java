@@ -16,7 +16,9 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("users")
-public class User extends BaseEntity implements UserDetails  {
+public class User extends BaseEntity {
+
+    private String mobile;
 
     private String passwordHash;
 
@@ -30,8 +32,6 @@ public class User extends BaseEntity implements UserDetails  {
 
     private Boolean accountNonExpired = true;
 
-    private String mobile;
-
     private String nickname;
 
     private String avatarUrl;
@@ -39,43 +39,7 @@ public class User extends BaseEntity implements UserDetails  {
     @TableField(exist = false)
     private List<String> roles;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (roles == null) {
-            return List.of();
-        }
-        return roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return passwordHash;
-    }
-
-    @Override
     public String getUsername() {
         return mobile;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return credentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

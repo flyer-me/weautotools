@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 使用限制控制器
+ * UsageLimit
  * 使用新的BaseController和内部网关获取用户信息
  *
  * @author WeAutoTools Team

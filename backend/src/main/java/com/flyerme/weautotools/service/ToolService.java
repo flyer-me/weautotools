@@ -2,7 +2,6 @@ package com.flyerme.weautotools.service;
 
 import com.flyerme.weautotools.entity.Tool;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 工具服务接口
@@ -14,34 +13,14 @@ import java.util.Optional;
 public interface ToolService {
 
     /**
-     * 根据工具代码获取工具
-     */
-    Optional<Tool> getByToolCode(String toolCode);
-
-    /**
      * 根据工具类型获取工具列表
      */
     List<Tool> getByToolType(String toolType);
 
     /**
-     * 根据工具分类获取工具列表
-     */
-    List<Tool> getByCategory(String category);
-
-    /**
      * 获取所有活跃工具
      */
     List<Tool> getActiveTools();
-
-    /**
-     * 获取前端工具列表
-     */
-    List<Tool> getFrontendTools();
-
-    /**
-     * 获取后端工具列表
-     */
-    List<Tool> getBackendTools();
 
     /**
      * 根据状态获取工具列表
@@ -68,15 +47,6 @@ public interface ToolService {
      */
     boolean deleteTool(Long id);
 
-    /**
-     * 根据工具代码获取工具ID
-     */
-    Long getToolIdByCode(String toolCode);
-
-    /**
-     * 检查工具代码是否存在
-     */
-    boolean existsByToolCode(String toolCode);
 
     /**
      * 统计各状态的工具数量
@@ -86,5 +56,30 @@ public interface ToolService {
     /**
      * 统计各分类的工具数量
      */
-    java.util.Map<String, Integer> countByCategory();
+    java.util.Map<String, Integer> countByType();
+
+    /**
+     * 根据工具名称获取工具
+     *
+     * @param toolName 工具名称（实际映射到tool_code字段）
+     * @return 工具实体
+     */
+
+    List<Tool> getByToolName(String toolName);
+
+    /**
+     * 根据工具名称获取工具ID（兼容性方法）
+     * 
+     * @param toolName 工具名称
+     * @return 工具ID，不存在则返回null
+     */
+    Long getToolIdByName(String toolName);
+
+    /**
+     * 检查工具名称是否存在
+     * 
+     * @param toolName 工具名称
+     * @return 是否存在
+     */
+    boolean existsByToolName(String toolName);
 }

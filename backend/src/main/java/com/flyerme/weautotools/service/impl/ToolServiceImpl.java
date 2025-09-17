@@ -1,16 +1,15 @@
 package com.flyerme.weautotools.service.impl;
 
+import com.flyerme.weautotools.common.BusinessException;
 import com.flyerme.weautotools.entity.Tool;
-import com.flyerme.weautotools.mapper.ToolMapper;
+import com.flyerme.weautotools.dao.ToolMapper;
 import com.flyerme.weautotools.service.ToolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -28,34 +27,16 @@ public class ToolServiceImpl implements ToolService {
     private final ToolMapper toolMapper;
 
     @Override
-    public Optional<Tool> getByToolCode(String toolCode) {
-        return Optional.ofNullable(toolMapper.selectByToolCode(toolCode));
-    }
-
-    @Override
     public List<Tool> getByToolType(String toolType) {
         return toolMapper.selectByToolType(toolType);
     }
 
-    @Override
-    public List<Tool> getByCategory(String category) {
-        return toolMapper.selectByCategory(category);
-    }
 
     @Override
     public List<Tool> getActiveTools() {
         return toolMapper.selectActiveTools();
     }
 
-    @Override
-    public List<Tool> getFrontendTools() {
-        return toolMapper.selectFrontendTools();
-    }
-
-    @Override
-    public List<Tool> getBackendTools() {
-        return toolMapper.selectBackendTools();
-    }
 
     @Override
     public List<Tool> getByStatus(String status) {
@@ -68,28 +49,24 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    @Transactional
     public Tool createTool(Tool tool) {
-        // 检查工具代码是否已存在
-        if (existsByToolCode(tool.getToolCode())) {
-            throw new IllegalArgumentException("工具代码已存在: " + tool.getToolCode());
+        // 检查是否已存在
+        if (existsByToolName(tool.getToolName())) {
+            throw new BusinessException("ToolName已存在: " + tool.getToolName());
         }
-        
         toolMapper.insert(tool);
-        log.info("创建工具成功: {}", tool.getToolCode());
+        log.info("创建tool成功: {}", tool.getId());
         return tool;
     }
 
     @Override
-    @Transactional
     public Tool updateTool(Tool tool) {
         toolMapper.updateById(tool);
-        log.info("更新工具成功: {}", tool.getToolCode());
+        log.info("更新工具成功: {}", tool.getId());
         return tool;
     }
 
     @Override
-    @Transactional
     public boolean deleteTool(Long id) {
         Tool tool = toolMapper.selectById(id);
         if (tool != null) {
@@ -102,18 +79,6 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public Long getToolIdByCode(String toolCode) {
-        return getByToolCode(toolCode)
-                .map(Tool::getId)
-                .orElse(null);
-    }
-
-    @Override
-    public boolean existsByToolCode(String toolCode) {
-        return toolMapper.existsByToolCode(toolCode) > 0;
-    }
-
-    @Override
     public Map<String, Integer> countByStatus() {
         return toolMapper.countByStatus().stream()
                 .collect(Collectors.toMap(
@@ -123,11 +88,26 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public Map<String, Integer> countByCategory() {
-        return toolMapper.countByCategory().stream()
+    public Map<String, Integer> countByType() {
+        return toolMapper.countByType().stream()
                 .collect(Collectors.toMap(
                     item -> (String) item.get("category"),
                     item -> ((Number) item.get("count")).intValue()
                 ));
+    }
+
+    @Override
+    public List<Tool> getByToolName(String toolName) {
+        return toolMapper.selectByToolName(toolName);
+    }
+
+    @Override
+    public Long getToolIdByName(String toolName) {
+        return 0L;
+    }
+
+    @Override
+    public boolean existsByToolName(String toolName) {
+        return toolMapper.existsByToolName(toolName);
     }
 }

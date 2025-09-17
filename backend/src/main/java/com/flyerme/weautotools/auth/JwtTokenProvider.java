@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -35,7 +36,9 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
                 .claim("userId", userPrincipal.getId())
-                .claim("roles", userPrincipal.getRoles())
+                .claim("roles", authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(getSigningKey())

@@ -36,23 +36,6 @@ public class ToolController {
         return Result.success(tools);
     }
 
-    @GetMapping("/category/{category}")
-    public Result<List<Tool>> getToolsByCategory(@PathVariable String category) {
-        List<Tool> tools = toolService.getByCategory(category);
-        return Result.success(tools);
-    }
-
-    @GetMapping("/frontend")
-    public Result<List<Tool>> getFrontendTools() {
-        List<Tool> tools = toolService.getFrontendTools();
-        return Result.success(tools);
-    }
-
-    @GetMapping("/backend")
-    public Result<List<Tool>> getBackendTools() {
-        List<Tool> tools = toolService.getBackendTools();
-        return Result.success(tools);
-    }
 
     @GetMapping("/status/{status}")
     public Result<List<Tool>> getToolsByStatus(@PathVariable String status) {
@@ -64,13 +47,6 @@ public class ToolController {
     public Result<List<Tool>> searchTools(@RequestParam String keyword) {
         List<Tool> tools = toolService.searchByKeyword(keyword);
         return Result.success(tools);
-    }
-
-    @GetMapping("/{toolCode}")
-    public Result<Tool> getToolByCode(@PathVariable String toolCode) {
-        return toolService.getByToolCode(toolCode)
-                .map(Result::success)
-                .orElse(Result.error("工具不存在"));
     }
 
     @PostMapping
@@ -92,9 +68,9 @@ public class ToolController {
         return deleted ? Result.success("工具删除成功") : Result.error("工具不存在");
     }
 
-    @GetMapping("/exists/{toolCode}")
-    public Result<Boolean> existsByToolCode(@PathVariable String toolCode) {
-        Boolean exists = toolService.existsByToolCode(toolCode);
+    @GetMapping("/exists/{toolName}")
+    public Result<Boolean> existsByToolCode(@PathVariable String toolName) {
+        Boolean exists = toolService.existsByToolName(toolName);
         return Result.success(exists);
     }
 
@@ -104,15 +80,9 @@ public class ToolController {
         return Result.success(stats);
     }
 
-    @GetMapping("/stats/category")
-    public Result<Map<String, Integer>> countByCategory() {
-        Map<String, Integer> stats = toolService.countByCategory();
+    @GetMapping("/stats/type")
+    public Result<Map<String, Integer>> countByType() {
+        Map<String, Integer> stats = toolService.countByType();
         return Result.success(stats);
-    }
-
-    @GetMapping("/{toolCode}/id")
-    public Result<Long> getToolIdByCode(@PathVariable String toolCode) {
-        Long toolId = toolService.getToolIdByCode(toolCode);
-        return toolId != null ? Result.success(toolId) : Result.error("工具不存在");
     }
 }

@@ -20,12 +20,6 @@ import jakarta.validation.constraints.NotNull;
 public class Tool extends BaseEntity {
 
     /**
-     * 工具代码（唯一标识）
-     */
-    @NotBlank(message = "工具代码不能为空")
-    private String toolCode;
-
-    /**
      * 工具名称
      */
     @NotBlank(message = "工具名称不能为空")
@@ -43,20 +37,11 @@ public class Tool extends BaseEntity {
     private String description;
 
     /**
-     * 工具分类
-     */
-    private String category;
-
-    /**
      * 工具状态
      */
     @NotNull(message = "工具状态不能为空")
     private String status = ToolStatus.ACTIVE.name();
 
-    /**
-     * 是否为前端工具
-     */
-    private Boolean isFrontend = false;
 
     /**
      * 工具状态枚举
@@ -71,21 +56,15 @@ public class Tool extends BaseEntity {
      * 工具类型枚举
      */
     public enum ToolType {
-        QR_CODE,        // 二维码工具
-        IMAGE_PROCESS,  // 图片处理工具
-        DATA_CONVERT,   // 数据转换工具
+        FILE_CONVERT,   // 文件转换
+        QR_CODE,        // 二维码
+        IMAGE_PROCESS,  // 图片处理
+        MEDIA_PROCESS,  // 媒体处理
+        DATA_EDIT,       // 数据处理
+        DATA_CONVERT,   // 数据转换
         DEFAULT         // 默认工具
     }
 
-    /**
-     * 工具分类枚举
-     */
-    public enum ToolCategory {
-        QRCODE,    // 二维码
-        IMAGE,     // 图片处理
-        DATA,      // 数据处理
-        BASE       // 基础工具
-    }
 
     /**
      * 便捷方法：设置工具状态（使用枚举）
@@ -123,35 +102,8 @@ public class Tool extends BaseEntity {
         }
     }
 
-    /**
-     * 便捷方法：设置工具分类（使用枚举）
-     */
-    public void setCategory(ToolCategory category) {
-        this.category = category.name().toLowerCase();
-    }
-
-    /**
-     * 便捷方法：获取工具分类枚举
-     */
-    public ToolCategory getCategoryEnum() {
-        try {
-            return ToolCategory.valueOf(this.category.toUpperCase());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return ToolCategory.BASE; // 默认分类
-        }
-    }
-
-    /**
-     * 判断是否为活跃状态
-     */
     public boolean isActive() {
         return ToolStatus.ACTIVE.name().equals(this.status);
     }
 
-    /**
-     * 判断是否为前端工具
-     */
-    public boolean isFrontendTool() {
-        return Boolean.TRUE.equals(this.isFrontend);
-    }
 }
