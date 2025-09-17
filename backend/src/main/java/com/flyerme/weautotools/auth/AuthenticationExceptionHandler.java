@@ -98,7 +98,7 @@ public class AuthenticationExceptionHandler {
             return Result.error(ResultCode.AUTH_TOKEN_EXPIRED);
         } else if (ex instanceof io.jsonwebtoken.MalformedJwtException) {
             return Result.error(ResultCode.AUTH_TOKEN_MALFORMED);
-        } else if (ex instanceof io.jsonwebtoken.SignatureException) {
+        } else if (ex instanceof io.jsonwebtoken.security.SignatureException) {
             return Result.error(ResultCode.AUTH_TOKEN_SIGNATURE_INVALID);
         } else {
             return Result.error(ResultCode.AUTH_TOKEN_INVALID);
