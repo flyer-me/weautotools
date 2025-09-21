@@ -1,6 +1,7 @@
 package com.flyerme.weautotools.aspect;
 
 import com.flyerme.weautotools.annotation.UsageLimit;
+import com.flyerme.weautotools.auth.IdentifierResolver;
 import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.dto.AuthInfo;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
@@ -11,7 +12,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -25,11 +26,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * @since 2025-09-12
  */
 @Aspect
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class UsageLimitAspect {
 
     private final UsageLimitService usageLimitService;
+    private final IdentifierResolver identifierResolver;
 
     /**
      * 环绕通知，检查使用限制
@@ -46,7 +49,7 @@ public class UsageLimitAspect {
             }
 
             // 获取用户信息
-            AuthInfo authInfo = AuthInfo.ANONYMOUS; // TODO
+            AuthInfo authInfo = identifierResolver.getCurrentUserIdentifier();
             String userIdentifier = authInfo.userIdentifier();
             ToolUsageLimit.UserType userType = authInfo.authenticated() ?
                 ToolUsageLimit.UserType.LOGIN : ToolUsageLimit.UserType.ANONYMOUS;

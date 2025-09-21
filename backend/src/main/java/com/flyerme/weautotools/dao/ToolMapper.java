@@ -2,13 +2,11 @@ package com.flyerme.weautotools.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.flyerme.weautotools.entity.Tool;
-import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 工具数据访问层接口

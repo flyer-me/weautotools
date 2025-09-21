@@ -1,16 +1,14 @@
 package com.flyerme.weautotools.service.impl;
 
 import com.flyerme.weautotools.common.BusinessException;
-import com.flyerme.weautotools.entity.Tool;
 import com.flyerme.weautotools.dao.ToolMapper;
+import com.flyerme.weautotools.entity.Tool;
 import com.flyerme.weautotools.service.ToolService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 工具服务实现类

@@ -2,8 +2,6 @@ package com.flyerme.weautotools.dto;
 
 import jakarta.validation.constraints.*;
 
-import static com.flyerme.weautotools.dto.RegisterType.PHONE;
-
 /**
  * 用户注册请求DTO
  *

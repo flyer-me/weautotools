@@ -6,8 +6,8 @@ import com.flyerme.weautotools.dto.UsageLimitCheckResponse;
 import com.flyerme.weautotools.dto.UsageLimitConfigRequest;
 import com.flyerme.weautotools.dto.UsageLimitConfigResponse;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
-import com.flyerme.weautotools.service.UsageLimitService;
 import com.flyerme.weautotools.service.UsageLimitConfigService;
+import com.flyerme.weautotools.service.UsageLimitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +34,13 @@ public class UsageLimitController extends BaseController {
 
     /**
      * 检查工具使用限制
-     * 使用新的用户信息获取方式
      */
     @GetMapping("/check")
     public Result<UsageLimitCheckResponse> checkUsageLimit(
             @RequestParam String toolName) {
         try {
             // 使用BaseController的方法获取用户信息
-            AuthInfo authInfo = AuthInfo.ANONYMOUS; // TODO
+            AuthInfo authInfo = getCurrentUserIdentifier();
             String userIdentifier = authInfo.userIdentifier();
             ToolUsageLimit.UserType userType = authInfo.authenticated() ?
                     ToolUsageLimit.UserType.LOGIN : ToolUsageLimit.UserType.ANONYMOUS;

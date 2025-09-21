@@ -2,7 +2,6 @@ package com.flyerme.weautotools.auth;
 
 import com.flyerme.weautotools.dao.RoleMapper;
 import com.flyerme.weautotools.dao.UserMapper;
-import com.flyerme.weautotools.entity.Role;
 import com.flyerme.weautotools.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -57,10 +54,5 @@ public class CustomUserDetailsService implements UserDetailsService {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .toList();
-        /*
-        return user.getRoles().stream()
-                .map(role -> (GrantedAuthority) role::getName)
-                .collect(Collectors.toList());
-         */
     }
 }

@@ -1,7 +1,6 @@
 package com.flyerme.weautotools.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
 import lombok.Data;
 
 @Data

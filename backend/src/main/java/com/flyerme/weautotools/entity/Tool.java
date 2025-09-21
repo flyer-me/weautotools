@@ -2,10 +2,10 @@ package com.flyerme.weautotools.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.flyerme.weautotools.common.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 工具实体类

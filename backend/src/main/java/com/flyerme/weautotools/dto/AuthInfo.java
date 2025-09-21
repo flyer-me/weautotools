@@ -1,11 +1,11 @@
 package com.flyerme.weautotools.dto;
 
+/**
+ * 认证信息 authenticated = true时，字段均有效，否则userId为null
+ */
 public record AuthInfo(
         boolean authenticated,
-        String userIdentifier,
-        String username,
-        Object principal
+        Long userId,
+        String userIdentifier
 ) {
-    public static final AuthInfo ANONYMOUS = new AuthInfo(
-            false, "ANONYMOUS", "anonymousUser", null);
 }

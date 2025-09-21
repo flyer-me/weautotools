@@ -1,7 +1,7 @@
 package com.flyerme.weautotools.controller;
 
-import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.common.PageResult;
+import com.flyerme.weautotools.common.Result;
 import com.flyerme.weautotools.dto.ClickCounterRequest;
 import com.flyerme.weautotools.dto.ClickCounterResponse;
 import com.flyerme.weautotools.dto.ClickCounterStatistics;
