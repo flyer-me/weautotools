@@ -115,7 +115,9 @@ CREATE TABLE IF NOT EXISTS users (
     nickname                VARCHAR(50),
     avatar_url              TEXT,
     create_at               TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
-    update_at               TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP
+    update_at               TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP,
+    deleted     INTEGER      NOT NULL DEFAULT 0,
+    version     INTEGER      NOT NULL DEFAULT 0
 );
 
 -- 表注释
@@ -159,3 +161,19 @@ COMMENT ON COLUMN user_bindings.raw_info IS '原始信息';
 COMMENT ON COLUMN user_bindings.create_at IS '创建时间';
 COMMENT ON COLUMN user_bindings.update_at IS '更新时间';
 
+
+CREATE TABLE roles (
+                       id BIGSERIAL PRIMARY KEY,
+                       name VARCHAR(50) UNIQUE NOT NULL, -- 如 "ADMIN", "USER"
+                       description VARCHAR(255),
+                       created_time TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO roles (name, description) VALUES ('ROLE_USER', '普通角色');
+INSERT INTO roles (name, description) VALUES ('ROLE_ADMIN', '管理员');
+
+drop table if exists user_roles;
+CREATE TABLE user_roles (
+                            user_id BIGINT NOT NULL,
+                            role_id BIGINT NOT NULL,
+                            PRIMARY KEY (user_id, role_id)
+);

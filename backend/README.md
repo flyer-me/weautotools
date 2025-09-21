@@ -54,7 +54,7 @@ src/main/java/com/flyerme/weautotools/
 ### 启动端口
 
 - 开发环境: `8080`
-- 上下文路径: `/api`
+- 上下文路径: ``
 
 ## 快速开始
 
@@ -90,8 +90,8 @@ GRANT ALL PRIVILEGES ON DATABASE weautotools TO weautotools;
 ### 4. 验证启动
 
 访问健康检查接口：
-- http://localhost:8080/api/health
-- http://localhost:8080/api/health/hello
+- http://localhost:8080/health
+- http://localhost:8080/health/hello
 
 ## 开发指南
 
@@ -126,7 +126,7 @@ GRANT ALL PRIVILEGES ON DATABASE weautotools TO weautotools;
 
 1. **创建计数器**
    ```
-   POST /api/click-counter
+   POST /click-counter
    Content-Type: application/json
 
    {
@@ -138,31 +138,31 @@ GRANT ALL PRIVILEGES ON DATABASE weautotools TO weautotools;
 
 2. **点击计数**
    ```
-   POST /api/click-counter/{id}/click
-   POST /api/click-counter/name/{counterName}/click
+   POST /click-counter/{id}/click
+   POST /click-counter/name/{counterName}/click
    ```
 
 3. **查询计数器**
    ```
-   GET /api/click-counter                    # 获取所有计数器
-   GET /api/click-counter/{id}               # 根据ID获取
-   GET /api/click-counter/name/{counterName} # 根据名称获取
-   GET /api/click-counter/enabled            # 获取启用的计数器
-   GET /api/click-counter/statistics         # 获取统计信息
+   GET /click-counter                    # 获取所有计数器
+   GET /click-counter/{id}               # 根据ID获取
+   GET /click-counter/name/{counterName} # 根据名称获取
+   GET /click-counter/enabled            # 获取启用的计数器
+   GET /click-counter/statistics         # 获取统计信息
    ```
 
 4. **管理计数器**
    ```
-   PUT /api/click-counter/{id}     # 更新计数器
-   DELETE /api/click-counter/{id}  # 删除计数器
-   POST /api/click-counter/{id}/reset  # 重置计数器
+   PUT /click-counter/{id}     # 更新计数器
+   DELETE /click-counter/{id}  # 删除计数器
+   POST /click-counter/{id}/reset  # 重置计数器
    ```
 
 5. **高级查询**
    ```
-   GET /api/click-counter/page?page=1&size=10  # 分页查询
-   GET /api/click-counter/search?enabled=true&counterName=test  # 条件查询
-   GET /api/click-counter/top?limit=5  # 获取点击数最多的计数器
+   GET /click-counter/page?page=1&size=10  # 分页查询
+   GET /click-counter/search?enabled=true&counterName=test  # 条件查询
+   GET /click-counter/top?limit=5  # 获取点击数最多的计数器
    ```
 
 #### 数据库表结构
@@ -185,9 +185,9 @@ CREATE TABLE click_counter (
 ### 监控端点
 
 Spring Boot Actuator 端点：
-- `/api/actuator/health` - 健康检查
-- `/api/actuator/info` - 应用信息
-- `/api/actuator/metrics` - 指标信息
+- `/actuator/health` - 健康检查
+- `/actuator/info` - 应用信息
+- `/actuator/metrics` - 指标信息
 
 ## 构建部署
 

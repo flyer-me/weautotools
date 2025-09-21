@@ -5,6 +5,10 @@ spring:
   jackson:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
     time-zone: UTC
+    mapper:
+      ACCEPT_CASE_INSENSITIVE_ENUMS: true
+    deserialization:
+      READ_UNKNOWN_ENUM_VALUES_AS_NULL: true
   datasource:
     url: jdbc:postgresql://localhost:5432/weautotools
     username: ${DB_USERNAME:weautotools}
@@ -23,23 +27,27 @@ spring:
               max-idle: 10
               min-idle: 5
               max-wait: 3000ms
-
-# JWT 配置
-app:
-  jwt:
-    secret: ThisIsASecretKeyForJwtGenerationWhichIsLongEnough
-    expiration-in-ms: 86400000 # 24 hours
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
 
 # 服务器配置
 server:
   port: 8080
 
-# MyBatis配置
 mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field:  deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
   configuration:
     map-underscore-to-camel-case: true
 
-# 日志配置
+
 logging:
   level:
     com.flyerme.weautotools: debug

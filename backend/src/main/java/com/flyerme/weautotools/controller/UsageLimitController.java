@@ -1,13 +1,13 @@
 package com.flyerme.weautotools.controller;
 
 import com.flyerme.weautotools.common.Result;
+import com.flyerme.weautotools.dto.AuthInfo;
 import com.flyerme.weautotools.dto.UsageLimitCheckResponse;
 import com.flyerme.weautotools.dto.UsageLimitConfigRequest;
 import com.flyerme.weautotools.dto.UsageLimitConfigResponse;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
 import com.flyerme.weautotools.service.UsageLimitService;
 import com.flyerme.weautotools.service.UsageLimitConfigService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2025-09-12
  */
 @RestController
-@RequestMapping("/api/usage-limits")
+@RequestMapping("/usage-limits")
 @RequiredArgsConstructor
 @Slf4j
 public class UsageLimitController extends BaseController {
@@ -38,14 +38,15 @@ public class UsageLimitController extends BaseController {
      */
     @GetMapping("/check")
     public Result<UsageLimitCheckResponse> checkUsageLimit(
-            @RequestParam String toolName,
-            HttpServletRequest request) {
+            @RequestParam String toolName) {
         try {
             // 使用BaseController的方法获取用户信息
-            String userIdentifier = getUserIdentifier(request);
-            ToolUsageLimit.UserType userType = getUserType(request);
+            AuthInfo authInfo = AuthInfo.ANONYMOUS; // TODO
+            String userIdentifier = authInfo.userIdentifier();
+            ToolUsageLimit.UserType userType = authInfo.authenticated() ?
+                    ToolUsageLimit.UserType.LOGIN : ToolUsageLimit.UserType.ANONYMOUS;
             
-            log.debug("Checking usage limit for tool: {}, user: {}, type: {}", 
+            log.debug("Checking usage limit for tool: {}, user: {}, type: {}",
                      toolName, userIdentifier, userType);
             
             // 检查限制

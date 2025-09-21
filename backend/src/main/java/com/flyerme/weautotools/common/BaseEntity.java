@@ -22,7 +22,6 @@ public abstract class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Instant createdAt;

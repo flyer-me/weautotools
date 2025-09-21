@@ -1,45 +1,39 @@
 package com.flyerme.weautotools.aspect;
 
 import com.flyerme.weautotools.annotation.UsageLimit;
-import com.flyerme.weautotools.auth.AuthConstants;
-import com.flyerme.weautotools.auth.AuthenticationCenterService;
 import com.flyerme.weautotools.common.Result;
-import com.flyerme.weautotools.dto.AuthenticatedUser;
+import com.flyerme.weautotools.dto.AuthInfo;
 import com.flyerme.weautotools.entity.ToolUsageLimit;
 import com.flyerme.weautotools.service.UsageLimitService;
-import com.flyerme.weautotools.util.IpUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 使用限制检查切面
  * 用于拦截带有@UsageLimit注解的方法，进行使用次数限制检查
- * 使用统一的认证中心服务获取用户信息
+ * 使用简化的认证中心服务获取用户信息
  *
  * @author WeAutoTools Team
- * @version 1.0.3
+ * @version 1.0.4
  * @since 2025-09-12
  */
 @Aspect
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class UsageLimitAspect {
 
     private final UsageLimitService usageLimitService;
-    private final AuthenticationCenterService authenticationCenterService;
 
     /**
      * 环绕通知，检查使用限制
-     * 使用统一认证服务获取用户信息
+     * 使用简化的认证服务获取用户信息
      */
     @Around("@annotation(usageLimit)")
     public Object checkUsageLimit(ProceedingJoinPoint joinPoint, UsageLimit usageLimit) throws Throwable {
@@ -50,19 +44,12 @@ public class UsageLimitAspect {
                 log.warn("无法获取HTTP请求信息，跳过使用限制检查");
                 return joinPoint.proceed();
             }
-            
-            HttpServletRequest request = attributes.getRequest();
-            
-            // 使用统一认证服务获取用户信息
-            AuthenticatedUser user = authenticationCenterService.getCurrentUser(request);
-            if (user == null) {
-                log.warn("无法获取用户信息，创建匿名用户");
-                user = createFallbackAnonymousUser(request);
-            }
-            
-            // 获取用户标识和类型
-            String userIdentifier = user.getUserIdentifier();
-            ToolUsageLimit.UserType userType = convertToUsageLimitUserType(user);
+
+            // 获取用户信息
+            AuthInfo authInfo = AuthInfo.ANONYMOUS; // TODO
+            String userIdentifier = authInfo.userIdentifier();
+            ToolUsageLimit.UserType userType = authInfo.authenticated() ?
+                ToolUsageLimit.UserType.LOGIN : ToolUsageLimit.UserType.ANONYMOUS;
             
             log.debug("检测到用户: {}, 类型: {}", userIdentifier, userType);
             
@@ -93,34 +80,6 @@ public class UsageLimitAspect {
         }
     }
     
-    /**
-     * 将AuthenticatedUser的用户类型转换为ToolUsageLimit的用户类型
-     */
-    private ToolUsageLimit.UserType convertToUsageLimitUserType(AuthenticatedUser user) {
-        if (user == null || !user.isAuthenticated()) {
-            return ToolUsageLimit.UserType.ANONYMOUS;
-        }
-        
-        // 基于用户类型进行转换
-        String userType = user.getUserType();
-        if (AuthConstants.ROLE_USER.equals(userType) || AuthConstants.ROLE_ADMIN.equals(userType)) {
-            return ToolUsageLimit.UserType.LOGIN;
-        }
-        
-        return ToolUsageLimit.UserType.ANONYMOUS;
-    }
-    
-    /**
-     * 创建备用匿名用户（当认证服务返回null时）
-     */
-    private AuthenticatedUser createFallbackAnonymousUser(HttpServletRequest request) {
-        String ipAddress = IpUtils.getClientIpAddress(request);
-        return AuthenticatedUser.builder()
-                .userType(AuthConstants.ROLE_ANONYMOUS)
-                .clientIp(ipAddress)
-                .build();
-    }
-
     /**
      * 创建限制超出的响应
      */

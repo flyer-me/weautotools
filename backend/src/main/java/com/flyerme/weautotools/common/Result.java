@@ -88,14 +88,14 @@ public class Result<T> implements Serializable {
      * 失败响应
      */
     public static <T> Result<T> error() {
-        return new Result<>(ResultCode.INTERNAL_SERVER_ERROR.getCode(), ResultCode.INTERNAL_SERVER_ERROR.getMessage());
+        return new Result<>(ResultCode.BUSINESS_ERROR.getCode(), ResultCode.INTERNAL_SERVER_ERROR.getMessage());
     }
 
     /**
      * 失败响应，自定义消息
      */
     public static <T> Result<T> error(String message) {
-        return new Result<>(ResultCode.INTERNAL_SERVER_ERROR.getCode(), message);
+        return new Result<>(ResultCode.BUSINESS_ERROR.getCode(), message);
     }
 
     /**

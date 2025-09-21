@@ -49,6 +49,8 @@ public enum ResultCode {
     DATA_NOT_FOUND(1001, "数据不存在"),
     DATA_ALREADY_EXISTS(1002, "数据已存在"),
     OPERATION_NOT_ALLOWED(1003, "操作不被允许"),
+    USER_ALREADY_EXISTS(1004, "用户已存在"),
+    OAUTH_ERROR(1005, "OAuth认证失败"),
 
     // 数据库错误
     DATABASE_ERROR(2000, "数据库操作失败"),

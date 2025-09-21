@@ -5,39 +5,33 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.flyerme.weautotools.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("users")
 public class User extends BaseEntity {
 
-    private String mobile;
-
     private String passwordHash;
-
-    private String role;
 
     private Boolean enabled = true;
 
-    private Boolean accountNonLocked = true;
+    private String mobile;
 
-    private Boolean credentialsNonExpired = true;
-
-    private Boolean accountNonExpired = true;
+    private String email;
 
     private String nickname;
 
     private String avatarUrl;
 
-    @TableField(exist = false)
-    private List<String> roles;
+    private Instant credentialsExpiry;
+
+    private Instant lockedUntil;
+
+    private Integer failedAttempts;
 
     public String getUsername() {
         return mobile;

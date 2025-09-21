@@ -34,6 +34,7 @@ public class ToolServiceImpl implements ToolService {
 
     @Override
     public List<Tool> getActiveTools() {
+        log.info("获取所有激活的工具");
         return toolMapper.selectActiveTools();
     }
 
@@ -78,23 +79,6 @@ public class ToolServiceImpl implements ToolService {
         return false;
     }
 
-    @Override
-    public Map<String, Integer> countByStatus() {
-        return toolMapper.countByStatus().stream()
-                .collect(Collectors.toMap(
-                    item -> (String) item.get("status"),
-                    item -> ((Number) item.get("count")).intValue()
-                ));
-    }
-
-    @Override
-    public Map<String, Integer> countByType() {
-        return toolMapper.countByType().stream()
-                .collect(Collectors.toMap(
-                    item -> (String) item.get("category"),
-                    item -> ((Number) item.get("count")).intValue()
-                ));
-    }
 
     @Override
     public List<Tool> getByToolName(String toolName) {

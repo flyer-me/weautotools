@@ -47,17 +47,6 @@ public interface ToolService {
      */
     boolean deleteTool(Long id);
 
-
-    /**
-     * 统计各状态的工具数量
-     */
-    java.util.Map<String, Integer> countByStatus();
-
-    /**
-     * 统计各分类的工具数量
-     */
-    java.util.Map<String, Integer> countByType();
-
     /**
      * 根据工具名称获取工具
      *

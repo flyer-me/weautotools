@@ -2,6 +2,7 @@ package com.flyerme.weautotools.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.flyerme.weautotools.entity.Tool;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -82,21 +83,4 @@ public interface ToolMapper extends BaseMapper<Tool> {
      */
     @Select("SELECT id FROM tools WHERE tool_name = #{toolName} AND deleted = 0")
     Long getToolIdByName(@Param("toolName") String toolName);
-
-    /**
-     * 统计各状态的工具数量
-     * 
-     * @return 状态统计Map
-     */
-    @Select("SELECT status, COUNT(1) as count FROM tools WHERE deleted = 0 GROUP BY status")
-    List<Map<String, Object>> countByStatus();
-
-    /**
-     * 统计各分类的工具数量
-     * 
-     * @return 分类统计Map
-     */
-    @Select("SELECT tool_type, COUNT(1) as count FROM tools WHERE deleted = 0 GROUP BY tool_type")
-    List<Map<String, Object>> countByType();
-
 }

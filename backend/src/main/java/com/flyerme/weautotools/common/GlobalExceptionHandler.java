@@ -38,6 +38,8 @@ public class GlobalExceptionHandler {
         return Result.error(e.getCode(), e.getMessage());
     }
 
+
+
     /**
      * 处理参数校验异常 - @Valid
      */

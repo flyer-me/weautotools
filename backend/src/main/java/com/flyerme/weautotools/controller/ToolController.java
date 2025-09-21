@@ -73,16 +73,4 @@ public class ToolController {
         Boolean exists = toolService.existsByToolName(toolName);
         return Result.success(exists);
     }
-
-    @GetMapping("/stats/status")
-    public Result<Map<String, Integer>> countByStatus() {
-        Map<String, Integer> stats = toolService.countByStatus();
-        return Result.success(stats);
-    }
-
-    @GetMapping("/stats/type")
-    public Result<Map<String, Integer>> countByType() {
-        Map<String, Integer> stats = toolService.countByType();
-        return Result.success(stats);
-    }
 }

@@ -1,0 +1,265 @@
+openapi: 3.0.3
+info:
+  title: Spring Authorization Server API
+  version: "1.0.0"
+  description: |
+    OAuth2 / OpenID Connect 协议端点，用于 Spring Authorization Server。
+    注意：动态客户端注册、UserInfo、Logout 等依赖配置是否启用。
+
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: localhost:8080
+
+paths:
+  /oauth2/authorize:
+    get:
+      summary: Authorization endpoint
+      description: 用于 Authorization Code 等授权流程。重定向用户进行登录 + 授予权限。
+      parameters:
+        - in: query
+          name: response_type
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: client_id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: redirect_uri
+          schema:
+            type: string
+        - in: query
+          name: scope
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            type: string
+        - in: query
+          name: code_challenge
+          schema:
+            type: string
+        - in: query
+          name: code_challenge_method
+          schema:
+            type: string
+      responses:
+        "302":
+          description: 重定向到登录或者重定向 URI
+        "400":
+          description: 输入参数有误
+
+  /oauth2/token:
+    post:
+      summary: Token endpoint
+      description: 客户端／授权码／刷新令牌等交换 Access Token
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                code:
+                  type: string
+                redirect_uri:
+                  type: string
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+                refresh_token:
+                  type: string
+                code_verifier:
+                  type: string
+              required:
+                - grant_type
+      responses:
+        "200":
+          description: 成功返回 token 响应
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                  expires_in:
+                    type: integer
+                  refresh_token:
+                    type: string
+                  scope:
+                    type: string
+        "400":
+          description: 请求参数有误
+
+  /oauth2/revoke:
+    post:
+      summary: Token revocation endpoint
+      description: 用于撤销 access_token 或 refresh_token（RFC 7009）
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                token_type_hint:
+                  type: string
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+              required:
+                - token
+      responses:
+        "200":
+          description: 撤销成功（可能不返回内容）
+
+  /oauth2/introspect:
+    post:
+      summary: Token introspection endpoint
+      description: 用于资源服务器或客户端检查 token 状态（是否 active，scope 等）
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                token_type_hint:
+                  type: string
+                client_id:
+                  type: string
+                client_secret:
+                  type: string
+              required:
+                - token
+      responses:
+        "200":
+          description: 成功返回内省信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active:
+                    type: boolean
+                  scope:
+                    type: string
+                  client_id:
+                    type: string
+                  username:
+                    type: string
+                  token_type:
+                    type: string
+                  exp:
+                    type: integer
+                  iat:
+                    type: integer
+                  sub:
+                    type: string
+
+  /.well-known/jwks.json:
+    get:
+      summary: JWK set endpoint
+      description: 用于公开签名公钥 (JSON Web Key Set)，资源服务器用来验证 JWT 签名
+      responses:
+        "200":
+          description: 公钥集合
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      type: object # 可以具体描述 JWK 格式
+                      properties:
+                        kty:
+                          type: string
+                        use:
+                          type: string
+                        alg:
+                          type: string
+                        kid:
+                          type: string
+                        n:
+                          type: string
+                        e:
+                          type: string
+
+  /.well-known/oauth-authorization-server:
+    get:
+      summary: Authorization server metadata
+      description: 提供 OAuth2 Authorization Server 的 metadata（包括各个端点 URL，支持的 grant type，签名算法等）RFC 8414
+      responses:
+        "200":
+          description: metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuer:
+                    type: string
+                  authorization_endpoint:
+                    type: string
+                  token_endpoint:
+                    type: string
+                  jwks_uri:
+                    type: string
+                  introspection_endpoint:
+                    type: string
+                  revocation_endpoint:
+                    type: string
+                  # 若启用 OIDC:
+                  userinfo_endpoint:
+                    type: string
+                  end_session_endpoint:
+                    type: string
+                  registration_endpoint:
+                    type: string
+
+  /userinfo:
+    get:
+      summary: UserInfo endpoint (OIDC)
+      description: 在 OIDC 流程中，用 Access Token 获取用户信息
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 用户信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sub:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  # etc 根据你实际的 userinfo 返回字段
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
