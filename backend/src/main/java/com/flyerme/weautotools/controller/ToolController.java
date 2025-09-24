@@ -17,7 +17,7 @@ import java.util.List;
  * @since 2025-09-16
  */
 @RestController
-@RequestMapping("/tools")
+@RequestMapping("/api/tools")
 @RequiredArgsConstructor
 public class ToolController {
 
@@ -55,14 +55,14 @@ public class ToolController {
     }
 
     @PutMapping("/{id}")
-    public Result<Tool> updateTool(@PathVariable Long id, @Valid @RequestBody Tool tool) {
+    public Result<Tool> updateTool(@PathVariable String id, @Valid @RequestBody Tool tool) {
         tool.setId(id);
         Tool updatedTool = toolService.updateTool(tool);
         return Result.success("工具更新成功", updatedTool);
     }
 
     @DeleteMapping("/{id}")
-    public Result<Void> deleteTool(@PathVariable Long id) {
+    public Result<Void> deleteTool(@PathVariable String id) {
         boolean deleted = toolService.deleteTool(id);
         return deleted ? Result.success("工具删除成功") : Result.error("工具不存在");
     }

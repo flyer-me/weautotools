@@ -38,7 +38,7 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
     }
 
     @Override
-    public UsageLimitConfigResponse getConfigById(Long id) {
+    public UsageLimitConfigResponse getConfigById(String id) {
         ToolUsageLimit config = toolUsageLimitMapper.selectById(id);
         if (config == null || config.getDeleted() != 0) {
             return null;
@@ -110,7 +110,7 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
 
     @Override
     @Transactional
-    public boolean deleteConfig(Long id) {
+    public boolean deleteConfig(String id) {
         ToolUsageLimit config = toolUsageLimitMapper.selectById(id);
         if (config == null || config.getDeleted() != 0) {
             return false;

@@ -18,9 +18,9 @@ import java.util.List;
  */
 
 public interface BaseService<T extends BaseEntity, R, S> extends IService<T> {
-    S update(Long id, R request);
+    S update(String id, R request);
     List<S> getAll();
     S create(R request);
-    S getByIdSerializable(Long id);
-    void delete(Long id);
+    S getByIdSerializable(String id);
+    void delete(String id);
 }

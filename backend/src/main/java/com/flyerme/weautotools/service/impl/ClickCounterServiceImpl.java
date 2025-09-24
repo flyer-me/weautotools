@@ -61,7 +61,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
 
 
     @Override
-    public ClickCounterResponse clickCounter(Long id) {
+    public ClickCounterResponse clickCounter(String id) {
         LocalDateTime now = LocalDateTime.now();
         int result = clickCounterMapper.incrementClickCount(id, now, now);
         if (result <= 0) {
@@ -139,7 +139,7 @@ public class ClickCounterServiceImpl extends BaseServiceImpl<ClickCounter, Click
     @Override
     @Transactional
     @Lock(key = "'counter:reset:' + #id")
-    public ClickCounterResponse resetCounter(Long id) {
+    public ClickCounterResponse resetCounter(String id) {
         ClickCounter counter = this.baseMapper.selectById(id);
         if (counter == null) {
             throw new BusinessException("计数器不存在: " + id);

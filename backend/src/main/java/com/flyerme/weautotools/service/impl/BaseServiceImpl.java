@@ -42,7 +42,7 @@ public class BaseServiceImpl<T extends BaseEntity, R, S>
      * @param id 实体ID
      * @return 响应DTO
      */
-    public S getByIdSerializable(Long id) {
+    public S getByIdSerializable(String id) {
         T entity = getById(id);
         if (entity == null) {
             return null;
@@ -57,7 +57,7 @@ public class BaseServiceImpl<T extends BaseEntity, R, S>
      * @param request 请求DTO
      * @return 响应DTO
      */
-    public S update(Long id, R request) {
+    public S update(String id, R request) {
         T entity = getById(id);
         if (entity == null) {
             throw new BusinessException("update的实体不存在: " + id);
@@ -82,7 +82,7 @@ public class BaseServiceImpl<T extends BaseEntity, R, S>
      *
      * @param id 实体ID
      */
-    public void delete(Long id) {
+    public void delete(String id) {
         if (!removeById(id)) {
             throw new BusinessException("删除失败");
         }
@@ -126,8 +126,8 @@ public class BaseServiceImpl<T extends BaseEntity, R, S>
     }
 
     protected void validateCreateRequest(R request) {}
-    protected void validateUpdateRequest(Long id, R request){}
+    protected void validateUpdateRequest(String id, R request){}
     protected void checkCreateBusinessRules(R request){}
-    protected void checkUpdateBusinessRules(Long id, R request, T entity){}
-    protected void checkDeleteBusinessRules(Long id, T entity){}
+    protected void checkUpdateBusinessRules(String id, R request, T entity){}
+    protected void checkDeleteBusinessRules(String id, T entity){}
 }

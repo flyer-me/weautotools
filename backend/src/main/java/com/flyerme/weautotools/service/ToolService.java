@@ -46,7 +46,7 @@ public interface ToolService {
     /**
      * 根据ID删除工具（逻辑删除）
      */
-    boolean deleteTool(Long id);
+    boolean deleteTool(String id);
 
     /**
      * 根据工具名称获取工具

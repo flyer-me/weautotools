@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/click-counter")
+@RequestMapping("/api/click-counter")
 @RequiredArgsConstructor
 public class ClickCounterController {
 
@@ -44,7 +44,7 @@ public class ClickCounterController {
      * 根据ID获取计数器
      */
     @GetMapping("/{id}")
-    public Result<ClickCounterResponse> getCounter(@PathVariable Long id) {
+    public Result<ClickCounterResponse> getCounter(@PathVariable String id) {
         ClickCounterResponse response = clickCounterService.getByIdSerializable(id);
         return Result.success(response);
     }
@@ -80,7 +80,7 @@ public class ClickCounterController {
      * 更新计数器
      */
     @PutMapping("/{id}")
-    public Result<ClickCounterResponse> updateCounter(@PathVariable Long id, 
+    public Result<ClickCounterResponse> updateCounter(@PathVariable String id, 
                                                      @Valid @RequestBody ClickCounterRequest request) {
         log.info("更新计数器请求: {} -> {}", id, request.getCounterName());
         ClickCounterResponse response = clickCounterService.update(id, request);
@@ -91,7 +91,7 @@ public class ClickCounterController {
      * 删除计数器
      */
     @DeleteMapping("/{id}")
-    public Result<Void> deleteCounter(@PathVariable Long id) {
+    public Result<Void> deleteCounter(@PathVariable String id) {
         log.info("删除计数器请求: {}", id);
         clickCounterService.delete(id);
         return Result.success("计数器删除成功");
@@ -101,7 +101,7 @@ public class ClickCounterController {
      * 点击计数（根据ID）
      */
     @PostMapping("/{id}/click")
-    public Result<ClickCounterResponse> clickCounter(@PathVariable Long id) {
+    public Result<ClickCounterResponse> clickCounter(@PathVariable String id) {
         ClickCounterResponse response = clickCounterService.clickCounter(id);
         return Result.success("点击成功", response);
     }
@@ -160,7 +160,7 @@ public class ClickCounterController {
      * 重置计数器点击数
      */
     @PostMapping("/{id}/reset")
-    public Result<ClickCounterResponse> resetCounter(@PathVariable Long id) {
+    public Result<ClickCounterResponse> resetCounter(@PathVariable String id) {
         log.info("重置计数器请求: {}", id);
         ClickCounterResponse response = clickCounterService.resetCounter(id);
         return Result.success("计数器重置成功", response);

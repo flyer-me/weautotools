@@ -25,7 +25,7 @@ public interface ClickCounterService extends BaseService<ClickCounter, ClickCoun
     /**
      * 点击计数（根据ID）
      */
-    ClickCounterResponse clickCounter(Long id);
+    ClickCounterResponse clickCounter(String id);
 
     /**
      * 点击计数（根据名称）
@@ -46,6 +46,6 @@ public interface ClickCounterService extends BaseService<ClickCounter, ClickCoun
     /**
      * 重置计数器点击数
      */
-    ClickCounterResponse resetCounter(Long id);
+    ClickCounterResponse resetCounter(String id);
 
 }

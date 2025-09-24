@@ -31,7 +31,7 @@ public interface ClickCounterMapper extends BaseMapper<ClickCounter> {
     @Update("UPDATE click_counter SET click_count = click_count + 1, last_click_time = #{lastClickTime}, " +
             "updated_at = #{updatedAt}, version = version + 1 " +
             "WHERE id = #{id} AND enabled = true AND deleted = 0")
-    int incrementClickCount(@Param("id") Long id,
+    int incrementClickCount(@Param("id") String id,
                            @Param("lastClickTime") LocalDateTime lastClickTime,
                            @Param("updatedAt") LocalDateTime updatedAt);
 

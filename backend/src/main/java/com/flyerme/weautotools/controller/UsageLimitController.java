@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2025-09-12
  */
 @RestController
-@RequestMapping("/usage-limits")
+@RequestMapping("/api/usage-limits")
 @RequiredArgsConstructor
 @Slf4j
 public class UsageLimitController extends BaseController {
@@ -83,7 +83,7 @@ public class UsageLimitController extends BaseController {
      * 根据ID获取限制配置
      */
     @GetMapping("/configs/{id}")
-    public Result<UsageLimitConfigResponse> getConfigById(@PathVariable Long id) {
+    public Result<UsageLimitConfigResponse> getConfigById(@PathVariable String id) {
         try {
             UsageLimitConfigResponse config = usageLimitConfigService.getConfigById(id);
             if (config == null) {
@@ -115,7 +115,7 @@ public class UsageLimitController extends BaseController {
      */
     @PutMapping("/configs/{id}")
     public Result<UsageLimitConfigResponse> updateConfig(
-            @PathVariable Long id, 
+            @PathVariable String id, 
             @Valid @RequestBody UsageLimitConfigRequest request) {
         try {
             request.setId(id);
@@ -134,7 +134,7 @@ public class UsageLimitController extends BaseController {
      * 删除限制配置
      */
     @DeleteMapping("/configs/{id}")
-    public Result<Void> deleteConfig(@PathVariable Long id) {
+    public Result<Void> deleteConfig(@PathVariable String id) {
         try {
             boolean success = usageLimitConfigService.deleteConfig(id);
             if (!success) {

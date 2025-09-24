@@ -22,7 +22,7 @@ public interface UsageLimitConfigService {
     /**
      * 根据ID获取限制配置
      */
-    UsageLimitConfigResponse getConfigById(Long id);
+    UsageLimitConfigResponse getConfigById(String id);
 
     /**
      * 创建限制配置
@@ -37,7 +37,7 @@ public interface UsageLimitConfigService {
     /**
      * 删除限制配置
      */
-    boolean deleteConfig(Long id);
+    boolean deleteConfig(String id);
 
     /**
      * 批量更新配置

@@ -66,7 +66,7 @@ public class ToolServiceImpl implements ToolService {
     }
 
     @Override
-    public boolean deleteTool(Long id) {
+    public boolean deleteTool(String id) {
         Tool tool = toolMapper.selectById(id);
         if (tool != null) {
             tool.setDeleted(1);
