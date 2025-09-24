@@ -1,0 +1,9 @@
+<!-- public/callback.html -->
+<!doctype html>
+<meta charset="utf-8" />
+<script type="module">
+  const { default: userManager } = await import('../../services/authService');
+  const user = await userManager.signinRedirectCallback();
+  const returnPath = (user?.state && user.state.returnPath) || "/";
+  location.replace(returnPath);
+</script>
