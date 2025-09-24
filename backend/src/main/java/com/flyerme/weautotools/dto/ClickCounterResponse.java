@@ -1,5 +1,6 @@
 package com.flyerme.weautotools.dto;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -10,6 +11,6 @@ import java.time.Instant;
  * @since 2025-08-15
  */
 public record ClickCounterResponse
-        (Long id, String counterName, String description,
+        (Serializable id, String counterName, String description,
          Long clickCount, Boolean enabled, Instant lastClickTime,
          Instant createdAt, Instant updatedAt) {}

@@ -29,7 +29,7 @@ public interface RoleMapper extends BaseMapper<Role> {
     SELECT r.id, r.name
     FROM roles r
     INNER JOIN user_roles ur ON r.id = ur.role_id
-    WHERE ur.user_id = #{userId}
+    WHERE ur.user_id = #{id}
 """)
-    List<Role> getRolesByUserId(Long id);
+    List<Role> getRolesByUserId(String id);
 }

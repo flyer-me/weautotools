@@ -45,9 +45,11 @@ const totalOrderBadge = computed(() => {
          badgeState.order.refunding
 })
 
+const totalUserBadge = computed(() => badgeState.user.points + badgeState.user.coupon)
+
 const tabBarBadges = computed(() => ({
   message: totalMessageBadge.value,
-  user: totalOrderBadge.value
+  user: totalUserBadge.value
 }))
 
 /**

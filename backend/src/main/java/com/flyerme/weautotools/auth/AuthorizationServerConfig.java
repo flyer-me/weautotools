@@ -15,6 +15,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,13 +28,18 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class AuthorizationServerConfig {
@@ -42,18 +48,26 @@ public class AuthorizationServerConfig {
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
             throws Exception {
-        var configurer = new OAuth2AuthorizationServerConfigurer();
-        var matcher = configurer.getEndpointsMatcher();
-        http
-                .securityMatcher(matcher)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .csrf(csrf -> csrf.ignoringRequestMatchers(matcher))
-                .with(configurer, c -> c
-                        .oidc(Customizer.withDefaults())) // OpenID Connect support
-                .httpBasic(Customizer.withDefaults()) // 允许 client_id/client_secret 走 HTTP Basic
-                .formLogin(AbstractHttpConfigurer::disable); // 禁用表单登录
+        http.securityMatcher("/oauth2/**", "/.well-known/**");
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+                .oidc(withDefaults()); // Enable OpenID Connect 1.0
+        http.exceptionHandling(ex -> ex
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
+        // http.cors(Customizer.withDefaults()); // 启用CORS
+        http.cors(Customizer.withDefaults());
+        // http.formLogin(withDefaults()); // 表单登录用于用户认证
         return http.build();
     }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setPrincipalClaimName("sub"); // sub claim = userId
+        return converter;
+    }
+
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() {

@@ -2,6 +2,7 @@ package com.flyerme.weautotools.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -17,7 +18,7 @@ public class UsageLimitConfigResponse {
     /**
      * 配置ID
      */
-    private Long id;
+    private Serializable id;
 
     /**
      * 工具类型

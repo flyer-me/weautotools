@@ -98,7 +98,7 @@ import {
   getOrderActions,
   ORDER_STATUS
 } from '@/utils/orderStatus.js'
-import { getFinalFeatureState, showFeatureDisabledToast, handleDisabledFeatureClick, DEV_MODE } from '@/config/features'
+import { getFinalFeatureState, showFeatureDisabledToast, handleDisabledFeatureClick, DEV_MODE } from '@/config/featurests'
 
 // 使用订单管理Hook
 const {

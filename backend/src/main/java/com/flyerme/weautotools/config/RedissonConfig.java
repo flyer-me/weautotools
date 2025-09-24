@@ -1,8 +1,11 @@
 package com.flyerme.weautotools.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +36,10 @@ public class RedissonConfig {
     @Value("${spring.data.redis.timeout:3000ms}")
     private String redisTimeout;
 
+    // 注入自定义配置的ObjectMapper
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * 配置Redisson客户端
      */
@@ -58,8 +65,8 @@ public class RedissonConfig {
             config.useSingleServer().setPassword(redisPassword);
         }
 
-        // 设置编码
-        config.setCodec(new org.redisson.codec.JsonJacksonCodec());
+        // 使用配置了自定义反序列化器的ObjectMapper创建编解码器
+        config.setCodec(new JsonJacksonCodec(objectMapper));
 
         return Redisson.create(config);
     }

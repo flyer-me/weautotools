@@ -17,7 +17,7 @@ public class UsageLimitConfigRequest {
     /**
      * 配置ID（更新时使用）
      */
-    private Long id;
+    private String id;
 
     /**
      * 工具类型

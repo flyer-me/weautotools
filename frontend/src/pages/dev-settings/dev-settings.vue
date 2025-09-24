@@ -181,7 +181,7 @@ import {
   getFinalFeatureState,
   isDevModeValid,
   disableDevMode
-} from '@/config/features'
+} from '@/config/featurests'
 import { useUsageLimitAdmin } from '@/composables/useUsageLimit'
 
 // 开发模式状态

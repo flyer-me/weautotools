@@ -1,5 +1,7 @@
 package com.flyerme.weautotools.common;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
@@ -22,7 +24,8 @@ public abstract class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    @TableId(type = IdType.ASSIGN_UUID)
+    protected String id;
 
     private Instant createdAt;
 

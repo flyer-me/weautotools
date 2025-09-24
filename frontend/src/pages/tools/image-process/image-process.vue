@@ -32,7 +32,7 @@
     <view v-if="selectedFiles.length > 0 && previewData.originalImage" class="preview-section">
       <view class="preview-hint">
         <uni-icons type="info" size="16" color="#666" />
-        <text class="hint-text">{{ previewHint }}</text>
+        <text class="hint-text">{{ previewHint(selectedTypes) }}</text>
       </view>
       <ImagePreviewCompare
         :originalImage="previewData.originalImage"
@@ -47,333 +47,37 @@
     </view>
 
     <!-- 处理选项 -->
-    <view class="process-options">
-      <view class="section-title">处理选项</view>
-      
-      <!-- 处理类型选择 -->
-      <view class="option-group">
-        <view class="option-label">处理类型</view>
-        <view class="process-types">
-          <view
-            v-for="type in processTypes"
-            :key="type.value"
-            class="type-option"
-            :class="{ active: selectedTypes.includes(type.value) }"
-            @click="handleTypeToggle(type.value)"
-          >
-            <view class="type-icon">
-              <uni-icons
-                :type="selectedTypes.includes(type.value) ? 'checkmarkempty' : 'circle'"
-                :size="20"
-                :color="selectedTypes.includes(type.value) ? '#007AFF' : '#ccc'"
-              />
-            </view>
-            <view class="type-content">
-              <text class="type-name">{{ type.name }}</text>
-              <text class="type-desc">{{ type.description }}</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 压缩设置 -->
-      <view v-if="selectedTypes.includes('compress')" class="option-group">
-        <view class="option-label">压缩设置</view>
-
-        <!-- 压缩模式选择 -->
-        <view class="compression-mode-selector">
-          <text class="mode-title">压缩方式</text>
-          <view class="mode-options">
-            <view
-              v-for="(mode, index) in compressionModes"
-              :key="index"
-              class="mode-option"
-              :class="{ active: selectedCompressionModeIndex === index }"
-              @click="handleCompressionModeChange({ detail: { value: index } })"
-            >
-              <view class="mode-icon">
-                <uni-icons :type="mode.icon" size="20" />
-              </view>
-              <text class="mode-name">{{ mode.label }}</text>
-              <text class="mode-desc">{{ mode.description }}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 质量优先模式 -->
-        <view v-if="compressOptions.mode === 'quality'" class="compress-quality-section">
-          <!-- 质量预设 -->
-          <view class="quality-presets-container">
-            <text class="preset-label">质量预设</text>
-            <view class="quality-presets">
-              <view
-                v-for="(preset, index) in qualityPresets"
-                :key="index"
-                class="preset-btn"
-                :class="{ active: selectedQualityIndex === index }"
-                @click="handleQualityPresetClick(index)"
-              >
-                <text class="preset-name">{{ preset.name }}</text>
-                <text class="preset-desc">{{ preset.description }}</text>
-              </view>
-            </view>
-          </view>
-
-          <!-- 精确质量调整 -->
-          <view class="quality-slider-container">
-            <view class="slider-header">
-              <text class="slider-label">精确调整</text>
-              <text class="slider-value">{{ compressOptions.quality }}%</text>
-            </view>
-            <view class="slider-wrapper">
-              <slider
-                :value="compressOptions.quality"
-                :min="10"
-                :max="100"
-                :step="1"
-                activeColor="#007AFF"
-                backgroundColor="#E5E5E5"
-                block-size="24"
-                @change="handleQualitySliderChange"
-                @changing="handleQualitySliderChanging"
-              />
-            </view>
-          </view>
-        </view>
-
-        <!-- 大小优先模式 -->
-        <view v-if="compressOptions.mode === 'size'" class="compress-size-section">
-          <view class="setting-item">
-            <text class="setting-label">目标文件大小</text>
-            <view class="target-size-input">
-              <input
-                v-model.number="compressOptions.targetSize"
-                type="number"
-                class="number-input"
-                placeholder="500"
-                @input="handleTargetSizeChange"
-              />
-              <picker
-                :range="sizeUnits"
-                range-key="label"
-                :value="selectedSizeUnitIndex"
-                @change="handleSizeUnitChange"
-              >
-                <view class="unit-picker">
-                  {{ sizeUnits[selectedSizeUnitIndex].label }}
-                  <uni-icons type="arrowdown" size="12" color="#666" />
-                </view>
-              </picker>
-            </view>
-          </view>
-
-          <!-- 目标大小预设 -->
-          <view class="setting-item">
-            <text class="setting-label">常用大小</text>
-            <view class="size-presets">
-              <view class="preset-buttons">
-                <view
-                  v-for="preset in sizePresets"
-                  :key="preset.value"
-                  class="preset-btn size-preset"
-                  @click="handleSizePresetClick(preset)"
-                >
-                  {{ preset.label }}
-                </view>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- 无损压缩模式 -->
-        <view v-if="compressOptions.mode === 'lossless'" class="compress-lossless-section">
-          <view class="lossless-info">
-            <view class="info-icon">
-              <uni-icons type="star" size="24" color="#007AFF" />
-            </view>
-            <view class="info-content">
-              <text class="info-title">无损压缩模式</text>
-              <text class="info-desc">保持原始图片质量，仅通过优化编码和尺寸调整来减小文件大小</text>
-            </view>
-          </view>
-
-          <view class="lossless-features">
-            <view class="feature-item">
-              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
-              <text class="feature-text">保持100%图片质量</text>
-            </view>
-            <view class="feature-item">
-              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
-              <text class="feature-text">优化文件编码结构</text>
-            </view>
-            <view class="feature-item">
-              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
-              <text class="feature-text">智能格式选择</text>
-            </view>
-            <view class="feature-item">
-              <uni-icons type="checkmarkempty" size="16" color="#28a745" />
-              <text class="feature-text">支持尺寸限制</text>
-            </view>
-          </view>
-
-          <view class="lossless-note">
-            <uni-icons type="info" size="16" color="#666" />
-            <text class="note-text">无损压缩的效果取决于原始图片的格式和内容，通常可以减小5%-30%的文件大小</text>
-          </view>
-        </view>
-
-
-
-        <!-- 压缩预览信息已移除，避免误导 -->
-      </view>
-
-
-
-
-
-      <!-- 尺寸调整设置 -->
-      <view v-if="selectedTypes.includes('resize')" class="option-group">
-        <view class="option-label">尺寸调整</view>
-
-        <!-- 尺寸限制设置 -->
-        <view class="resize-limit-section">
-          <view class="dimension-limit-container">
-            <!-- 尺寸输入 -->
-            <view class="dimension-inputs">
-              <view class="dimension-input">
-                <text class="dimension-label">最大宽度</text>
-                <view class="dimension-inline">
-                  <input
-                    v-model.number="resizeOptions.maxWidth"
-                    type="number"
-                    class="number-input"
-                    placeholder="留空表示不限制"
-                  />
-                  <text class="unit">px</text>
-                </view>
-              </view>
-              <view class="dimension-input">
-                <text class="dimension-label">最大高度</text>
-                <view class="dimension-inline">
-                  <input
-                    v-model.number="resizeOptions.maxHeight"
-                    type="number"
-                    class="number-input"
-                    placeholder="留空表示不限制"
-                  />
-                  <text class="unit">px</text>
-                </view>
-              </view>
-            </view>
-
-            <!-- 缩放模式选择 -->
-            <view class="setting-item">
-              <text class="setting-label">缩放方式</text>
-              <picker
-                :range="resizeModes"
-                range-key="label"
-                :value="selectedResizeModeIndex"
-                @change="handleResizeModeChange"
-              >
-                <view class="picker-display">
-                  {{ resizeModes[selectedResizeModeIndex].label }}
-                  <uni-icons type="arrowdown" size="14" color="#666" />
-                </view>
-              </picker>
-            </view>
-
-            <!-- 常用尺寸预设 -->
-            <view class="dimension-presets">
-              <text class="preset-label">常用尺寸</text>
-              <view class="preset-buttons">
-                <view
-                  class="preset-btn dimension-preset"
-                  :class="{ active: !resizeOptions.maxWidth && !resizeOptions.maxHeight }"
-                  @click="handleDimensionPresetClick({ name: '原始尺寸', width: null, height: null })"
-                >
-                  原始尺寸
-                </view>
-                <view
-                  v-for="preset in dimensionPresets.slice(0, -1)"
-                  :key="preset.name"
-                  class="preset-btn dimension-preset"
-                  :class="{ active: resizeOptions.maxWidth === preset.width && resizeOptions.maxHeight === preset.height }"
-                  @click="handleDimensionPresetClick(preset)"
-                >
-                  {{ preset.name }}
-                </view>
-              </view>
-            </view>
-
-            <!-- 说明信息 -->
-            <view class="dimension-note">
-              <uni-icons type="info" size="16" color="#666" />
-              <text class="note-text">设置图片的最大尺寸限制。超出限制的图片会根据所选缩放方式进行调整，留空表示该方向不限制</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 水印设置 -->
-      <view v-if="selectedTypes.includes('watermark')" class="option-group">
-        <view class="option-label">水印设置</view>
-        
-        <view class="setting-item">
-          <text class="setting-label">水印类型</text>
-          <picker
-            :range="watermarkTypes"
-            range-key="label"
-            :value="selectedWatermarkTypeIndex"
-            @change="handleWatermarkTypeChange"
-          >
-            <view class="picker-display">
-              {{ watermarkTypes[selectedWatermarkTypeIndex].label }}
-              <uni-icons type="arrowdown" size="14" color="#666" />
-            </view>
-          </picker>
-        </view>
-        
-        <!-- 文字水印设置 -->
-        <view v-if="watermarkOptions.type === 'text'" class="watermark-settings">
-          <view class="setting-item">
-            <text class="setting-label">水印文字</text>
-            <input
-              v-model="watermarkOptions.text"
-              class="text-input"
-              placeholder="请输入水印文字"
-            />
-          </view>
-          
-          <view class="setting-item">
-            <text class="setting-label">字体大小</text>
-            <input
-              v-model.number="watermarkOptions.fontSize"
-              type="number"
-              class="number-input"
-              placeholder="24"
-            />
-            <text class="unit">px</text>
-          </view>
-          
-          <view class="setting-item">
-            <text class="setting-label">位置</text>
-            <picker
-              :range="watermarkPositions"
-              range-key="label"
-              :value="selectedWatermarkPositionIndex"
-              @change="handleWatermarkPositionChange"
-            >
-              <view class="picker-display">
-                {{ watermarkPositions[selectedWatermarkPositionIndex].label }}
-                <uni-icons type="arrowdown" size="14" color="#666" />
-              </view>
-            </picker>
-          </view>
-        </view>
-      </view>
-
-
-    </view>
+    <ImageProcessOptions
+      v-model:selectedTypes="selectedTypes"
+      v-model:compressOptions="compressOptions"
+      v-model:resizeOptions="resizeOptions"
+      v-model:watermarkOptions="watermarkOptions"
+      v-model:selectedCompressionModeIndex="selectedCompressionModeIndex"
+      v-model:selectedQualityIndex="selectedQualityIndex"
+      v-model:selectedSizeUnitIndex="selectedSizeUnitIndex"
+      v-model:selectedResizeModeIndex="selectedResizeModeIndex"
+      v-model:selectedWatermarkTypeIndex="selectedWatermarkTypeIndex"
+      v-model:selectedWatermarkPositionIndex="selectedWatermarkPositionIndex"
+      :processTypes="processTypes"
+      :compressionModes="compressionModes"
+      :qualityPresets="qualityPresets"
+      :sizeUnits="sizeUnits"
+      :sizePresets="sizePresets"
+      :resizeModes="resizeModes"
+      :dimensionPresets="dimensionPresets"
+      :watermarkTypes="watermarkTypes"
+      :watermarkPositions="watermarkPositions"
+      @typeToggle="handleTypeToggle"
+      @compressionModeChange="handleCompressionModeChange"
+      @qualityChange="handleQualityChange"
+      @targetSizeChange="handleTargetSizeChange"
+      @dimensionChange="handleDimensionChange"
+      @resizeModeChange="handleResizeModeChange"
+      @watermarkTextChange="handleWatermarkTextChange"
+      @watermarkFontSizeChange="handleWatermarkFontSizeChange"
+      @watermarkPositionChange="handleWatermarkPositionChange"
+      @watermarkTypeChange="handleWatermarkTypeChange"
+    />
 
     <!-- 处理按钮 -->
     <view class="action-section">
@@ -464,166 +168,153 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import ToolContainer from '@/components/tools/ToolContainer.vue'
-import FileUploader from '@/components/tools/FileUploader.vue'
-import ImagePreviewCompare from '@/components/tools/ImagePreviewCompare.vue'
-import { ImageProcessor } from '@/tools/image/processor.js'
-import { ProgressTracker } from '@/tools/base/ProgressTracker.js'
-import { useUsageLimit } from '@/composables/useUsageLimit'
+import { ref, watch } from 'vue'
+import ToolContainer from '@/features/tools/shared/components/ToolContainer.vue'
+import FileUploader from '@/features/tools/shared/components/FileUploader.vue'
+import ImagePreviewCompare from '@/features/tools/shared/components/ImagePreviewCompare.vue'
+import ImageProcessOptions from './components/ImageProcessOptions.vue'
 
-// 响应式数据
+// 导入 composables
+import { useImageProcessor } from './composables/useImageProcessor.js'
+import { useImagePreview } from './composables/useImagePreview.js'
+import { useProcessSettings } from './composables/useProcessSettings.js'
+
+// 使用 composables
+const {
+  isProcessing,
+  progress,
+  progressStatus,
+  progressMessage,
+  results,
+  statistics,
+  errorMessage,
+  canProcess,
+  processBatch,
+  downloadFile,
+  downloadAll,
+  clearResults,
+  validateImageFormat
+} = useImageProcessor()
+
+const {
+  previewData,
+  previewSettings,
+  previewHint,
+  generatePreview,
+  updatePreview,
+  clearPreview,
+  handlePreviewModeChange,
+  handlePreviewZoom,
+  handlePreviewInfo,
+  previewImage
+} = useImagePreview()
+
+const {
+  selectedTypes,
+  selectedQualityIndex,
+  selectedResizeModeIndex,
+  selectedWatermarkTypeIndex,
+  selectedWatermarkPositionIndex,
+  selectedCompressionModeIndex,
+  selectedSizeUnitIndex,
+  compressOptions,
+  resizeOptions,
+  watermarkOptions,
+  processTypes,
+  qualityPresets,
+  compressionModes,
+  sizeUnits,
+  sizePresets,
+  dimensionPresets,
+  resizeModes,
+  watermarkTypes,
+  watermarkPositions,
+  updateTargetSizeBytes,
+  resetSettings,
+  getProcessOptions
+} = useProcessSettings()
+
+// 本地状态
 const fileUploaderRef = ref(null)
 const selectedFiles = ref([])
 
-const selectedTypes = ref(['compress'])
-const selectedQualityIndex = ref(1) // 标准质量
-const selectedResizeModeIndex = ref(0) // 保持比例缩放
-const selectedWatermarkTypeIndex = ref(0) // 文字
-const selectedWatermarkPositionIndex = ref(3) // 右下角
-const selectedCompressionModeIndex = ref(0) // 大小优先
-const selectedSizeUnitIndex = ref(1) // KB
+// 文件处理
+const handleFileChange = (files) => {
+  selectedFiles.value = files.filter(f => f.valid).map(f => f.file)
 
-const compressOptions = ref({
-  mode: 'size', // 'quality' | 'size' | 'lossless'
-  quality: 80, // 0-100
-  targetSize: 500, // 目标文件大小数值
-  targetSizeBytes: 500 * 1024 // 目标文件大小字节数
-})
-
-const customSize = ref({
-  width: null,
-  height: null
-})
-
-const resizeOptions = ref({
-  maxWidth: null, // 最大宽度，null表示不限制
-  maxHeight: null // 最大高度，null表示不限制
-})
-
-const watermarkOptions = ref({
-  type: 'text',
-  text: '© WeAutoTools',
-  fontSize: 24,
-  position: 'bottom-right',
-  color: 'rgba(255, 255, 255, 0.8)'
-})
-
-
-
-// 预览数据
-const previewData = ref({
-  originalImage: '',
-  processedImage: '',
-  originalInfo: {},
-  processedInfo: {},
-  isProcessing: false
-})
-
-// 预览设置
-const previewSettings = ref({
-  mode: 'side-by-side', // 'side-by-side' | 'slider'
-  isZoomed: false,
-  showInfo: false,
-  autoPreview: true // 是否自动生成预览
-})
-
-// 预览提示文本：仅展示 压缩/水印，不展示 尺寸调整
-const previewHint = computed(() => {
-  const shown = []
-  if (selectedTypes.value.includes('compress')) shown.push('压缩')
-  if (selectedTypes.value.includes('watermark')) shown.push('水印')
-  const shownText = shown.length ? shown.join('、') : '无'
-  const hideResize = selectedTypes.value.includes('resize') ? '；不展示：尺寸调整' : ''
-  return `预览仅展示：${shownText}${hideResize}`
-})
-
-const isProcessing = ref(false)
-const progress = ref(0)
-const progressStatus = ref('normal')
-const progressMessage = ref('')
-const results = ref([])
-const statistics = ref({})
-const errorMessage = ref('')
-
-// 工具实例
-const imageProcessor = new ImageProcessor()
-
-// 使用限制相关
-const {
-  useFrontendTool
-} = useUsageLimit()
-
-// 配置选项
-const processTypes = [
-  { value: 'compress', name: '压缩', description: '减小文件大小' },
-  { value: 'resize', name: '尺寸调整', description: '调整图片尺寸' },
-  { value: 'watermark', name: '添加水印', description: '添加文字或图片水印' }
-]
-
-const qualityPresets = imageProcessor.getQualityPresets()
-const compressionModes = imageProcessor.getCompressionModes()
-
-// 文件大小单位
-const sizeUnits = [
-  { label: 'B', value: 1 },
-  { label: 'KB', value: 1024 },
-  { label: 'MB', value: 1024 * 1024 }
-]
-
-// 常用文件大小预设
-const sizePresets = [
-  { label: '100KB', value: 100, unit: 'KB' },
-  { label: '500KB', value: 500, unit: 'KB' },
-  { label: '1MB', value: 1, unit: 'MB' },
-  { label: '2MB', value: 2, unit: 'MB' },
-  { label: '5MB', value: 5, unit: 'MB' }
-]
-
-// 常用尺寸预设（中国常用尺寸）
-const dimensionPresets = [
-  { name: '1寸证件照', width: 295, height: 413 },
-  { name: '2寸证件照', width: 413, height: 579 },
-  { name: '小2寸证件照', width: 413, height: 531 },
-  { name: '微信头像', width: 640, height: 640 },
-  { name: '朋友圈封面', width: 1080, height: 608 },
-  { name: '720P', width: 1280, height: 720 },
-  { name: '1080P', width: 1920, height: 1080 },
-  { name: '淘宝主图', width: 800, height: 800 },
-  { name: '公众号封面', width: 900, height: 500 },
-  { name: '无限制', width: null, height: null }
-]
-
-const resizeModes = [
-  { value: 'contain', label: '保持比例缩放', description: '等比例缩放，不会变形，可能有留白' },
-  { value: 'cover', label: '填满尺寸缩放', description: '等比例缩放填满，不会变形，可能会裁剪' },
-  { value: 'exact', label: '强制拉伸', description: '强制调整到指定尺寸，可能会变形' }
-]
-
-const watermarkTypes = [
-  { value: 'text', label: '文字水印' },
-  { value: 'image', label: '图片水印' }
-]
-
-const watermarkPositions = [
-  { value: 'top-left', label: '左上角' },
-  { value: 'top-right', label: '右上角' },
-  { value: 'bottom-left', label: '左下角' },
-  { value: 'bottom-right', label: '右下角' },
-  { value: 'center', label: '居中' }
-]
-
-// 计算属性
-const canProcess = computed(() => {
-  return selectedFiles.value.length > 0 && selectedTypes.value.length > 0
-})
-
-// 监听变化
-watch(selectedQualityIndex, (newIndex) => {
-  if (compressOptions.value.mode === 'quality') {
-    compressOptions.value.quality = Math.round(qualityPresets[newIndex].value * 100)
+  // 生成第一个文件的预览
+  if (selectedFiles.value.length > 0) {
+    generatePreview(selectedFiles.value[0])
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  } else {
+    clearPreview()
   }
-})
+}
+
+const handleFileError = (error) => {
+  errorMessage.value = error
+}
+
+// 处理选项变化
+const handleTypeToggle = (type) => {
+  if (selectedFiles.value.length > 0) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleCompressionModeChange = (mode) => {
+  if (selectedFiles.value.length > 0) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleQualityChange = (quality) => {
+  if (selectedFiles.value.length > 0 && compressOptions.value.mode === 'quality') {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleTargetSizeChange = () => {
+  if (selectedFiles.value.length > 0 && compressOptions.value.mode === 'size') {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleDimensionChange = () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('resize')) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleResizeModeChange = (mode) => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('resize')) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleWatermarkTextChange = () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleWatermarkFontSizeChange = () => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleWatermarkPositionChange = (position) => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
+
+const handleWatermarkTypeChange = (type) => {
+  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
+    updatePreview(selectedFiles.value[0], getProcessOptions())
+  }
+}
 
 // 监听目标大小变化
 watch(() => compressOptions.value.targetSize, () => {
@@ -634,546 +325,24 @@ watch(selectedSizeUnitIndex, () => {
   updateTargetSizeBytes()
 })
 
-// 防抖函数
-const debounce = (func, wait) => {
-  let timeout
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout)
-      func(...args)
-    }
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-  }
-}
-
-// 防抖的预览更新函数
-const debouncedPreviewUpdate = debounce(() => {
-  if (selectedFiles.value.length > 0) {
-    generateProcessedPreview(selectedFiles.value[0])
-  }
-}, 300)
-
-// 监听压缩设置变化，实时更新预览
-watch(() => compressOptions.value.quality, () => {
-  if (selectedFiles.value.length > 0 && compressOptions.value.mode === 'quality') {
-    debouncedPreviewUpdate()
-  }
-})
-
-watch(() => compressOptions.value.targetSizeBytes, () => {
-  if (selectedFiles.value.length > 0 && compressOptions.value.mode === 'size') {
-    debouncedPreviewUpdate()
-  }
-})
-
-watch(() => compressOptions.value.mode, () => {
-  if (selectedFiles.value.length > 0) {
-    generateProcessedPreview(selectedFiles.value[0])
-  }
-})
-
-// 监听水印相关变化，实时更新预览（不触发尺寸调整）
-watch(selectedWatermarkTypeIndex, () => {
-  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
-    debouncedPreviewUpdate()
-  }
-})
-
-watch(selectedWatermarkPositionIndex, () => {
-  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
-    debouncedPreviewUpdate()
-  }
-})
-
-watch(() => [watermarkOptions.value.text, watermarkOptions.value.fontSize, watermarkOptions.value.position], () => {
-  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('watermark')) {
-    debouncedPreviewUpdate()
-  }
-})
-
-// 监听尺寸调整参数变化
-watch(() => [resizeOptions.value.maxWidth, resizeOptions.value.maxHeight], () => {
-  if (selectedFiles.value.length > 0 && selectedTypes.value.includes('resize')) {
-    debouncedPreviewUpdate()
-  }
-})
-
-watch(selectedWatermarkTypeIndex, (newIndex) => {
-  watermarkOptions.value.type = watermarkTypes[newIndex].value
-})
-
-watch(selectedWatermarkPositionIndex, (newIndex) => {
-  watermarkOptions.value.position = watermarkPositions[newIndex].value
-})
-
-// 方法
-const validateImageFormat = (file) => {
-  return imageProcessor.validateFormat(file)
-}
-
-const handleFileChange = (files) => {
-  selectedFiles.value = files.filter(f => f.valid).map(f => f.file)
-
-  // 生成第一个文件的预览
-  if (selectedFiles.value.length > 0) {
-    generatePreview(selectedFiles.value[0])
-  } else {
-    clearPreview()
-  }
-}
-
-const handleFileError = (error) => {
-  errorMessage.value = error
-}
-
-const handleTypeToggle = (value) => {
-  const index = selectedTypes.value.indexOf(value)
-
-  if (index > -1) {
-    // 移除选中的类型
-    selectedTypes.value = selectedTypes.value.filter(type => type !== value)
-  } else {
-    // 添加新的类型
-    selectedTypes.value = [...selectedTypes.value, value]
-  }
-}
-
-// 压缩模式切换
-const handleCompressionModeChange = (e) => {
-  selectedCompressionModeIndex.value = e.detail.value
-  compressOptions.value.mode = compressionModes[e.detail.value].value
-}
-
-// 质量预设点击
-const handleQualityPresetClick = (index) => {
-  selectedQualityIndex.value = index
-  compressOptions.value.quality = Math.round(qualityPresets[index].value * 100)
-}
-
-// 质量滑块变化
-const handleQualitySliderChange = (e) => {
-  compressOptions.value.quality = e.detail.value
-  // 更新对应的预设索引
-  updateQualityPresetIndex(e.detail.value)
-}
-
-const handleQualitySliderChanging = (e) => {
-  compressOptions.value.quality = e.detail.value
-}
-
-// 更新质量预设索引
-const updateQualityPresetIndex = (quality) => {
-  const qualityValue = quality / 100
-  let closestIndex = 0
-  let minDiff = Math.abs(qualityPresets[0].value - qualityValue)
-
-  qualityPresets.forEach((preset, index) => {
-    const diff = Math.abs(preset.value - qualityValue)
-    if (diff < minDiff) {
-      minDiff = diff
-      closestIndex = index
-    }
-  })
-
-  selectedQualityIndex.value = closestIndex
-}
-
-// 目标大小变化
-const handleTargetSizeChange = () => {
-  updateTargetSizeBytes()
-}
-
-// 大小单位变化
-const handleSizeUnitChange = (e) => {
-  selectedSizeUnitIndex.value = e.detail.value
-  updateTargetSizeBytes()
-}
-
-// 更新目标大小字节数
-const updateTargetSizeBytes = () => {
-  const size = compressOptions.value.targetSize || 0
-  const unit = sizeUnits[selectedSizeUnitIndex.value]
-  compressOptions.value.targetSizeBytes = size * unit.value
-}
-
-// 大小预设点击
-const handleSizePresetClick = (preset) => {
-  compressOptions.value.targetSize = preset.value
-  const unitIndex = sizeUnits.findIndex(unit => unit.label === preset.unit)
-  if (unitIndex !== -1) {
-    selectedSizeUnitIndex.value = unitIndex
-  }
-  updateTargetSizeBytes()
-}
-
-// 尺寸预设点击
-const handleDimensionPresetClick = (preset) => {
-  resizeOptions.value.maxWidth = preset.width
-  resizeOptions.value.maxHeight = preset.height
-}
-
-
-// 格式化总文件大小
-const formatTotalSize = (files) => {
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0)
-  return imageProcessor.formatFileSize(totalSize)
-}
-
-// 预览相关方法
-const handlePreviewModeChange = (mode) => {
-  previewSettings.value.mode = mode
-}
-
-const handlePreviewZoom = (isZoomed) => {
-  previewSettings.value.isZoomed = isZoomed
-}
-
-const handlePreviewInfo = (showInfo) => {
-  previewSettings.value.showInfo = showInfo
-}
-
-// 生成预览
-const generatePreview = async (file) => {
-  if (!file || !previewSettings.value.autoPreview) return
-
-  try {
-    // 设置原始图片
-    const originalUrl = URL.createObjectURL(file)
-    previewData.value.originalImage = originalUrl
-    previewData.value.originalInfo = await imageProcessor.getImageInfo(file)
-
-    // 开始处理预览
-    previewData.value.isProcessing = true
-    previewData.value.processedImage = ''
-
-    // 根据当前设置生成处理后的预览
-    await generateProcessedPreview(file)
-
-  } catch (error) {
-    console.error('预览生成失败:', error)
-  } finally {
-    previewData.value.isProcessing = false
-  }
-}
-
-// 生成处理后的预览（仅应用 压缩/水印，不应用 尺寸调整）
-const generateProcessedPreview = async (file) => {
-  try {
-    let previewFile = file
-
-    // 先应用水印（如启用）
-    if (selectedTypes.value.includes('watermark')) {
-      previewFile = await imageProcessor.addWatermark(previewFile, watermarkOptions.value)
-    }
-
-    // 再应用压缩（如启用）
-    if (selectedTypes.value.includes('compress')) {
-      if (compressOptions.value.mode === 'quality') {
-        previewFile = await imageProcessor.compressImage(previewFile, {
-          quality: compressOptions.value.quality / 100
-        })
-      } else if (compressOptions.value.mode === 'size') {
-        previewFile = await imageProcessor.compressToTargetSize(
-          previewFile,
-          compressOptions.value.targetSizeBytes
-        )
-      } else if (compressOptions.value.mode === 'lossless') {
-        previewFile = await imageProcessor.compressImage(previewFile, {
-          lossless: true
-        })
-      }
-    }
-
-    // 若都未启用，则展示原图
-    const processedUrl = URL.createObjectURL(previewFile)
-    previewData.value.processedImage = processedUrl
-    previewData.value.processedInfo = await imageProcessor.getImageInfo(previewFile)
-
-  } catch (error) {
-    console.error('处理预览生成失败:', error)
-    previewData.value.processedImage = previewData.value.originalImage
-    previewData.value.processedInfo = previewData.value.originalInfo
-  }
-}
-
-// 清理预览数据
-const clearPreview = () => {
-  if (previewData.value.originalImage) {
-    URL.revokeObjectURL(previewData.value.originalImage)
-  }
-  if (previewData.value.processedImage && previewData.value.processedImage !== previewData.value.originalImage) {
-    URL.revokeObjectURL(previewData.value.processedImage)
-  }
-
-  previewData.value = {
-    originalImage: '',
-    processedImage: '',
-    originalInfo: {},
-    processedInfo: {},
-    isProcessing: false
-  }
-}
-
-
-const handleResizeModeChange = (e) => {
-  selectedResizeModeIndex.value = e.detail.value
-}
-
-const handleWatermarkTypeChange = (e) => {
-  selectedWatermarkTypeIndex.value = e.detail.value
-}
-
-const handleWatermarkPositionChange = (e) => {
-  selectedWatermarkPositionIndex.value = e.detail.value
-}
-
+// 处理操作
 const handleProcess = async () => {
-  if (!canProcess.value || isProcessing.value) return
-  
-  // 1. 预检查使用限制
-  const usageResult = await useFrontendTool('image-process', selectedFiles.value.length)
-  if (!usageResult.canUse) {
-    return // 已显示限制提示
-  }
-  
-  isProcessing.value = true
-  progress.value = 0
-  progressStatus.value = 'running'
-  errorMessage.value = ''
-  results.value = []
+  if (!canProcess.value || isProcessing.value || selectedFiles.value.length === 0) return
   
   try {
-    const tracker = new ProgressTracker(selectedFiles.value.length, (status) => {
-      progress.value = status.percentage
-      progressMessage.value = `正在处理第 ${status.current}/${status.total} 张图片...`
-    })
-    
-    tracker.start()
-    
-    const processResults = await imageProcessor.processBatch(
-      selectedFiles.value,
-      async (file) => {
-        return await processImage(file)
-      },
-      (progress) => {
-        tracker.setCurrent(progress.completed, `正在处理: ${progress.currentFile}`)
-      }
-    )
-    
-    results.value = await Promise.all(processResults.map(async (result) => {
-      // 安全地获取文件名 - result.file 现在是真正的 File 对象
-      const originalFile = result.file
-      const fileName = originalFile?.name || 'unknown_file.jpg'
-
-      // 提取文件名和扩展名
-      let originalName, extension
-      if (fileName.includes('.')) {
-        const lastDotIndex = fileName.lastIndexOf('.')
-        originalName = fileName.substring(0, lastDotIndex)
-        extension = fileName.substring(lastDotIndex + 1)
-      } else {
-        originalName = fileName
-        extension = 'jpg' // 默认扩展名
-      }
-
-      // 根据实际结果 MIME 决定最终扩展名
-      const mime = result.success ? (result.result?.type || originalFile?.type) : (originalFile?.type || '')
-      const mimeToExt = {
-        'image/jpeg': 'jpg',
-        'image/jpg': 'jpg',
-        'image/png': 'png',
-        'image/webp': 'webp',
-        'image/gif': 'gif'
-      }
-      const finalExt = mimeToExt[mime] || extension
-      const processedName = `${originalName}_done.${finalExt}`
-
-      let thumbnail = null
-      if (result.success && result.result) {
-        try {
-          thumbnail = URL.createObjectURL(result.result)
-        } catch (error) {
-          console.warn('Failed to create thumbnail:', error)
-        }
-      }
-
-      return {
-        success: result.success,
-        file: {
-          name: fileName,
-          type: originalFile?.type || 'image/jpeg',
-          processedName: processedName
-        },
-        result: result.success ? result.result : null,
-        thumbnail: thumbnail,
-        originalSize: originalFile?.size || 0,
-        compressedSize: result.success ? (result.result?.size || 0) : 0,
-        error: result.error
-      }
-    }))
-    
-    progressStatus.value = 'completed'
-    progressMessage.value = '处理完成'
-    
-    // 计算统计信息
-    updateStatistics()
-    
-    tracker.complete()
-    
-    // 3. 成功后报告使用
-    const successfulCount = results.value.filter(r => r.success).length
-    await usageResult.reportUsage(successfulCount)
-    
+    await processBatch(selectedFiles.value, getProcessOptions())
   } catch (error) {
-    progressStatus.value = 'error'
-    progressMessage.value = '处理失败'
-    errorMessage.value = error.message
-    // 失败时不记录使用次数
-  } finally {
-    isProcessing.value = false
+    console.error('处理失败:', error)
   }
 }
 
-const processImage = async (file) => {
-  let processedFile = file
-  
-  // 按优化顺序执行各种处理：尺寸调整 → 水印 → 压缩
-
-  if (selectedTypes.value.includes('resize')) {
-    await processResize()
-  }
-
-  if (selectedTypes.value.includes('watermark')) {
-    await processWatermark()
-  }
-
-  // 3. 最后执行压缩（确保在最终尺寸上压缩）
-  if (selectedTypes.value.includes('compress')) {
-    await processCompress()
-  }
-
-  // 处理函数封装
-  async function processResize() {
-    // 尺寸限制模式 - 根据设置的最大尺寸进行调整
-    if (resizeOptions.value.maxWidth || resizeOptions.value.maxHeight) {
-      const imageInfo = await imageProcessor.getImageInfo(processedFile)
-      const maxWidth = resizeOptions.value.maxWidth || imageInfo.width
-      const maxHeight = resizeOptions.value.maxHeight || imageInfo.height
-      const mode = resizeModes[selectedResizeModeIndex.value].value
-
-      // 检查是否需要调整
-      const needResize = (resizeOptions.value.maxWidth && imageInfo.width > resizeOptions.value.maxWidth) ||
-                       (resizeOptions.value.maxHeight && imageInfo.height > resizeOptions.value.maxHeight)
-
-      if (needResize) {
-        // 判断是否后续需要压缩，如果需要压缩则不使用无损质量
-        const willCompress = selectedTypes.value.includes('compress')
-
-        processedFile = await imageProcessor.resizeImage(processedFile, {
-          width: maxWidth,
-          height: maxHeight,
-          mode: mode
-        }, {
-          preserveQuality: !willCompress, // 如果后续要压缩，则不保持无损质量
-          keepOriginalFormat: false // 允许格式转换以优化后续压缩
-        })
-      }
-    }
-  }
-
-  async function processWatermark() {
-    processedFile = await imageProcessor.addWatermark(processedFile, watermarkOptions.value)
-  }
-
-  async function processCompress() {
-    if (compressOptions.value.mode === 'quality') {
-      // 质量优先模式
-      processedFile = await imageProcessor.compressImage(processedFile, {
-        mimeType: 'image/jpeg',
-        quality: compressOptions.value.quality / 100
-      })
-    } else if (compressOptions.value.mode === 'size') {
-      // 大小优先模式
-      processedFile = await imageProcessor.compressToTargetSize(
-        processedFile,
-        compressOptions.value.targetSizeBytes,
-        { mimeType: 'image/jpeg' }
-      )
-    } else if (compressOptions.value.mode === 'lossless') {
-      // 无损压缩模式
-      processedFile = await imageProcessor.compressImage(processedFile, {
-        lossless: true
-      })
-    }
-  }
-  
-  return processedFile
-}
-
-const updateStatistics = () => {
-  const successful = results.value.filter(r => r.success)
-  const failed = results.value.filter(r => !r.success)
-  
-  const originalSize = results.value.reduce((sum, r) => sum + r.originalSize, 0)
-  const processedSize = successful.reduce((sum, r) => sum + r.compressedSize, 0)
-  
-  statistics.value = {
-    total: results.value.length,
-    successful: successful.length,
-    failed: failed.length,
-    successRate: `${((successful.length / results.value.length) * 100).toFixed(1)}%`,
-    originalSize: formatFileSize(originalSize),
-    processedSize: formatFileSize(processedSize),
-    compressionRatio: originalSize > 0 ? 
-      `${(((originalSize - processedSize) / originalSize) * 100).toFixed(1)}%` : '0%'
-  }
-}
-
-const handleDownload = (result) => {
-  if (result.result) {
-    const filename = result.file.processedName || result.file.name
-    imageProcessor.downloadFile(result.result, filename)
-  }
-}
-
-const handleDownloadAll = async () => {
-  try {
-    const files = results.value
-      .filter(r => r.success)
-      .map((result) => {
-        return {
-          data: result.result,
-          filename: result.file.processedName || result.file.name,
-          mimeType: result.result.type
-        }
-      })
-
-    await imageProcessor.downloadBatch(files, 'processed_images.zip')
-  } catch (error) {
-    uni.showToast({
-      title: error.message,
-      icon: 'none'
-    })
-  }
+const handleReset = () => {
+  resetSettings()
+  handleClear()
 }
 
 const handleClear = () => {
-  // 清理缩略图URL
-  results.value.forEach(result => {
-    if (result.thumbnail) {
-      URL.revokeObjectURL(result.thumbnail)
-    }
-  })
-
-  results.value = []
-  statistics.value = {}
-  errorMessage.value = ''
-  progress.value = 0
-  progressStatus.value = 'normal'
-  progressMessage.value = ''
-
-  // 清理预览数据
+  clearResults()
   clearPreview()
 
   if (fileUploaderRef.value) {
@@ -1183,74 +352,21 @@ const handleClear = () => {
   selectedFiles.value = []
 }
 
-const handleReset = () => {
-  selectedTypes.value = ['compress']
-  selectedQualityIndex.value = 1
-  selectedResizeModeIndex.value = 0 // 保持比例缩放
-  selectedWatermarkTypeIndex.value = 0
-  selectedWatermarkPositionIndex.value = 3
-  selectedCompressionModeIndex.value = 0 // 大小优先
+const handleDownload = (result) => {
+  downloadFile(result)
+}
 
-  compressOptions.value = {
-    mode: 'size',
-    quality: 80,
-    targetSize: 500,
-    targetSizeBytes: 500 * 1024
-  }
-
-  customSize.value = {
-    width: null,
-    height: null
-  }
-
-  resizeOptions.value = {
-    maxWidth: null,
-    maxHeight: null
-  }
-
-  watermarkOptions.value = {
-    type: 'text',
-    text: '© WeAutoTools',
-    fontSize: 24,
-    position: 'bottom-right',
-    color: 'rgba(255, 255, 255, 0.8)'
-  }
-
-  handleClear()
+const handleDownloadAll = async () => {
+  await downloadAll()
 }
 
 const handlePreview = (result) => {
-  if (result.result) {
-    const url = URL.createObjectURL(result.result)
-    uni.previewImage({
-      urls: [url],
-      current: 0
-    })
-  }
-}
-
-const formatFileSize = (size) => {
-  if (!size) return '0B'
-  if (size < 1024) return `${size}B`
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)}KB`
-  if (size < 1024 * 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)}MB`
-  return `${(size / (1024 * 1024 * 1024)).toFixed(1)}GB`
+  previewImage(result)
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/tools-common.scss';
-.process-options {
-  margin: 32rpx 0;
-
-  .section-title {
-    font-size: 36rpx;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 24rpx;
-    padding: 0 8rpx;
-  }
-}
 
 .preview-section {
   margin-bottom: 24rpx;
@@ -1271,271 +387,6 @@ const formatFileSize = (size) => {
     }
   }
 }
-
-.option-group {
-  margin-bottom: 32rpx;
-  padding: 24rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  border: 2rpx solid #f0f0f0;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  .option-label {
-    font-size: 32rpx;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 24rpx;
-    padding-bottom: 12rpx;
-    border-bottom: 2rpx solid #f0f0f0;
-  }
-}
-
-.process-types {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280rpx, 1fr));
-  gap: 16rpx;
-
-  .type-option {
-    display: flex;
-    align-items: center;
-    padding: 24rpx;
-    background: white;
-    border: 3rpx solid #e9ecef;
-    border-radius: 16rpx;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4rpx;
-      background: transparent;
-      transition: all 0.3s ease;
-    }
-
-    &.active {
-      border-color: #007aff;
-      background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
-      box-shadow: 0 6rpx 20rpx rgba(0, 122, 255, 0.2);
-      transform: translateY(-2rpx);
-
-      &::before {
-        background: linear-gradient(90deg, #007AFF 0%, #00d4ff 100%);
-      }
-
-      .type-icon {
-        background: rgba(0, 122, 255, 0.1);
-        transform: scale(1.1);
-      }
-
-      .type-name {
-        color: #007AFF;
-      }
-    }
-
-    &:hover:not(.active) {
-      border-color: #007aff;
-      background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-      transform: translateY(-1rpx);
-      box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.1);
-
-      .type-icon {
-        transform: scale(1.05);
-      }
-    }
-
-    .type-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48rpx;
-      height: 48rpx;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 12rpx;
-      margin-right: 16rpx;
-      transition: all 0.3s ease;
-      flex-shrink: 0;
-    }
-
-    .type-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4rpx;
-    }
-
-    .type-name {
-      font-size: 28rpx;
-      color: #333;
-      font-weight: 600;
-      line-height: 1.2;
-      transition: color 0.3s ease;
-    }
-
-    .type-desc {
-      font-size: 22rpx;
-      color: #666;
-      line-height: 1.3;
-    }
-  }
-}
-
-.setting-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24rpx;
-  padding: 16rpx 0;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  .setting-label {
-    font-size: 28rpx;
-    color: #333;
-    font-weight: 500;
-    min-width: 140rpx;
-  }
-
-  .picker-display {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16rpx 20rpx;
-    background: #f8f9fa;
-    border: 2rpx solid #e9ecef;
-    border-radius: 12rpx;
-    font-size: 26rpx;
-    color: #333;
-    min-width: 200rpx;
-    transition: all 0.3s ease;
-
-    &:hover {
-      border-color: #007aff;
-      background: #fff;
-    }
-  }
-
-  .number-input,
-  .text-input {
-    padding: 16rpx 20rpx;
-    background: #f8f9fa;
-    border: 2rpx solid #e9ecef;
-    border-radius: 12rpx;
-    font-size: 26rpx;
-    color: #333;
-    min-width: 150rpx;
-    transition: all 0.3s ease;
-
-    &:focus {
-      border-color: #007aff;
-      background: #fff;
-      box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
-    }
-  }
-
-  .unit {
-    font-size: 24rpx;
-    color: #666;
-    margin-left: 12rpx;
-    font-weight: 500;
-  }
-}
-
-/* 页面统一输入框样式，确保非 .setting-item 内的输入也有边框 */
-.number-input,
-.text-input {
-  padding: 16rpx 20rpx;
-  background: #f8f9fa;
-  border: 2rpx solid #e9ecef;
-  border-radius: 12rpx;
-  font-size: 26rpx;
-  color: #333;
-  min-width: 150rpx;
-  transition: all 0.3s ease;
-
-  &:focus {
-    border-color: #007aff;
-    background: #fff;
-    box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
-  }
-}
-
-.target-size-input {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.unit-picker {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 16rpx 20rpx;
-  background: #f8f9fa;
-  border: 2rpx solid #e9ecef;
-  border-radius: 12rpx;
-  font-size: 26rpx;
-  color: #333;
-}
-
-.custom-size {
-  margin-top: 20rpx;
-  
-  .size-inputs {
-    display: flex;
-    align-items: center;
-    gap: 20rpx;
-    
-    .size-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10rpx;
-      
-      .size-label {
-        font-size: 24rpx;
-        color: #666;
-      }
-      
-      .size-input {
-        padding: 15rpx;
-        background: white;
-        border: 2rpx solid #ddd;
-        border-radius: 8rpx;
-        font-size: 26rpx;
-        width: 120rpx;
-        text-align: center;
-      }
-    }
-    
-    .size-separator {
-      font-size: 28rpx;
-      color: #666;
-      margin-top: 30rpx;
-    }
-  }
-}
-
-.watermark-settings {
-  margin-top: 20rpx;
-  padding: 20rpx;
-  background: white;
-  border-radius: 12rpx;
-  border: 2rpx solid #eee;
-}
-
-
 
 .action-section {
   display: flex;
@@ -1581,306 +432,148 @@ const formatFileSize = (size) => {
   }
 }
 
+.statistics-section {
+  margin-top: 40rpx;
+  padding: 32rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+
+  .statistics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32rpx;
+    padding-bottom: 20rpx;
+    border-bottom: 2rpx solid #f0f0f0;
+
+    .statistics-title {
+      font-size: 36rpx;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .statistics-summary {
+      display: flex;
+      gap: 20rpx;
+      align-items: center;
+
+      .summary-text {
+        font-size: 26rpx;
+        color: #666;
+      }
+
+      .summary-success {
+        font-size: 26rpx;
+        color: #28a745;
+        font-weight: 600;
+      }
+
+      .summary-failed {
+        font-size: 26rpx;
+        color: #dc3545;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .statistics-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200rpx, 1fr));
+    gap: 24rpx;
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 16rpx;
+      padding: 24rpx;
+      background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+      border-radius: 12rpx;
+      border: 2rpx solid #f0f0f0;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2rpx);
+        box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56rpx;
+        height: 56rpx;
+        background: rgba(0, 122, 255, 0.1);
+        border-radius: 12rpx;
+        flex-shrink: 0;
+      }
+
+      .stat-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4rpx;
+
+        .stat-label {
+          font-size: 24rpx;
+          color: #666;
+          font-weight: 500;
+        }
+
+        .stat-value {
+          font-size: 32rpx;
+          color: #333;
+          font-weight: 700;
+
+          &.compression-ratio {
+            color: #17a2b8;
+          }
+
+          &.success-rate {
+            color: #28a745;
+          }
+        }
+      }
+    }
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 750rpx) {
-  .process-options {
-    padding: 20rpx;
-  }
+  .statistics-section {
+    padding: 24rpx;
 
-  .process-types {
-    grid-template-columns: 1fr;
-    gap: 12rpx;
+    .statistics-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16rpx;
 
-    .type-option {
-      padding: 20rpx;
-
-      .type-icon {
-        width: 40rpx;
-        height: 40rpx;
-        margin-right: 12rpx;
-      }
-
-      .type-name {
-        font-size: 26rpx;
-      }
-
-      .type-desc {
-        font-size: 20rpx;
+      .statistics-summary {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8rpx;
       }
     }
-  }
 
-  .setting-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15rpx;
+    .statistics-details {
+      grid-template-columns: 1fr;
+      gap: 16rpx;
 
-    .picker-display,
-    .number-input,
-    .text-input {
-      width: 100%;
-      min-width: auto;
-    }
-  }
+      .stat-card {
+        padding: 20rpx;
 
-  .size-inputs {
-    flex-direction: column;
+        .stat-icon {
+          width: 48rpx;
+          height: 48rpx;
+        }
 
-    .size-separator {
-      margin: 0;
-      transform: rotate(90deg);
-    }
-  }
-
-
-
-  .dimension-presets {
-    .preset-buttons {
-      gap: 8rpx;
-
-      .dimension-preset {
-        padding: 8rpx 16rpx;
-        font-size: 20rpx;
-        flex: 1;
-        min-width: 0;
-        text-align: center;
+        .stat-content {
+          .stat-value {
+            font-size: 28rpx;
+          }
+        }
       }
     }
   }
 }
-
-/* 压缩设置样式 */
-.compress-quality-section,
-.compress-size-section,
-.compress-lossless-section {
-  margin-top: 24rpx;
-  padding: 24rpx;
-  background: #fff;
-  border-radius: 12rpx;
-  border: 2rpx solid #f0f0f0;
-}
-
-.compression-mode-selector {
-  margin-bottom: 32rpx;
-
-  .mode-title {
-    display: block;
-    font-size: 30rpx;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 20rpx;
-  }
-
-  .mode-options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20rpx;
-  }
-
-  .mode-option {
-    position: relative;
-    padding: 28rpx 24rpx;
-    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-    border: 3rpx solid #e9ecef;
-    border-radius: 16rpx;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4rpx;
-      background: transparent;
-      transition: all 0.3s ease;
-    }
-
-    &.active {
-      background: linear-gradient(135deg, #007AFF 0%, #0056b3 100%);
-      border-color: #007AFF;
-      color: white;
-      transform: translateY(-2rpx);
-      box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.25);
-
-      &::before {
-        background: linear-gradient(90deg, #00d4ff 0%, #007AFF 100%);
-      }
-
-      .mode-icon {
-        opacity: 1;
-        transform: scale(1.1);
-      }
-    }
-
-    &:hover:not(.active) {
-      border-color: #007AFF;
-      background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%);
-      transform: translateY(-1rpx);
-      box-shadow: 0 6rpx 16rpx rgba(0, 122, 255, 0.1);
-
-      .mode-icon {
-        transform: scale(1.05);
-      }
-    }
-
-    .mode-icon {
-      margin-bottom: 12rpx;
-      opacity: 0.8;
-      transition: all 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 48rpx;
-      height: 48rpx;
-      margin: 0 auto 12rpx;
-      background: rgba(0, 122, 255, 0.1);
-      border-radius: 12rpx;
-    }
-
-    &.active .mode-icon {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .mode-name {
-      display: block;
-      font-size: 28rpx;
-      font-weight: 700;
-      margin-bottom: 8rpx;
-      letter-spacing: 0.5rpx;
-    }
-
-    .mode-desc {
-      display: block;
-      font-size: 22rpx;
-      opacity: 0.8;
-      line-height: 1.4;
-      font-weight: 400;
-    }
-  }
-}
-
-/* 尺寸调整设置样式 */
-.resize-limit-section {
-  margin-top: 24rpx;
-  padding: 24rpx;
-  background: #fff;
-  border-radius: 12rpx;
-  border: 2rpx solid #f0f0f0;
-}
-
-.dimension-inputs {
-  display: flex;
-  gap: 24rpx;
-}
-
-.dimension-input {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
-.dimension-label {
-  font-size: 26rpx;
-  color: #333;
-  min-width: 140rpx;
-}
-
-.dimension-inline {
-  display: flex;
-  align-items: center;
-}
-
-// 无损压缩设置样式保留，因为这是特定的功能样式
-.compress-lossless-section {
-  .lossless-info {
-    display: flex;
-    align-items: flex-start;
-    gap: $spacing-sm;
-    padding: $spacing-md;
-    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
-    border-radius: $radius-md;
-    border: 2rpx solid rgba(0, 122, 255, 0.1);
-    margin-bottom: $spacing-md;
-
-    .info-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48rpx;
-      height: 48rpx;
-      background: rgba(0, 122, 255, 0.1);
-      border-radius: $radius-md;
-      flex-shrink: 0;
-    }
-
-    .info-content {
-      flex: 1;
-
-      .info-title {
-        display: block;
-        font-size: $font-md;
-        font-weight: 600;
-        color: $primary-color;
-        margin-bottom: $spacing-xs;
-      }
-
-      .info-desc {
-        display: block;
-        font-size: $font-sm;
-        color: $text-secondary;
-        line-height: 1.4;
-      }
-    }
-  }
-
-  .lossless-features {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: $spacing-sm;
-    margin-bottom: $spacing-md;
-
-    .feature-item {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      padding: $spacing-sm $spacing-md;
-      background: rgba(40, 167, 69, 0.05);
-      border-radius: $radius-sm;
-      border: 1rpx solid rgba(40, 167, 69, 0.1);
-
-      .feature-text {
-        font-size: $font-xs;
-        color: $text-primary;
-        font-weight: 500;
-      }
-    }
-  }
-
-  .lossless-note {
-    display: flex;
-    align-items: flex-start;
-    gap: $spacing-xs;
-    padding: $spacing-sm;
-    background: rgba(255, 193, 7, 0.05);
-    border-radius: $radius-md;
-    border: 1rpx solid rgba(255, 193, 7, 0.1);
-
-    .note-text {
-      font-size: $font-xs;
-      color: $text-secondary;
-      line-height: 1.4;
-    }
-  }
-}
-
-// 尺寸限制设置样式已移至通用样式
-
-// 质量预设、滑块、大小预设等样式已移至通用样式
-
-// 所有重复样式已移至通用样式文件
 </style>

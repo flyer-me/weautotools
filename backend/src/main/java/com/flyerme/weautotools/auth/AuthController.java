@@ -186,7 +186,7 @@ public class AuthController {
                 // 保存撤销后的授权信息
                 OAuth2Authorization revokedAuthorization = builder.build();
                 authorizationService.save(revokedAuthorization);
-                log.info("OAuth2授权已撤销，principal: {}", authorization.getPrincipalName());
+                log.info("OAuth2授权已撤销");
             } else {
                 log.warn("未找到对应的OAuth2授权，令牌可能已过期或无效");
             }

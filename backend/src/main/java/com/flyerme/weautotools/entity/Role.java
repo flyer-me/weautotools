@@ -3,11 +3,13 @@ package com.flyerme.weautotools.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @TableName("roles")
 public class Role {
 
-    private Long id;
+    private String id;
 
     private String name; // 如 "ROLE_ADMIN"
 

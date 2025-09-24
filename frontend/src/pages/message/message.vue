@@ -68,7 +68,7 @@ import MessageItem from '@/components/MessageItem.vue'
 import { ref, computed, onMounted } from 'vue'
 import { useMessage } from '@/composables/useMessage'
 import { MESSAGE_TYPE, MESSAGE_TYPE_TEXT } from '@/constants'
-import { getFinalFeatureState } from '@/config/features'
+import { getFinalFeatureState } from '@/config/featurests'
 
 // 使用消息管理Hook
 const {

@@ -1,102 +1,123 @@
 {
-	"easycom": {
-		"autoscan": true,
-		"custom": {
-			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
-		}
-	},
-	"pages": [
-		{
-			"path": "pages/category/category",
-			"style": {}
-		},
-		{
-			"path": "pages/user/user",
-			"style": {}
-		},
-		{
-			"path": "pages/message/message",
-			"style": {}
-		},
-		{
-			"path": "pages/chat-detail/chat-detail",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/goods-detail/goods-detail",
-			"style": {}
-		},
-		{
-			"path": "pages/search/search",
-			"style": {
-				"navigationBarBackgroundColor": "#ffffff"
-			}
-		},
-		{
-			"path": "pages/order-list/order-list",
-			"style": {}
-		},
-		{
-			"path": "pages/dev-settings/dev-settings",
-			"style": {}
-		},
-		{
-			"path": "pages/tools/qr-generate/qr-generate",
-			"style": {
-				"navigationBarTitleText": "二维码生成",
-				"navigationBarBackgroundColor": "#007aff",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/tools/qr-decode/qr-decode",
-			"style": {
-				"navigationBarTitleText": "二维码识别",
-				"navigationBarBackgroundColor": "#007aff",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/tools/data-convert/data-convert",
-			"style": {
-				"navigationBarTitleText": "数据格式转换",
-				"navigationBarBackgroundColor": "#007aff",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/tools/image-process/image-process",
-			"style": {
-				"navigationBarTitleText": "图片处理",
-				"navigationBarBackgroundColor": "#007aff",
-				"navigationBarTextStyle": "white"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8",
-		"animationType": "slide-in-right",
-		"animationDuration": 300
-	},
-	"tabBar": {
-		"custom": true,
-		"color": "#888888",
-		"selectedColor": "#007aff",
-		"backgroundColor": "#ffffff",
-		"list": [
-			{
-				"pagePath": "pages/category/category",
-				"text": "工具"
-			},
-			{
-				"pagePath": "pages/user/user",
-				"text": "我的"
-			}
-		]
-	}
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/category/category",
+      "style": {}
+    },
+    {
+      "path": "pages/user/user",
+      "style": {}
+    },
+    {
+      "path": "pages/auth/callback",
+      "style": {
+        "navigationBarTitleText": "登录中..."
+      }
+    },
+    {
+      "path": "pages/auth/logout-success",
+      "style": {
+        "navigationBarTitleText": "已注销"
+      }
+    },
+    {
+      "path": "pages/auth/login-failed",
+      "style": {
+        "navigationBarTitleText": "登录失败"
+      }
+    },
+    {
+      "path": "pages/message/message",
+      "style": {}
+    },
+    {
+      "path": "pages/chat-detail/chat-detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/goods-detail/goods-detail",
+      "style": {}
+    },
+    {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/order-list/order-list",
+      "style": {}
+    },
+    {
+      "path": "pages/dev-settings/dev-settings",
+      "style": {}
+    },
+    {
+      "path": "pages/tools/qr-generate/qr-generate",
+      "style": {
+        "navigationBarTitleText": "二维码生成",
+        "navigationBarBackgroundColor": "#007aff",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/tools/qr-decode/qr-decode",
+      "style": {
+        "navigationBarTitleText": "二维码识别",
+        "navigationBarBackgroundColor": "#007aff",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/tools/data-convert/data-convert",
+      "style": {
+        "navigationBarTitleText": "数据格式转换",
+        "navigationBarBackgroundColor": "#007aff",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/tools/image-process/image-process",
+      "style": {
+        "navigationBarTitleText": "图片处理",
+        "navigationBarBackgroundColor": "#007aff",
+        "navigationBarTextStyle": "white"
+      }
+    }
+  ],
+  "h5": {
+    "router": { "mode": "history", "base": "/" }
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8",
+    "animationType": "slide-in-right",
+    "animationDuration": 300
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#888888",
+    "selectedColor": "#007aff",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/category/category",
+        "text": "工具"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "我的"
+      }
+    ]
+  }
 }

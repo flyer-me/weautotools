@@ -14,6 +14,6 @@ public class Initializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         roleService.initDefaultRoles();
-        System.out.println("默认Role(s)已初始化");
+        System.out.println("检查了默认Role(s)初始化");
     }
 }

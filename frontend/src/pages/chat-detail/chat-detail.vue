@@ -86,7 +86,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { navigate } from '@/utils/router.js'
+import { navigate } from '@/router/index.js'
 import { getFinalFeatureState, showFeatureDisabledToast } from '@/config/features'
 
 // 页面参数

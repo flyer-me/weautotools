@@ -1,23 +1,23 @@
-/**
- * 测试工具函数
- * 用于验证各个工具的基本功能
+﻿/**
+ * 娴嬭瘯宸ュ叿鍑芥暟
+ * 鐢ㄤ簬楠岃瘉鍚勪釜宸ュ叿鐨勫熀鏈姛鑳?
  */
 
-import { QRGenerator } from '@/tools/qrcode/generator.js'
-import { QRDecoder } from '@/tools/qrcode/decoder.js'
-import { DataConverter } from '@/tools/data/converter.js'
-import { ImageProcessor } from '@/tools/image/processor.js'
+import { QRGenerator } from '@/features/tools/qrcode/generator.js'
+import { QRDecoder } from '@/features/tools/qrcode/decoder.js'
+import { DataConverter } from '@/features/tools/data/converter.js'
+import { ImageProcessor } from '@/features/tools/image/processor.js'
 
 /**
- * 测试二维码生成功能
+ * 娴嬭瘯浜岀淮鐮佺敓鎴愬姛鑳?
  */
 export async function testQRGenerator() {
-  console.log('🧪 测试二维码生成功能...')
+  console.log('馃И 娴嬭瘯浜岀淮鐮佺敓鎴愬姛鑳?..')
   
   try {
     const generator = new QRGenerator()
     
-    // 测试基本生成
+    // 娴嬭瘯鍩烘湰鐢熸垚
     const result = await generator.generate('https://weautotools.com', {
       width: 256,
       color: {
@@ -26,7 +26,7 @@ export async function testQRGenerator() {
       }
     })
     
-    console.log('✅ 二维码生成成功:', {
+    console.log('鉁?浜岀淮鐮佺敓鎴愭垚鍔?', {
       size: result.size,
       width: result.width,
       height: result.height
@@ -34,141 +34,141 @@ export async function testQRGenerator() {
     
     return true
   } catch (error) {
-    console.error('❌ 二维码生成失败:', error.message)
+    console.error('鉂?浜岀淮鐮佺敓鎴愬け璐?', error.message)
     return false
   }
 }
 
 /**
- * 测试数据格式转换功能
+ * 娴嬭瘯鏁版嵁鏍煎紡杞崲鍔熻兘
  */
 export async function testDataConverter() {
-  console.log('🧪 测试数据格式转换功能...')
+  console.log('馃И 娴嬭瘯鏁版嵁鏍煎紡杞崲鍔熻兘...')
   
   try {
     const converter = new DataConverter()
     
-    // 测试JSON转YAML
+    // 娴嬭瘯JSON杞琘AML
     const jsonData = '{"name": "WeAutoTools", "version": "1.0.0", "tools": ["qrcode", "image", "pdf"]}'
     const yamlResult = converter.jsonToYaml(jsonData)
     
-    console.log('✅ JSON转YAML成功:', yamlResult.substring(0, 50) + '...')
+    console.log('鉁?JSON杞琘AML鎴愬姛:', yamlResult.substring(0, 50) + '...')
     
-    // 测试YAML转JSON
+    // 娴嬭瘯YAML杞琂SON
     const jsonResult = converter.yamlToJson(yamlResult)
     const parsedResult = JSON.parse(jsonResult)
     
-    console.log('✅ YAML转JSON成功:', parsedResult.name)
+    console.log('鉁?YAML杞琂SON鎴愬姛:', parsedResult.name)
     
-    // 测试格式验证
+    // 娴嬭瘯鏍煎紡楠岃瘉
     const validation = converter.validateJson(jsonData)
-    console.log('✅ JSON格式验证:', validation.valid ? '通过' : '失败')
+    console.log('鉁?JSON鏍煎紡楠岃瘉:', validation.valid ? '閫氳繃' : '澶辫触')
     
     return true
   } catch (error) {
-    console.error('❌ 数据格式转换失败:', error.message)
+    console.error('鉂?鏁版嵁鏍煎紡杞崲澶辫触:', error.message)
     return false
   }
 }
 
 /**
- * 测试图片处理功能（模拟）
+ * 娴嬭瘯鍥剧墖澶勭悊鍔熻兘锛堟ā鎷燂級
  */
 export async function testImageProcessor() {
-  console.log('🧪 测试图片处理功能...')
+  console.log('馃И 娴嬭瘯鍥剧墖澶勭悊鍔熻兘...')
   
   try {
     const processor = new ImageProcessor()
     
-    // 测试支持的格式
+    // 娴嬭瘯鏀寔鐨勬牸寮?
     const formats = processor.getSupportedOutputFormats()
-    console.log('✅ 支持的输出格式:', formats.map(f => f.label).join(', '))
+    console.log('鉁?鏀寔鐨勮緭鍑烘牸寮?', formats.map(f => f.label).join(', '))
     
-    // 测试预设尺寸
+    // 娴嬭瘯棰勮灏哄
     const sizes = processor.getPresetSizes()
-    console.log('✅ 预设尺寸数量:', sizes.length)
+    console.log('鉁?棰勮灏哄鏁伴噺:', sizes.length)
     
-    // 测试质量预设
+    // 娴嬭瘯璐ㄩ噺棰勮
     const qualities = processor.getQualityPresets()
-    console.log('✅ 质量预设数量:', qualities.length)
+    console.log('鉁?璐ㄩ噺棰勮鏁伴噺:', qualities.length)
     
     return true
   } catch (error) {
-    console.error('❌ 图片处理器初始化失败:', error.message)
+    console.error('鉂?鍥剧墖澶勭悊鍣ㄥ垵濮嬪寲澶辫触:', error.message)
     return false
   }
 }
 
 /**
- * 测试文件工具函数
+ * 娴嬭瘯鏂囦欢宸ュ叿鍑芥暟
  */
 export async function testFileUtils() {
-  console.log('🧪 测试文件工具函数...')
+  console.log('馃И 娴嬭瘯鏂囦欢宸ュ叿鍑芥暟...')
   
   try {
-    // 测试文件大小格式化
-    const { FileProcessor } = await import('@/tools/base/FileProcessor.js')
+    // 娴嬭瘯鏂囦欢澶у皬鏍煎紡鍖?
+    const { FileProcessor } = await import('@/features/tools/base/FileProcessor.js')
     const processor = new FileProcessor()
     
     const sizes = [1024, 1024 * 1024, 1024 * 1024 * 1024]
     const formatted = sizes.map(size => processor.formatFileSize(size))
     
-    console.log('✅ 文件大小格式化:', formatted.join(', '))
+    console.log('鉁?鏂囦欢澶у皬鏍煎紡鍖?', formatted.join(', '))
     
-    // 测试文件名生成
+    // 娴嬭瘯鏂囦欢鍚嶇敓鎴?
     const filename = processor.generateFileName('test.jpg', '_processed')
-    console.log('✅ 文件名生成:', filename)
+    console.log('鉁?鏂囦欢鍚嶇敓鎴?', filename)
     
     return true
   } catch (error) {
-    console.error('❌ 文件工具测试失败:', error.message)
+    console.error('鉂?鏂囦欢宸ュ叿娴嬭瘯澶辫触:', error.message)
     return false
   }
 }
 
 /**
- * 测试进度跟踪器
+ * 娴嬭瘯杩涘害璺熻釜鍣?
  */
 export async function testProgressTracker() {
-  console.log('🧪 测试进度跟踪器...')
+  console.log('馃И 娴嬭瘯杩涘害璺熻釜鍣?..')
   
   try {
-    const { ProgressTracker } = await import('@/tools/base/ProgressTracker.js')
+    const { ProgressTracker } = await import('@/features/tools/base/ProgressTracker.js')
     
     const tracker = new ProgressTracker(10, (status) => {
-      console.log(`进度: ${status.percentage}% - ${status.message}`)
+      console.log(`杩涘害: ${status.percentage}% - ${status.message}`)
     })
     
     tracker.start()
     
-    // 模拟进度更新
+    // 妯℃嫙杩涘害鏇存柊
     for (let i = 1; i <= 10; i++) {
-      tracker.increment(1, `处理第 ${i} 项`)
+      tracker.increment(1, `澶勭悊绗?${i} 椤筦)
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     
-    tracker.complete('测试完成')
+    tracker.complete('娴嬭瘯瀹屾垚')
     
-    console.log('✅ 进度跟踪器测试完成')
+    console.log('鉁?杩涘害璺熻釜鍣ㄦ祴璇曞畬鎴?)
     return true
   } catch (error) {
-    console.error('❌ 进度跟踪器测试失败:', error.message)
+    console.error('鉂?杩涘害璺熻釜鍣ㄦ祴璇曞け璐?', error.message)
     return false
   }
 }
 
 /**
- * 运行所有测试
+ * 杩愯鎵€鏈夋祴璇?
  */
 export async function runAllTests() {
-  console.log('🚀 开始运行所有测试...')
+  console.log('馃殌 寮€濮嬭繍琛屾墍鏈夋祴璇?..')
   
   const tests = [
-    { name: '二维码生成', test: testQRGenerator },
-    { name: '数据格式转换', test: testDataConverter },
-    { name: '图片处理', test: testImageProcessor },
-    { name: '文件工具', test: testFileUtils },
-    { name: '进度跟踪', test: testProgressTracker }
+    { name: '浜岀淮鐮佺敓鎴?, test: testQRGenerator },
+    { name: '鏁版嵁鏍煎紡杞崲', test: testDataConverter },
+    { name: '鍥剧墖澶勭悊', test: testImageProcessor },
+    { name: '鏂囦欢宸ュ叿', test: testFileUtils },
+    { name: '杩涘害璺熻釜', test: testProgressTracker }
   ]
   
   const results = []
@@ -178,30 +178,30 @@ export async function runAllTests() {
       const result = await test()
       results.push({ name, success: result })
     } catch (error) {
-      console.error(`❌ ${name}测试异常:`, error.message)
+      console.error(`鉂?${name}娴嬭瘯寮傚父:`, error.message)
       results.push({ name, success: false, error: error.message })
     }
   }
   
-  // 输出测试结果
-  console.log('\n📊 测试结果汇总:')
+  // 杈撳嚭娴嬭瘯缁撴灉
+  console.log('\n馃搳 娴嬭瘯缁撴灉姹囨€?')
   console.log('=' * 50)
   
   const successful = results.filter(r => r.success)
   const failed = results.filter(r => !r.success)
   
   successful.forEach(r => {
-    console.log(`✅ ${r.name}: 通过`)
+    console.log(`鉁?${r.name}: 閫氳繃`)
   })
   
   failed.forEach(r => {
-    console.log(`❌ ${r.name}: 失败 ${r.error ? `(${r.error})` : ''}`)
+    console.log(`鉂?${r.name}: 澶辫触 ${r.error ? `(${r.error})` : ''}`)
   })
   
-  console.log(`\n总计: ${results.length} 项测试`)
-  console.log(`通过: ${successful.length} 项`)
-  console.log(`失败: ${failed.length} 项`)
-  console.log(`成功率: ${((successful.length / results.length) * 100).toFixed(1)}%`)
+  console.log(`\n鎬昏: ${results.length} 椤规祴璇昤)
+  console.log(`閫氳繃: ${successful.length} 椤筦)
+  console.log(`澶辫触: ${failed.length} 椤筦)
+  console.log(`鎴愬姛鐜? ${((successful.length / results.length) * 100).toFixed(1)}%`)
   
   return {
     total: results.length,
@@ -212,15 +212,15 @@ export async function runAllTests() {
 }
 
 /**
- * 性能测试
+ * 鎬ц兘娴嬭瘯
  */
 export async function performanceTest() {
-  console.log('⚡ 开始性能测试...')
+  console.log('鈿?寮€濮嬫€ц兘娴嬭瘯...')
   
   const startTime = performance.now()
   
   try {
-    // 测试二维码批量生成性能
+    // 娴嬭瘯浜岀淮鐮佹壒閲忕敓鎴愭€ц兘
     const generator = new QRGenerator()
     const texts = Array.from({ length: 10 }, (_, i) => `Test QR Code ${i + 1}`)
     
@@ -231,38 +231,38 @@ export async function performanceTest() {
     const batchTime = batchEndTime - batchStartTime
     const avgTime = batchTime / texts.length
     
-    console.log(`✅ 批量生成 ${texts.length} 个二维码`)
-    console.log(`总耗时: ${batchTime.toFixed(2)}ms`)
-    console.log(`平均耗时: ${avgTime.toFixed(2)}ms/个`)
+    console.log(`鉁?鎵归噺鐢熸垚 ${texts.length} 涓簩缁寸爜`)
+    console.log(`鎬昏€楁椂: ${batchTime.toFixed(2)}ms`)
+    console.log(`骞冲潎鑰楁椂: ${avgTime.toFixed(2)}ms/涓猔)
     
     const endTime = performance.now()
     const totalTime = endTime - startTime
     
-    console.log(`\n⚡ 性能测试完成，总耗时: ${totalTime.toFixed(2)}ms`)
+    console.log(`\n鈿?鎬ц兘娴嬭瘯瀹屾垚锛屾€昏€楁椂: ${totalTime.toFixed(2)}ms`)
     
     return {
       totalTime,
       batchTime,
       avgTime,
-      throughput: (texts.length / (batchTime / 1000)).toFixed(2) + ' QR/秒'
+      throughput: (texts.length / (batchTime / 1000)).toFixed(2) + ' QR/绉?
     }
   } catch (error) {
-    console.error('❌ 性能测试失败:', error.message)
+    console.error('鉂?鎬ц兘娴嬭瘯澶辫触:', error.message)
     return null
   }
 }
 
 /**
- * 内存使用测试
+ * 鍐呭瓨浣跨敤娴嬭瘯
  */
 export function memoryTest() {
   if (typeof performance !== 'undefined' && performance.memory) {
     const memory = performance.memory
     
-    console.log('💾 内存使用情况:')
-    console.log(`已使用: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`)
-    console.log(`总分配: ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`)
-    console.log(`限制: ${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB`)
+    console.log('馃捑 鍐呭瓨浣跨敤鎯呭喌:')
+    console.log(`宸蹭娇鐢? ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`)
+    console.log(`鎬诲垎閰? ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`)
+    console.log(`闄愬埗: ${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB`)
     
     return {
       used: memory.usedJSHeapSize,
@@ -270,7 +270,8 @@ export function memoryTest() {
       limit: memory.jsHeapSizeLimit
     }
   } else {
-    console.log('💾 当前环境不支持内存监控')
+    console.log('馃捑 褰撳墠鐜涓嶆敮鎸佸唴瀛樼洃鎺?)
     return null
   }
 }
+

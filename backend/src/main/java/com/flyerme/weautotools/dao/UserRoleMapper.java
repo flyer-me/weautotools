@@ -5,9 +5,11 @@ import com.flyerme.weautotools.entity.UserRole;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.io.Serializable;
+
 @Mapper
 public interface UserRoleMapper extends BaseMapper<UserRole> {
 
     @Insert("insert into user_roles (user_id, role_id) values (#{userId}, #{roleId})")
-    int save(Long userId, Long roleId);
+    int save(Serializable userId, Serializable roleId);
 }

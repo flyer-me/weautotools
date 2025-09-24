@@ -1,11 +1,27 @@
 import { defineConfig } from 'vite'
 import uni from '@dcloudio/vite-plugin-uni'
+import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [uni()],
+  plugins: [
+    uni({
+      exclude: [
+        'node_modules'
+      ]
+    })
+  ],
+  server: {
+      // 确保前端开发服务器与后端CORS和客户端配置匹配
+      port: 5173,
+    },
   define: {
     global: 'globalThis',
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
   },
   optimizeDeps: {
     include: [

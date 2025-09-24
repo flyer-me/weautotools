@@ -134,10 +134,10 @@
 
 <script setup>
 import { ref, computed, nextTick } from 'vue'
-import ToolContainer from '@/components/tools/ToolContainer.vue'
-import FileUploader from '@/components/tools/FileUploader.vue'
-import { QRDecoder } from '@/tools/qrcode/decoder.js'
-import { ProgressTracker } from '@/tools/base/ProgressTracker.js'
+import ToolContainer from '@/features/tools/shared/components/ToolContainer.vue'
+import FileUploader from '@/features/tools/shared/components/FileUploader.vue'
+import { QRDecoder } from '@/features/tools/qrcode/decoder.js'
+import { ProgressTracker } from '@/features/tools/base/ProgressTracker.js'
 import { useUsageLimit } from '@/composables/useUsageLimit'
 
 // 响应式数据

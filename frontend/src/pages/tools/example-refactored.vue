@@ -78,10 +78,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import SettingGroup from '@/components/tools/SettingGroup.vue'
-import OptionPicker from '@/components/tools/OptionPicker.vue'
-import PresetButtons from '@/components/tools/PresetButtons.vue'
-import FormInput from '@/components/tools/FormInput.vue'
+import SettingGroup from '@/features/tools/shared/components/SettingGroup.vue'
+import OptionPicker from '@/features/tools/shared/components/OptionPicker.vue'
+import PresetButtons from '@/features/tools/shared/components/PresetButtons.vue'
+import FormInput from '@/features/tools/shared/components/FormInput.vue'
 
 // 响应式数据
 const selectedMode = ref(0)

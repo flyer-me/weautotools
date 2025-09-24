@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
 import java.time.Duration;
+import java.util.UUID;
 
 /**
  * OAuth2客户端配置
@@ -38,7 +40,11 @@ public class OAuth2ClientConfig {
             RegisteredClient client = createWeAutoToolsClient();
             repository.save(client);
         }
-        
+
+        if (repository.findByClientId("weautotools-frontend-client") == null) {
+            RegisteredClient client = createWeAutoToolsFrontendClient();
+            repository.save(client);
+        }
         return repository;
     }
 
@@ -62,6 +68,28 @@ public class OAuth2ClientConfig {
                         .accessTokenTimeToLive(Duration.ofHours(2))
                         .refreshTokenTimeToLive(Duration.ofDays(30))
                         .reuseRefreshTokens(true)
+                        .build())
+                .build();
+    }
+
+    // 注册 SPA 客户端（公共客户端 + PKCE）
+    private RegisteredClient createWeAutoToolsFrontendClient() {
+        return RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("weautotools-frontend-client") // 前端应用的客户端ID
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("http://localhost:5173/callback")  // 前端应用的回调地址 (登录成功后跳转)
+                .postLogoutRedirectUri("http://localhost:5173/logout-success")
+                // 5. 定义允许的权限范围 (scope)
+                .scope(OidcScopes.OPENID) // 必须，用于OIDC流程
+                .scope(OidcScopes.PROFILE) // 获取用户信息
+                .scope("api.read") // 自定义API权限
+                .scope("api.write")
+                // 6. 关键：开启PKCE要求
+                .clientSettings(ClientSettings.builder()
+                        .requireProofKey(true)
+                        .requireAuthorizationConsent(false) // TODO 验证
                         .build())
                 .build();
     }
