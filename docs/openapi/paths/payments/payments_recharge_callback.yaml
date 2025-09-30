@@ -1,0 +1,14 @@
+post:
+  tags:
+    - Payment
+  summary: 第三方支付回调（服务端到服务端）
+  description: 支付网关用于通知支付结果的回调。实现必须验证签名并具备幂等等处理能力。
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+  responses:
+    '200':
+      description: OK

@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: WeAutoTools - 合并 API（资源 + 授权 + 使用限制）
+  title: WeAutoTools - 合并 API(资源 + 授权 + 使用限制)
   description: >-
-    本规范包含钱包 / 支付 / 商家 管理等资源 API，授权服务器端点（Spring Authorization Server）。
+    本规范包含钱包 / 支付 / 商家 管理等资源 API，授权服务器端点(Spring Authorization Server)。
   version: 1.0.0
 servers:
   - url: https://api.weautotools.com/v1
@@ -22,45 +22,47 @@ tags:
   - name: Admin
     description: 平台管理与运维相关接口
   - name: Auth
-    description: 授权服务器端点（OAuth2 / OIDC）
+    description: 授权服务器端点(OAuth2 / OIDC)
   - name: Usage-Limits
     description: 平台使用次数/频率限制管理
 
 paths:
   /wallet:
-    $ref: './openapi/paths/wallet/wallet.yaml'
+    $ref: './openapi/paths/wallet.yaml'
   /wallet/transactions:
-    $ref: './openapi/paths/wallet/wallet_transactions.yaml'
+    $ref: './openapi/paths/wallet_transactions.yaml'
   /payments/recharge:
-    $ref: './openapi/paths/payments/payments_recharge.yaml'
+    $ref: './openapi/paths/payments_recharge.yaml'
   /payments/recharge/callback:
-    $ref: './openapi/paths/payments/payments_recharge_callback.yaml'
+    $ref: './openapi/paths/payments_recharge_callback.yaml'
   /orders:
-    $ref: './openapi/paths/payments/orders.yaml'
+    $ref: './openapi/paths/orders.yaml'
   /merchants/apply:
-    $ref: './openapi/paths/merchants/merchants_apply.yaml'
+    $ref: './openapi/paths/merchants_apply.yaml'
   /merchants/{merchantId}/products:
-    $ref: './openapi/paths/merchants/merchants_products.yaml'
+    $ref: './openapi/paths/merchants_products.yaml'
   /health:
     $ref: './openapi/paths/health.yaml'
   /metrics:
     $ref: './openapi/paths/metrics.yaml'
   /admin/audit:
-    $ref: './openapi/paths/admin/admin_audit.yaml'
+    $ref: './openapi/paths/admin_audit.yaml'
   /admin/users:
-    $ref: './openapi/paths/admin/admin_users.yaml'
+    $ref: './openapi/paths/admin_users.yaml'
   /files/upload:
-    $ref: './openapi/paths/infra/files_upload.yaml'
+    $ref: './openapi/paths/files_upload.yaml'
   /webhooks/{source}:
-    $ref: './openapi/paths/infra/webhooks_source.yaml'
+    $ref: './openapi/paths/webhooks_source.yaml'
   /admin/reconciliation:
-    $ref: './openapi/paths/admin/admin_reconciliation.yaml'
+    $ref: './openapi/paths/admin_reconciliation.yaml'
   /admin/settlements:
-    $ref: './openapi/paths/admin/admin_settlements.yaml'
+    $ref: './openapi/paths/admin_settlements.yaml'
   /.well-known/jwks.json:
-    $ref: './openapi/paths/infra/wellknown_jwks.yaml'
+    $ref: './openapi/paths/wellknown_jwks.yaml'
   /.well-known/oauth-authorization-server:
-    $ref: './openapi/paths/infra/wellknown_oauth_metadata.yaml'
+    $ref: './openapi/paths/wellknown_oauth_metadata.yaml'
+  /userinfo:
+    $ref: './openapi/paths/userinfo.yaml'
   /api/usage-limits/check:
     $ref: './openapi/paths/usage_check.yaml'
   /api/usage-limits/configs:

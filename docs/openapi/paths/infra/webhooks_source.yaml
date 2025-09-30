@@ -1,0 +1,20 @@
+post:
+  tags:
+    - Admin
+  summary: 通用 Webhook 接收端
+  description: 接收来自外部提供商的 webhook。请为每个提供商实现签名验证与幂等处理。
+  parameters:
+    - name: source
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+  responses:
+    '200':
+      description: Received

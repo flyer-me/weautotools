@@ -23,7 +23,6 @@ class ResultTest {
         assertEquals(ResultCode.SUCCESS.getCode(), result.getCode());
         assertEquals(ResultCode.SUCCESS.getMessage(), result.getMessage());
         assertEquals("测试数据", result.getData());
-        assertNotNull(result.getTimestamp());
     }
 
     @Test
@@ -34,7 +33,6 @@ class ResultTest {
         assertEquals(ResultCode.SUCCESS.getCode(), result.getCode());
         assertEquals("操作成功", result.getMessage());
         assertEquals("测试数据", result.getData());
-        assertNotNull(result.getTimestamp());
     }
 
     @Test
@@ -45,7 +43,6 @@ class ResultTest {
         assertEquals(ResultCode.INTERNAL_SERVER_ERROR.getCode(), result.getCode());
         assertEquals("操作失败", result.getMessage());
         assertNull(result.getData());
-        assertNotNull(result.getTimestamp());
     }
 
     @Test
@@ -56,7 +53,6 @@ class ResultTest {
         assertEquals(4001, result.getCode());
         assertEquals("认证失败", result.getMessage());
         assertNull(result.getData());
-        assertNotNull(result.getTimestamp());
     }
 
     @Test
@@ -67,7 +63,6 @@ class ResultTest {
         assertEquals(ResultCode.AUTH_FAILED.getCode(), result.getCode());
         assertEquals(ResultCode.AUTH_FAILED.getMessage(), result.getMessage());
         assertNull(result.getData());
-        assertNotNull(result.getTimestamp());
     }
 
     @Test
@@ -78,6 +73,5 @@ class ResultTest {
         assertEquals(ResultCode.SUCCESS.getCode(), result.getCode());
         assertEquals(ResultCode.SUCCESS.getMessage(), result.getMessage());
         assertEquals("测试数据", result.getData());
-        assertNotNull(result.getTimestamp());
     }
 }

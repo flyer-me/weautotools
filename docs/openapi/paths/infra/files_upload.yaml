@@ -1,0 +1,27 @@
+post:
+  tags:
+    - Admin
+  summary: 上传文件（multipart）
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+  responses:
+    '201':
+      description: 文件已上传
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              url:
+                type: string

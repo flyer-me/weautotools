@@ -1,0 +1,28 @@
+post:
+  tags:
+    - Payment
+  summary: 创建充值订单
+  security:
+    - oAuth2: [write:payment]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/components.yaml#/schemas/CreateRechargeRequest'
+  responses:
+    '201':
+      description: 充值订单已创建
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/components.yaml#/schemas/ResultRechargeOrder'
+          examples:
+            created:
+              value:
+                code: 201
+                message: 已创建
+                data:
+                  id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  status: PENDING
+                  payment_payload: {}

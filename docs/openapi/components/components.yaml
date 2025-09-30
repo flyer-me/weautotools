@@ -1,0 +1,238 @@
+schemas:
+  ResultBase:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+      data:
+        type: object
+  ResultWallet:
+    allOf:
+      - $ref: '#/schemas/ResultBase'
+      - type: object
+        properties:
+          data:
+            $ref: '#/schemas/Wallet'
+  ResultTransactions:
+    allOf:
+      - $ref: '#/schemas/ResultBase'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: '#/schemas/WalletTransaction'
+  ResultRechargeOrder:
+    allOf:
+      - $ref: '#/schemas/ResultBase'
+      - type: object
+        properties:
+          data:
+            $ref: '#/schemas/RechargeOrder'
+  ResultPaymentOrder:
+    allOf:
+      - $ref: '#/schemas/ResultBase'
+      - type: object
+        properties:
+          data:
+            $ref: '#/schemas/PaymentOrder'
+  ResultProduct:
+    allOf:
+      - $ref: '#/schemas/ResultBase'
+      - type: object
+        properties:
+          data:
+            $ref: '#/schemas/Product'
+  Wallet:
+    type: object
+    properties:
+      balance:
+        type: integer
+        format: int64
+        description: 以分为单位的可用余额
+      frozen_amount:
+        type: integer
+        format: int64
+        description: 以分为单位的冻结余额
+      currency:
+        type: string
+        example: CNY
+  WalletTransaction:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      tx_type:
+        type: string
+        enum: [RECHARGE, CONSUME, REFUND, ADJUST]
+      amount:
+        type: integer
+        format: int64
+      balance_after:
+        type: integer
+        format: int64
+      created_at:
+        type: string
+        format: date-time
+  CreateRechargeRequest:
+    type: object
+    required:
+      - amount
+      - payment_method
+      - idempotency_key
+    properties:
+      amount:
+        type: integer
+        format: int64
+        example: 10000
+        description: 以分为单位的金额
+      payment_method:
+        type: string
+        enum: [ALIPAY, WECHAT, BANK]
+      idempotency_key:
+        type: string
+        format: uuid
+        example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  RechargeOrder:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      status:
+        type: string
+      payment_payload:
+        type: object
+  CreateOrderRequest:
+    type: object
+    required:
+      - items
+      - idempotency_key
+    properties:
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            item_id:
+              type: string
+            quantity:
+              type: integer
+      idempotency_key:
+        type: string
+        format: uuid
+  PaymentOrder:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      status:
+        type: string
+  MerchantApplication:
+    type: object
+    properties:
+      name:
+        type: string
+      contact:
+        type: object
+  Product:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      title:
+        type: string
+      price:
+        type: integer
+        format: int64
+      pricing_rule:
+        type: object
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+      details:
+        type: object
+  Pagination:
+    type: object
+    properties:
+      page:
+        type: integer
+      size:
+        type: integer
+      total:
+        type: integer
+  AuditEntry:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      principal:
+        type: string
+      action:
+        type: string
+      resource:
+        type: string
+      timestamp:
+        type: string
+        format: date-time
+      metadata:
+        type: object
+  PaginatedUsers:
+    type: object
+    properties:
+      total:
+        type: integer
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            username:
+              type: string
+            email:
+              type: string
+  SettlementBatch:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+      status:
+        type: string
+      amount:
+        type: integer
+        format: int64
+      created_at:
+        type: string
+        format: date-time
+securitySchemes:
+  oAuth2:
+    type: oauth2
+    flows:
+      authorizationCode:
+        authorizationUrl: https://auth.example.com/oauth2/authorize
+        tokenUrl: https://auth.example.com/oauth2/token
+        scopes:
+          read:wallet: 读取钱包信息
+          write:payment: 执行支付操作
+          write:merchant: 管理商家账号
+          write:product: 管理商品
+          admin:read: 读取管理资源
+          admin:write: 修改管理资源
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

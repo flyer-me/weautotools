@@ -4,12 +4,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @TableName("roles")
 public class Role {
 
-    private String id;
+    private UUID id;
 
     private String name; // 如 "ROLE_ADMIN"
 

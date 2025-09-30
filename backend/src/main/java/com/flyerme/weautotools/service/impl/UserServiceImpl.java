@@ -1,5 +1,6 @@
 package com.flyerme.weautotools.service.impl;
 
+import com.flyerme.weautotools.common.BusinessException;
 import com.flyerme.weautotools.dao.RoleMapper;
 import com.flyerme.weautotools.dao.UserMapper;
 import com.flyerme.weautotools.dao.UserRoleMapper;
@@ -26,7 +27,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void assignDefaultRole(User user) {
         Role role = roleMapper.findDefaultRole();
-        userRoleMapper.save(user.getId(), role.getId());
+        int result = userRoleMapper.save(user.getId(), role.getId());
+        if (result != 1) {
+            throw new BusinessException("为用户分配默认role异常");
+        }
     }
     
     @Override

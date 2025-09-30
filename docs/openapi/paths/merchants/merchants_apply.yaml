@@ -1,0 +1,15 @@
+post:
+  tags:
+    - Merchant
+  summary: 申请成为商家账号
+  security:
+    - oAuth2: [write:merchant]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/components.yaml#/schemas/MerchantApplication'
+  responses:
+    '202':
+      description: 申请已接受，等待审核

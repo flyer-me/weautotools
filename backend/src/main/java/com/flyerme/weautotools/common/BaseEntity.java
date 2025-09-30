@@ -9,10 +9,11 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * 基础实体类
- * 包含通用字段：id、创建时间、更新时间、逻辑删除标记
+ * 包含通用字段：id、创建时间、更新时间、逻辑删除标记、版本号
  *
  * @author WeAutoTools Team
  * @version 1.0.0
@@ -24,20 +25,16 @@ public abstract class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    protected String id;
+    @TableId
+    protected UUID id;
 
-    private Instant createdAt;
+    protected Instant createdAt;
 
-    private Instant updatedAt;
+    protected Instant updatedAt;
 
-    /**
-     * 逻辑删除标记
-     * 0: 未删除, 1: 已删除
-     */
     @TableLogic
-    private Integer deleted = 0;
+    protected Integer deleted = 0;
 
     @Version
-    private Integer version = 0;
+    protected Integer version = 0;
 }

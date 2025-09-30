@@ -2,10 +2,10 @@ package com.flyerme.weautotools.entity;
 
 import lombok.Data;
 
-import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 public class UserRole {
-    private Serializable userId;
-    private Serializable roleId;
+    private UUID userId;
+    private UUID roleId;
 }

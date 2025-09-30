@@ -1,0 +1,19 @@
+post:
+  tags:
+    - Payment
+  summary: 创建支付订单
+  security:
+    - oAuth2: [write:payment]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/components.yaml#/schemas/CreateOrderRequest'
+  responses:
+    '201':
+      description: 订单已创建
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/components.yaml#/schemas/ResultPaymentOrder'

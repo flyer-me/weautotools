@@ -1,0 +1,25 @@
+post:
+  tags:
+    - Merchant
+  summary: 创建商品
+  security:
+    - oAuth2: [write:product]
+  parameters:
+    - name: merchantId
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/components.yaml#/schemas/Product'
+  responses:
+    '201':
+      description: 商品已创建
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/components.yaml#/schemas/ResultProduct'

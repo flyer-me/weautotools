@@ -1,0 +1,39 @@
+get:
+  tags:
+    - Admin
+  summary: 查询审计日志条目
+  parameters:
+    - in: query
+      name: start
+      schema:
+        type: string
+        format: date-time
+    - in: query
+      name: end
+      schema:
+        type: string
+        format: date-time
+    - in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        default: 50
+  responses:
+    '200':
+      description: 审计日志条目列表
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+              items:
+                type: array
+                items:
+                  $ref: '../../components/components.yaml#/schemas/AuditEntry'

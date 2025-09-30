@@ -1,0 +1,38 @@
+name: OpenAPI Spectral Lint
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/openapi-spectral.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+
+jobs:
+  spectral-lint:
+    name: Spectral lint OpenAPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Spectral and OAS ruleset
+        run: |
+          npm install --no-save @stoplight/spectral-cli @stoplight/spectral/rulesets/oas
+
+      - name: Run Spectral lint
+        run: |-
+          # Lint the repository's main OpenAPI index. Use ruleset installed in node_modules.
+          TARGET="docs/openapi.yaml"
+          if [ -f "$TARGET" ]; then
+            npx @stoplight/spectral-cli@6 lint "$TARGET" --ruleset "node_modules/@stoplight/spectral/rulesets/oas/index.json" --fail-severity error
+          else
+            echo "File $TARGET not found; attempting docs/openapi/openapi.yaml"
+            npx @stoplight/spectral-cli@6 lint "docs/openapi/openapi.yaml" --ruleset "node_modules/@stoplight/spectral/rulesets/oas/index.json" --fail-severity error
+          fi

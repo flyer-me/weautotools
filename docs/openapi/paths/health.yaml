@@ -1,0 +1,16 @@
+get:
+  tags:
+    - Admin
+  summary: 服务健康检查
+  description: 轻量级健康检查端点，适用于负载均衡和可用性监控。更详细的指标请使用 /metrics（Prometheus）。
+  responses:
+    '200':
+      description: 服务状态正常
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: UP

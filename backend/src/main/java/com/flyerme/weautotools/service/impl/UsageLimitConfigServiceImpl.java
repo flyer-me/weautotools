@@ -51,8 +51,7 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
     public UsageLimitConfigResponse createConfig(UsageLimitConfigRequest request) {
         // 检查是否已存在相同配置
         LambdaQueryWrapper<ToolUsageLimit> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ToolUsageLimit::getToolName, request.getToolName())
-                   .eq(ToolUsageLimit::getUserType, request.getUserType())
+        queryWrapper.eq(ToolUsageLimit::getUserType, request.getUserType())
                    .eq(ToolUsageLimit::getLimitType, request.getLimitType())
                    .eq(ToolUsageLimit::getDeleted, 0);
         
@@ -82,8 +81,7 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
 
         // 检查是否与其他配置冲突
         LambdaQueryWrapper<ToolUsageLimit> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ToolUsageLimit::getToolName, request.getToolName())
-                   .eq(ToolUsageLimit::getUserType, request.getUserType())
+        queryWrapper.eq(ToolUsageLimit::getUserType, request.getUserType())
                    .eq(ToolUsageLimit::getLimitType, request.getLimitType())
                    .eq(ToolUsageLimit::getDeleted, 0)
                    .ne(ToolUsageLimit::getId, request.getId());
@@ -94,8 +92,6 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
         }
 
         // 更新配置
-        existingConfig.setToolType(request.getToolType());
-        existingConfig.setToolName(request.getToolName());
         existingConfig.setUserType(request.getUserType());
         existingConfig.setLimitType(request.getLimitType());
         existingConfig.setLimitCount(request.getLimitCount());
@@ -144,8 +140,6 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
     private UsageLimitConfigResponse convertToResponse(ToolUsageLimit config) {
         UsageLimitConfigResponse response = new UsageLimitConfigResponse();
         response.setId(config.getId());
-        response.setToolType(config.getToolType());
-        response.setToolName(config.getToolName());
         response.setUserType(config.getUserType());
         response.setLimitType(config.getLimitType());
         response.setLimitCount(config.getLimitCount());
@@ -160,8 +154,6 @@ public class UsageLimitConfigServiceImpl implements UsageLimitConfigService {
      */
     private ToolUsageLimit convertFromRequest(UsageLimitConfigRequest request) {
         ToolUsageLimit config = new ToolUsageLimit();
-        config.setToolType(request.getToolType());
-        config.setToolName(request.getToolName());
         config.setUserType(request.getUserType());
         config.setLimitType(request.getLimitType());
         config.setLimitCount(request.getLimitCount());

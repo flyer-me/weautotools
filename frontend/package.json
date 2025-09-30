@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "WeAutoTools 前端 - 基于uniapp的自动化工具平台",
   "scripts": {
+    "generate:api-client": "npx @openapitools/openapi-generator-cli generate -g typescript-axios -i ../docs/openapi_combined.yaml -o src/api-client",
     "dev:custom": "uni -p",
     "dev:h5": "uni",
     "dev:h5:ssr": "uni --ssr",
@@ -36,6 +37,7 @@
     "build:quickapp-webview-huawei": "uni build -p quickapp-webview-huawei",
     "build:quickapp-webview-union": "uni build -p quickapp-webview-union"
   },
+  
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-4070620250821001",
     "@dcloudio/uni-app-harmony": "3.0.0-4070620250821001",

@@ -1,0 +1,12 @@
+get:
+  tags:
+    - Admin
+  summary: Prometheus 指标出口（文本格式）
+  description: 返回 Prometheus 格式的指标（文本）。
+  responses:
+    '200':
+      description: 指标文本
+      content:
+        text/plain:
+          schema:
+            type: string

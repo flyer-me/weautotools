@@ -104,3 +104,6 @@ application-*.yml
 !application-*.yml.example
 qodana.yaml
 .qoder/
+
+# Ignore generated API client
+frontend/src/api-client/

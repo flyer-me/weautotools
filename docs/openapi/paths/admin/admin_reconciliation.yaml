@@ -1,0 +1,15 @@
+post:
+  tags:
+    - Admin
+  summary: 管理-对账操作
+  security:
+    - oAuth2: [admin:write]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+  responses:
+    '202':
+      description: 对账任务已接受

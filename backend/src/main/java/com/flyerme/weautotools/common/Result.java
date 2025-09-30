@@ -36,13 +36,7 @@ public class Result<T> implements Serializable {
      */
     private T data;
 
-    /**
-     * 时间戳
-     */
-    private Instant timestamp;
-
     public Result() {
-        this.timestamp = Instant.now();
     }
 
     public Result(Integer code, String message) {
