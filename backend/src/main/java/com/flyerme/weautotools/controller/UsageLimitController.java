@@ -66,20 +66,6 @@ public class UsageLimitController extends BaseController {
     }
 
     /**
-     * 获取所有限制配置
-     */
-    @GetMapping("/configs")
-    public Result<List<UsageLimitConfigResponse>> getAllConfigs() {
-        try {
-            List<UsageLimitConfigResponse> configs = usageLimitConfigService.getAllConfigs();
-            return Result.success(configs);
-        } catch (Exception e) {
-            log.error("获取限制配置异常", e);
-            return Result.error("获取限制配置失败");
-        }
-    }
-
-    /**
      * 根据ID获取限制配置
      */
     @GetMapping("/configs/{id}")

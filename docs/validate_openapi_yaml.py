@@ -1,11 +1,15 @@
-import sys
-import yaml
-p = r'f:/User_Data/Code/weautotools/docs/openapi_v2.yaml'
-try:
-    with open(p, 'r', encoding='utf-8') as f:
-        yaml.safe_load(f)
-    print('YAML PARSE: OK')
-except Exception as e:
-    print('YAML PARSE: ERROR')
-    print(e)
-    sys.exit(1)
+import yaml,sys,glob
+paths=glob.glob('docs/openapi/**/*.yaml',recursive=True)+['docs/openapi.yaml']
+paths=list(set(paths))
+ok=True
+for p in sorted(paths):
+    try:
+        with open(p,'r',encoding='utf-8') as fh:
+            yaml.safe_load(fh)
+        print(p+" -> PARSE OK")
+    except Exception as e:
+        print(p+" -> PARSE ERROR: "+str(e))
+        ok=False
+if not ok:
+    sys.exit(2)
+print('ALL PARSE OK')
